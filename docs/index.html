@@ -324,6 +324,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 const canvas = document.getElementById('scene');
 const requestedMap = new URLSearchParams(location.search).get('map') || 'derail';
 const MAP = requestedMap.toLowerCase() === 'derail' ? 'derail' : requestedMap;
+const MAP_FILE_CODE = MAP === 'derail' ? 'Derail' : MAP;
 const MAP_ROOT = './map/' + MAP + '/';
 let viewRoll = 0;
 function mapRollFor(code) {
@@ -671,7 +672,7 @@ async function parseMfpk(url) {
 async function getMfpk(name) {
   if (mfpkCache[name]) return mfpkCache[name];
   try {
-    const pkg = await parseMfpk(MAP_ROOT + MAP + '_' + name + '.mfpk');
+    const pkg = await parseMfpk(MAP_ROOT + MAP_FILE_CODE + '_' + name + '.mfpk');
     mfpkCache[name] = pkg;
     return pkg;
   } catch (error) {
@@ -718,7 +719,7 @@ function instanceFromGltf(group, entry, insts, name, meshIndex, gltf) {
 
 async function loadTilesFromMfpk(manifest) {
   const pkg = await getMfpk('low');
-  if (!pkg) throw new Error('缺少低精度 MFPK 数据包：' + MAP + '_low.mfpk');
+  if (!pkg) throw new Error('缺少低精度 MFPK 数据包：' + MAP_FILE_CODE + '_low.mfpk');
   const queue = [...manifest.tiles];
   const workers = Array.from({ length: 6 }, async () => {
     while (queue.length) {
@@ -792,7 +793,7 @@ async function loadTier(name) {
     byMesh.get(inst[0]).push(inst);
   }
   const pkg = await getMfpk(name);
-  if (!pkg) throw new Error('缺少 MFPK 数据包：' + MAP + '_' + name + '.mfpk');
+  if (!pkg) throw new Error('缺少 MFPK 数据包：' + MAP_FILE_CODE + '_' + name + '.mfpk');
   const jobs = [...byMesh.keys()];
   const total = jobs.length;
   let done = 0;
@@ -1840,7 +1841,8 @@ function loadBallistics() {
     .then((doc) => {
       ballisticsData = doc;
       ballisticWeapons = doc.weapons || [];
-      return fetch(`./data/fixed_weapons/${MAP}.json`).then((r) => r.json()).catch(() => []);
+      return fetch('./data/fixed_weapons/index.json').then((r) => r.json())
+        .then((all) => all[MAP_FILE_CODE] || []).catch(() => []);
     })
     .then((fw) => {
       sceneFixedWeapons = fw;
