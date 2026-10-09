@@ -1,0 +1,200 @@
+[
+  {
+    "name": "BP_SceneAAGun_LD3000_C_2",
+    "type": "vulcan",
+    "weaponId": "fixed_18990000023",
+    "position": [
+      2574.37,
+      -94.7,
+      -1394.28
+    ],
+    "yaw": 89.12
+  },
+  {
+    "name": "BP_SceneAAGun_LD3000_C_3",
+    "type": "vulcan",
+    "weaponId": "fixed_18990000023",
+    "position": [
+      2514.89,
+      -82.18,
+      -1654.55
+    ],
+    "yaw": 69.74
+  },
+  {
+    "name": "BP_SceneMachineGun_C_0",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2437.86,
+      -95.39,
+      -1340.41
+    ],
+    "yaw": 89.07
+  },
+  {
+    "name": "BP_SceneMachineGun_C_1",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2591.38,
+      -91.49,
+      -1340.99
+    ],
+    "yaw": -90.54
+  },
+  {
+    "name": "BP_SceneMachineGun_C_10",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2442.04,
+      -68.02,
+      -1755.19
+    ],
+    "yaw": 160.57
+  },
+  {
+    "name": "BP_SceneMachineGun_C_11",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2466.78,
+      -92.24,
+      -1244.66
+    ],
+    "yaw": -88.46
+  },
+  {
+    "name": "BP_SceneMachineGun_C_12",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2572.01,
+      -91.49,
+      -1340.58
+    ],
+    "yaw": -88.46
+  },
+  {
+    "name": "BP_SceneMachineGun_C_13",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2432.46,
+      -82.18,
+      -1635.74
+    ],
+    "yaw": 69.51
+  },
+  {
+    "name": "BP_SceneMachineGun_C_14",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2500.99,
+      -95.55,
+      -1379.65
+    ],
+    "yaw": 90.41
+  },
+  {
+    "name": "BP_SceneMachineGun_C_15",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2527.49,
+      -95.55,
+      -1379.57
+    ],
+    "yaw": 90.41
+  },
+  {
+    "name": "BP_SceneMachineGun_C_2",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2553.65,
+      -95.39,
+      -1421.7
+    ],
+    "yaw": 89.07
+  },
+  {
+    "name": "BP_SceneMachineGun_C_3",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2527.27,
+      -95.53,
+      -1437.81
+    ],
+    "yaw": -90.28
+  },
+  {
+    "name": "BP_SceneMachineGun_C_4",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2574.29,
+      -91.58,
+      -1519.09
+    ],
+    "yaw": 0.68
+  },
+  {
+    "name": "BP_SceneMachineGun_C_5",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2574.32,
+      -91.58,
+      -1531.1
+    ],
+    "yaw": 0.68
+  },
+  {
+    "name": "BP_SceneMachineGun_C_6",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2398.76,
+      -77.18,
+      -1726.89
+    ],
+    "yaw": -20.31
+  },
+  {
+    "name": "BP_SceneMachineGun_C_7",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2403.69,
+      -68.02,
+      -1741.54
+    ],
+    "yaw": -20.31
+  },
+  {
+    "name": "BP_SceneMachineGun_C_8",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2411.88,
+      -68.02,
+      -1719.09
+    ],
+    "yaw": -20.31
+  },
+  {
+    "name": "BP_SceneMachineGun_C_9",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      2450.35,
+      -68.02,
+      -1732.67
+    ],
+    "yaw": 160.57
+  }
+]

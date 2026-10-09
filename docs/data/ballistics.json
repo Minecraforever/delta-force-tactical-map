@@ -1,0 +1,167 @@
+{
+  "categories": {
+    "coastal": "岸防炮",
+    "vulcan": "火神炮",
+    "aa": "防空炮",
+    "mortar": "载具迫击炮",
+    "drone": "巡飞弹"
+  },
+  "weapons": [
+    {
+      "id": "fixed_18990000008",
+      "name": "岸防炮（ShoreGun）",
+      "category": "coastal",
+      "kind": "fixed",
+      "initSpeed": 300.0,
+      "gravity": 12.0,
+      "airDrag": 0.0012,
+      "zeroGravityDistance": 0.0,
+      "maxDistance": 1000.0,
+      "validDistance": 300.0,
+      "attenuateDistances": [
+        10000.0
+      ],
+      "attenuateRates": [
+        0.8
+      ],
+      "radius": 0.1,
+      "mountHeight": 2.5,
+      "pitch": [
+        -15,
+        50
+      ]
+    },
+    {
+      "id": "fixed_18990000023",
+      "name": "火神炮（LD3000 陆盾3000）",
+      "category": "vulcan",
+      "kind": "fixed",
+      "initSpeed": 1000.0,
+      "gravity": 9.8,
+      "airDrag": 0,
+      "zeroGravityDistance": 0.0,
+      "maxDistance": 1000.0,
+      "validDistance": 700.0,
+      "attenuateDistances": [
+        1000.0
+      ],
+      "attenuateRates": [
+        0.8
+      ],
+      "radius": 0.1,
+      "mountHeight": 2.5,
+      "pitch": [
+        -5,
+        89
+      ]
+    },
+    {
+      "id": "fixed_18990000007",
+      "name": "防空炮（AAGun）",
+      "category": "aa",
+      "kind": "fixed",
+      "initSpeed": 1000.0,
+      "gravity": 8.0,
+      "airDrag": 0.0012,
+      "zeroGravityDistance": 0.0,
+      "maxDistance": 1000.0,
+      "validDistance": 700.0,
+      "attenuateDistances": [
+        1000.0
+      ],
+      "attenuateRates": [
+        0.8
+      ],
+      "radius": 0.1,
+      "mountHeight": 2.5,
+      "pitch": [
+        -5,
+        72
+      ]
+    },
+    {
+      "id": "mortar_18120000013",
+      "name": "武器站-迫击炮",
+      "category": "mortar",
+      "kind": "mortar",
+      "initSpeed": 80.0,
+      "gravity": 50.0,
+      "airDrag": 0,
+      "zeroGravityDistance": 10.0,
+      "maxDistance": 300.0,
+      "validDistance": 100.0,
+      "attenuateDistances": [
+        200.0,
+        3000.0
+      ],
+      "attenuateRates": [
+        0.7,
+        0.5
+      ],
+      "radius": 0.1,
+      "mountHeight": 2.8,
+      "pitch": [
+        -30,
+        45
+      ]
+    },
+    {
+      "id": "mortar_18120000086",
+      "name": "猫猫车迫击炮",
+      "category": "mortar",
+      "kind": "mortar",
+      "initSpeed": 100.0,
+      "gravity": 40.0,
+      "airDrag": 0,
+      "zeroGravityDistance": 10.0,
+      "maxDistance": 3000.0,
+      "validDistance": 1000.0,
+      "attenuateDistances": [
+        200.0,
+        3000.0
+      ],
+      "attenuateRates": [
+        0.7,
+        0.5
+      ],
+      "radius": 0.1,
+      "mountHeight": 2.2,
+      "pitch": [
+        45,
+        85
+      ]
+    },
+    {
+      "id": "bullet_18080000009",
+      "name": "巡飞弹（乌鲁鲁大招·制导巡航导弹）",
+      "category": "drone",
+      "kind": "drone",
+      "initSpeed": 25.0,
+      "gravity": 34.3,
+      "airDrag": 0,
+      "zeroGravityDistance": 70.0,
+      "maxDistance": 1000.0,
+      "hipFireSpeed": 54.0,
+      "cruiseSpeed": 33.0,
+      "adsSpeed": [
+        25.0,
+        7.5,
+        33.0
+      ],
+      "secondaryAcceleration": 66.0,
+      "secondaryMaxSpeed": 66.0,
+      "energyCostPerSec": 8.33,
+      "secondaryEnergyCostPerSec": 16.6,
+      "health": 5.0,
+      "subMissileSpawnSpeed": 5.0,
+      "subMissileSpawnAngle": 45.0,
+      "guided": true,
+      "speedRange": [
+        10,
+        66
+      ],
+      "mountHeight": 1.7
+    }
+  ],
+  "note": "speed m/s, gravity m/s^2, distance m; drag is per-second velocity decay; validDistance = full-damage range, attenuateDistances = falloff range, maxDistance = hard cap"
+}

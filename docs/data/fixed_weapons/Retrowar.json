@@ -1,0 +1,123 @@
+[
+  {
+    "name": "BP_SceneAAGun_C_0",
+    "type": "aa",
+    "weaponId": "fixed_18990000007",
+    "position": [
+      674.22,
+      -6.53,
+      -1150.32
+    ],
+    "yaw": 0
+  },
+  {
+    "name": "BP_SceneAAGun_C_1",
+    "type": "aa",
+    "weaponId": "fixed_18990000007",
+    "position": [
+      1355.13,
+      5.08,
+      -1167.61
+    ],
+    "yaw": -180.0
+  },
+  {
+    "name": "BP_SceneAAGun_LD3000_C_2",
+    "type": "vulcan",
+    "weaponId": "fixed_18990000023",
+    "position": [
+      1381.17,
+      24.09,
+      -856.91
+    ],
+    "yaw": -180.0
+  },
+  {
+    "name": "BP_SceneAAGun_LD3000_C_3",
+    "type": "vulcan",
+    "weaponId": "fixed_18990000023",
+    "position": [
+      1022.23,
+      23.39,
+      -835.9
+    ],
+    "yaw": -1.19
+  },
+  {
+    "name": "BP_SceneAAGun_LD3000_C_4",
+    "type": "vulcan",
+    "weaponId": "fixed_18990000023",
+    "position": [
+      748.31,
+      21.91,
+      -800.7
+    ],
+    "yaw": -76.19
+  },
+  {
+    "name": "BP_SceneMachineGun_C_0",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      925.23,
+      34.8,
+      -790.98
+    ],
+    "yaw": -2.02
+  },
+  {
+    "name": "BP_SceneMachineGun_C_1",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      908.52,
+      -3.53,
+      -1149.63
+    ],
+    "yaw": 177.98
+  },
+  {
+    "name": "BP_SceneMachineGun_C_2",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      833.38,
+      -0.24,
+      -1128.73
+    ],
+    "yaw": 22.98
+  },
+  {
+    "name": "BP_SceneMachineGun_C_3",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      1162.83,
+      3.24,
+      -1207.27
+    ],
+    "yaw": 112.98
+  },
+  {
+    "name": "BP_SceneShoreGun_C_0",
+    "type": "coastal",
+    "weaponId": "fixed_18990000008",
+    "position": [
+      1073.84,
+      -1.21,
+      -1203.61
+    ],
+    "yaw": 155.0
+  },
+  {
+    "name": "BP_SceneShoreGun_C_1",
+    "type": "coastal",
+    "weaponId": "fixed_18990000008",
+    "position": [
+      1079.08,
+      19.42,
+      -781.25
+    ],
+    "yaw": 0
+  }
+]

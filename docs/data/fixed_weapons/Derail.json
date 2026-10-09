@@ -1,0 +1,68 @@
+[
+  {
+    "name": "BP_SceneMachineGun_C_0",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      1029.3,
+      11.88,
+      -1122.96
+    ],
+    "yaw": 90.0
+  },
+  {
+    "name": "BP_SceneMachineGun_C_1",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      1020.55,
+      14.91,
+      -548.27
+    ],
+    "yaw": -144.25
+  },
+  {
+    "name": "BP_SceneMachineGun_C_2",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      879.86,
+      21.98,
+      -476.93
+    ],
+    "yaw": -116.68
+  },
+  {
+    "name": "BP_SceneShoreGun_C_0",
+    "type": "coastal",
+    "weaponId": "fixed_18990000008",
+    "position": [
+      886.44,
+      20.33,
+      -1119.63
+    ],
+    "yaw": -10.0
+  },
+  {
+    "name": "BP_SceneShoreGun_C_1",
+    "type": "coastal",
+    "weaponId": "fixed_18990000008",
+    "position": [
+      693.02,
+      27.03,
+      -670.3
+    ],
+    "yaw": -66.03
+  },
+  {
+    "name": "BP_SceneShoreGun_C_2",
+    "type": "coastal",
+    "weaponId": "fixed_18990000008",
+    "position": [
+      686.8,
+      28.18,
+      -930.31
+    ],
+    "yaw": -50.0
+  }
+]

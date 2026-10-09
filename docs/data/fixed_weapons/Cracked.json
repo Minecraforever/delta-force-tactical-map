@@ -1,0 +1,57 @@
+[
+  {
+    "name": "BP_SceneAAGun_C_0",
+    "type": "aa",
+    "weaponId": "fixed_18990000007",
+    "position": [
+      1050.88,
+      5.26,
+      -719.72
+    ],
+    "yaw": -90.6
+  },
+  {
+    "name": "BP_SceneAAGun_C_3",
+    "type": "aa",
+    "weaponId": "fixed_18990000007",
+    "position": [
+      940.08,
+      -5.2,
+      -1191.74
+    ],
+    "yaw": 100.0
+  },
+  {
+    "name": "BP_SceneAAGun_C_4",
+    "type": "aa",
+    "weaponId": "fixed_18990000007",
+    "position": [
+      960.6,
+      -6.99,
+      -960.27
+    ],
+    "yaw": 90.0
+  },
+  {
+    "name": "BP_SceneAAGun_LD3000_C_0",
+    "type": "vulcan",
+    "weaponId": "fixed_18990000023",
+    "position": [
+      1295.77,
+      -6.82,
+      -1034.56
+    ],
+    "yaw": -170.0
+  },
+  {
+    "name": "BP_SceneAAGun_LD3000_C_1",
+    "type": "vulcan",
+    "weaponId": "fixed_18990000023",
+    "position": [
+      649.76,
+      -9.41,
+      -807.42
+    ],
+    "yaw": 0
+  }
+]

@@ -1,0 +1,123 @@
+[
+  {
+    "name": "BP_SceneAAGun_C_1",
+    "type": "aa",
+    "weaponId": "fixed_18990000007",
+    "position": [
+      1985.01,
+      82.85,
+      -1831.89
+    ],
+    "yaw": 128.02
+  },
+  {
+    "name": "BP_SceneAAGun_C_2",
+    "type": "aa",
+    "weaponId": "fixed_18990000007",
+    "position": [
+      2361.6,
+      30.51,
+      -1818.03
+    ],
+    "yaw": 147.0
+  },
+  {
+    "name": "BP_SceneAAGun_C_3",
+    "type": "aa",
+    "weaponId": "fixed_18990000007",
+    "position": [
+      2049.24,
+      119.18,
+      -2055.64
+    ],
+    "yaw": 85.0
+  },
+  {
+    "name": "BP_SceneAAGun_C_4",
+    "type": "aa",
+    "weaponId": "fixed_18990000007",
+    "position": [
+      1977.73,
+      89.82,
+      -2295.85
+    ],
+    "yaw": 109.02
+  },
+  {
+    "name": "BP_SceneAAGun_C_5",
+    "type": "aa",
+    "weaponId": "fixed_18990000007",
+    "position": [
+      1764.48,
+      85.16,
+      -2048.4
+    ],
+    "yaw": 123.84
+  },
+  {
+    "name": "BP_SceneAAGun_C_6",
+    "type": "aa",
+    "weaponId": "fixed_18990000007",
+    "position": [
+      1632.98,
+      48.76,
+      -1812.95
+    ],
+    "yaw": 8.09
+  },
+  {
+    "name": "BP_SceneAAGun_LD3000_C_3",
+    "type": "vulcan",
+    "weaponId": "fixed_18990000023",
+    "position": [
+      2227.56,
+      126.3,
+      -2009.55
+    ],
+    "yaw": 129.59
+  },
+  {
+    "name": "BP_SceneAAGun_LD3000_C_5",
+    "type": "vulcan",
+    "weaponId": "fixed_18990000023",
+    "position": [
+      2257.64,
+      142.97,
+      -2194.29
+    ],
+    "yaw": 109.02
+  },
+  {
+    "name": "BP_SceneAAGun_LD3000_C_7",
+    "type": "vulcan",
+    "weaponId": "fixed_18990000023",
+    "position": [
+      1907.31,
+      66.45,
+      -1615.97
+    ],
+    "yaw": -59.92
+  },
+  {
+    "name": "BP_SceneShoreGun_C_0",
+    "type": "coastal",
+    "weaponId": "fixed_18990000008",
+    "position": [
+      1860.36,
+      77.29,
+      -1614.85
+    ],
+    "yaw": -64.48
+  },
+  {
+    "name": "BP_SceneShoreGun_C_1",
+    "type": "coastal",
+    "weaponId": "fixed_18990000008",
+    "position": [
+      2196.98,
+      136.72,
+      -2184.02
+    ],
+    "yaw": 107.97
+  }
+]
