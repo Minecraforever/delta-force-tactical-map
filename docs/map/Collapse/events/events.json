@@ -1,1 +1,1 @@
-[{"code":"Collapse_BigEvent","name":"大地震","dir":"events/Collapse_BigEvent","stage":2},{"code":"Collapse_SmallEvent","name":"小地震","dir":"events/Collapse_SmallEvent","stage":2}]
+[{"code":"Collapse_BeforeBigEvent","name":"震前建筑","dir":"events/Collapse_BeforeBigEvent","stage":2},{"code":"Collapse_BigEvent","name":"大地震","dir":"events/Collapse_BigEvent","stage":2},{"code":"Collapse_SmallEvent","name":"小地震","dir":"events/Collapse_SmallEvent","stage":2}]

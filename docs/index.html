@@ -136,6 +136,7 @@
     <button id="tierMid" disabled title="在线版未包含中精度数据包">中精度（本地版）</button>
     <button id="tierHigh" disabled title="在线版未包含高精度数据包">高精度（本地版）</button>
   </div>
+
   <div class="note">在线版无法使用中高精度；如需体验，请联系作者获取本地版。</div>
 
   <div class="buttons">
@@ -338,7 +339,7 @@ function mapRollFor(code) {
 }
 const mapSelect = document.getElementById('mapSelect');
 mapSelect.addEventListener('change', () => {
-  const code = mapSelect.value === 'Derail' ? 'derail' : mapSelect.value;
+  const code = mapSelect.value;
   const url = new URL(location.href);
   url.searchParams.set('map', code);
   location.href = url.toString();
@@ -614,7 +615,7 @@ function buildTerrain(t, ground) {
  * 二进制文件，浏览器每档只发 1 次请求，减少数百/上千次 HTTP 往返。 */
 const mfpkCache = {};
 
-const SPLIT_MFPK = {"map/Colosseum/Colosseum_low.mfpk":{"parts":["Colosseum_low.mfpk.part01","Colosseum_low.mfpk.part02","Colosseum_low.mfpk.part03","Colosseum_low.mfpk.part04"],"size":151546836},"map/Mogadishu/Mogadishu_low.mfpk":{"parts":["Mogadishu_low.mfpk.part01","Mogadishu_low.mfpk.part02","Mogadishu_low.mfpk.part03"],"size":91356736},"map/Monument/Monument_low.mfpk":{"parts":["Monument_low.mfpk.part01","Monument_low.mfpk.part02","Monument_low.mfpk.part03"],"size":95133936},"map/Retrowar/Retrowar_low.mfpk":{"parts":["Retrowar_low.mfpk.part01","Retrowar_low.mfpk.part02"],"size":66089412},"map/Suez/Suez_low.mfpk":{"parts":["Suez_low.mfpk.part01","Suez_low.mfpk.part02","Suez_low.mfpk.part03"],"size":98558288}};
+const SPLIT_MFPK = {"map/Retrowar/Retrowar_low.mfpk":{"parts":["Retrowar_low.mfpk.part01","Retrowar_low.mfpk.part02"],"size":66089412},"map/Monument/Monument_low.mfpk":{"parts":["Monument_low.mfpk.part01","Monument_low.mfpk.part02","Monument_low.mfpk.part03"],"size":95133936},"map/Suez/Suez_low.mfpk":{"parts":["Suez_low.mfpk.part01","Suez_low.mfpk.part02","Suez_low.mfpk.part03"],"size":98558288},"map/Colosseum/Colosseum_low.mfpk":{"parts":["Colosseum_low.mfpk.part01","Colosseum_low.mfpk.part02","Colosseum_low.mfpk.part03","Colosseum_low.mfpk.part04"],"size":151546836},"map/Mogadishu/Mogadishu_low.mfpk":{"parts":["Mogadishu_low.mfpk.part01","Mogadishu_low.mfpk.part02","Mogadishu_low.mfpk.part03"],"size":91356736}};
 async function fetchMfpkBytes(url) {
   const key = url.replace(/^\.\//, '');
   const split = SPLIT_MFPK[key];
@@ -694,7 +695,8 @@ function instanceFromGltf(group, entry, insts, name, meshIndex, gltf) {
       }
     }
     const mesh = new THREE.InstancedMesh(node.geometry, material, insts.length);
-    mesh.userData = { tier: name, meshIndex: meshIndex };
+    mesh.userData = { tier: name, meshIndex: meshIndex, meshName: entry.name };
+    baseMeshNodes.push({ mesh, name: entry.name });
     mesh.matrixAutoUpdate = false;
     const m = new THREE.Matrix4();
     const p = new THREE.Vector3(), q = new THREE.Quaternion(), s = new THREE.Vector3();
@@ -715,6 +717,19 @@ function instanceFromGltf(group, entry, insts, name, meshIndex, gltf) {
     mesh.computeBoundingSphere();
     group.add(mesh);
   });
+}
+
+/* 大事件阶段需要把“会被事件摧毁/替换”的基础建筑隐藏掉（如余震 B1 隐藏完好 S2 楼群、
+   B2 隐藏完好加油站），换成事件 overlay 的残骸。 */
+const baseMeshNodes = [];
+function applyMeshHides() {
+  let patterns = [];
+  if (phasePlan && activePhase && activePhase.hide) {
+    patterns = (activePhase.hide || []).map(String);
+  }
+  for (const node of baseMeshNodes) {
+    node.mesh.visible = !patterns.some((p) => node.name.includes(p));
+  }
 }
 
 async function loadTilesFromMfpk(manifest) {
@@ -765,6 +780,7 @@ async function loadTiles(manifest) {
 let lodDoc = null;
 const tierGroups = {};
 const tierState = { mid: false, high: false };
+const ONLINE_TIERS = new Set(['low']);
 
 async function loadTier(name) {
   if (!lodDoc) lodDoc = await (await fetch(MAP_ROOT + 'lod.json')).json();
@@ -818,6 +834,7 @@ async function loadTier(name) {
   const instTris = [...byMesh.entries()].reduce((s, [idx, insts]) => s + (spec.meshes[idx]?.tris || 0) * insts.length, 0);
   hud.textContent = `${spec.label} 已载入：${loadedCount} 个实例 · ${instTris.toLocaleString('en-US')} 三角面`;
   group.visible = tierState[name];
+  applyMeshHides();
   collidableDirty = true;
 }
 
@@ -923,24 +940,32 @@ function markEventButtons() {
   }
 }
 
-/* 推车 / 护送轨迹 overlay：读取 route 数据画折线 + 检查点标记 */
+/* 推车 / 护送轨迹 overlay：读取 route 数据画加粗路径 + 检查点标记 */
 let escortGroup = null;
 
-function escortLine(points, colour) {
-  const pts = points.filter((p) => p && p.length >= 3).map((p) => new THREE.Vector3(p[0], p[1] + 2.5, p[2]));
+const ESCORT_PALETTE = {
+  escort: 0xe74c3c,   // 推进（防守方红）
+  approach: 0x2ecc71, // 入场（进攻方绿）
+};
+
+const ESCORT_LIFT = 2.5; // 路径线与标记的同一抬升高度
+
+function escortLine(points, colour, width = 1.4) {
+  const pts = points.filter((p) => p && p.length >= 3).map((p) => new THREE.Vector3(p[0], p[1] + ESCORT_LIFT, p[2]));
   if (pts.length < 2) return null;
-  const geo = new THREE.BufferGeometry().setFromPoints(pts);
-  const mat = new THREE.LineBasicMaterial({ color: colour, transparent: true, opacity: 0.95, depthTest: false });
-  const line = new THREE.Line(geo, mat);
-  line.renderOrder = 25;
-  return line;
+  const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5);
+  const geo = new THREE.TubeGeometry(curve, Math.max(8, pts.length * 3), width, 5, false);
+  const mat = new THREE.MeshBasicMaterial({ color: colour, transparent: true, opacity: 0.95, depthTest: false });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.renderOrder = 25;
+  return mesh;
 }
 
 function escortMarker(pos, colour, radius = 4) {
   const geo = new THREE.SphereGeometry(radius, 12, 12);
   const mat = new THREE.MeshBasicMaterial({ color: colour, transparent: true, opacity: 0.9, depthTest: false });
   const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.set(pos[0], pos[1] + 2.5, pos[2]);
+  mesh.position.set(pos[0], pos[1] + ESCORT_LIFT, pos[2]);
   mesh.renderOrder = 26;
   return mesh;
 }
@@ -959,21 +984,58 @@ async function loadEscortOverlay(phase) {
   scene.add(group);
   escortGroup = group;
   const route = data.route || [];
-  if (route.length) {
-    const line = escortLine(route, 0xffa94d);
+  const approach = (data.segments && data.segments.approach) || [];
+  const objective = data.objective;
+
+  let greenPts = approach;
+  let redPts = route;
+  if (objective && approach.length >= 2 && route.length >= 2) {
+    // 以绿色点（objective）为分界：入场绿线止于绿点，推进红线起于绿点
+    const nearest = (pts) => {
+      let bi = 0, bd = Infinity;
+      pts.forEach((p, i) => {
+        if (!p || p.length < 3) return;
+        const dx = p[0] - objective[0];
+        const dz = p[2] - objective[2];
+        const d = dx * dx + dz * dz;
+        if (d < bd) { bd = d; bi = i; }
+      });
+      return bi;
+    };
+    const ai = nearest(approach);
+    greenPts = approach.slice(0, ai + 1).concat([objective]);
+    const ri = nearest(route);
+    redPts = [objective].concat(route.slice(ri + 1));
+  }
+
+  if (greenPts.length >= 2) {
+    const line = escortLine(greenPts, ESCORT_PALETTE.approach, 1.6);
     if (line) group.add(line);
   }
-  for (const [key, seg] of Object.entries(data.segments || {})) {
-    if (key === 'escort') continue;
-    const line = escortLine(seg, 0x6fb3ff);
+  if (redPts.length >= 2) {
+    const line = escortLine(redPts, ESCORT_PALETTE.escort, 2.2);
     if (line) group.add(line);
   }
+
+  // 检查点球吸附到红线上（不抬线，把球放进线里）
+  const snapToLine = (p, pts) => {
+    let bi = 0, bd = Infinity;
+    pts.forEach((q, i) => {
+      const dx = q[0] - p[0], dz = q[2] - p[2];
+      const d = dx * dx + dz * dz;
+      if (d < bd) { bd = d; bi = i; }
+    });
+    return pts[bi];
+  };
   for (const cp of data.checkpoints || []) {
     if (!cp.pos) continue;
-    group.add(escortMarker(cp.pos, 0xff6b6b, 5));
+    const on = redPts.length ? snapToLine(cp.pos, redPts) : cp.pos;
+    group.add(escortMarker(on, 0xff6b6b, 4));
   }
-  if (data.objective) group.add(escortMarker(data.objective, 0x2ecc71, 6));
-  if (data.convoy) group.add(escortMarker(data.convoy, 0xf1c40f, 6));
+  // 绿色球：分界点 + 绿线另一端（入场起点）
+  if (data.objective) group.add(escortMarker(data.objective, 0x2ecc71, 4.5));
+  const entry = greenPts.length ? greenPts[0] : null;
+  if (entry && entry.length >= 3) group.add(escortMarker(entry, 0x2ecc71, 4.5));
 }
 
 function clearEscortOverlay() {
@@ -997,6 +1059,7 @@ async function applyOverlays() {
   const set = new Set(want);
   for (const code of set) await loadEventOverlay(code);
   for (const [code, group] of Object.entries(eventGroups)) group.visible = set.has(code);
+  applyMeshHides();
   collidableDirty = true;
 }
 
@@ -1515,8 +1578,7 @@ async function run() {
   buildAreas(breakthrough);
   buildStageList(breakthrough);
   for (const name of (earlyParams.get('tiers') || '').split(',').map((t) => t.trim()).filter(Boolean)) {
-    if (!(name in tierState)) continue;
-    if (document.getElementById({ mid: 'tierMid', high: 'tierHigh' }[name]).disabled) continue;
+    if (!(name in tierState) || !ONLINE_TIERS.has(name)) continue;
     tierState[name] = true;
     await loadTier(name);
     document.getElementById({ mid: 'tierMid', high: 'tierHigh' }[name]).classList.add('on');
@@ -1841,8 +1903,10 @@ function loadBallistics() {
     .then((doc) => {
       ballisticsData = doc;
       ballisticWeapons = doc.weapons || [];
-      return fetch('./data/fixed_weapons/index.json').then((r) => r.json())
-        .then((all) => all[MAP_FILE_CODE] || []).catch(() => []);
+      return fetch('./data/fixed_weapons/index.json')
+        .then((r) => r.json())
+        .then((doc) => doc[MAP_FILE_CODE] || [])
+        .catch(() => []);
     })
     .then((fw) => {
       sceneFixedWeapons = fw;
