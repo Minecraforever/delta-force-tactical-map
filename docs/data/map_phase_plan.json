@@ -696,14 +696,15 @@
           "button": "B1大事件",
           "objectives": [
             {
-              "label": "B1",
-              "role": "event"
+              "label": "B2",
+              "role": "main"
             }
           ],
           "overlays": [
             "Collapse_BigEvent"
           ],
           "hide": [
+            "Building_Collapse_S1_",
             "Building_Collapse_S2_"
           ]
         },
@@ -714,15 +715,16 @@
           "button": "B2大事件",
           "objectives": [
             {
-              "label": "B2",
-              "role": "event"
+              "label": "B1",
+              "role": "main"
             }
           ],
           "overlays": [
-            "Collapse_SmallEvent"
+            "Collapse_BigEvent"
           ],
           "hide": [
-            "Building_Collapse_GasStation_"
+            "Building_Collapse_S1_",
+            "Building_Collapse_S2_"
           ]
         },
         {
@@ -754,12 +756,35 @@
               "role": "main"
             }
           ]
+        },
+        {
+          "id": "EV_D",
+          "stage": 4,
+          "kind": "event",
+          "button": "D小事件",
+          "objectives": [
+            {
+              "label": "D1",
+              "role": "main"
+            },
+            {
+              "label": "D2",
+              "role": "main"
+            }
+          ],
+          "overlays": [
+            "Collapse_SmallEvent"
+          ],
+          "hide": [
+            "Building_Collapse_GasStation_"
+          ]
         }
       ],
       "notes": [
         "A 去掉 1",
-        "B 后两个地震事件阶段：B1 大地震、B2 小地震",
-        "正常阶段展示完整 CBD 建筑（已并入基础地图）"
+        "B 后两个大事件阶段：B1/B2 均为大地震",
+        "小地震（加油站）挂 D 阶段",
+        "正常阶段展示完整 CBD 建筑"
       ]
     },
     {

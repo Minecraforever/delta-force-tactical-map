@@ -701,17 +701,23 @@ function instanceFromGltf(group, entry, insts, name, meshIndex, gltf) {
     const m = new THREE.Matrix4();
     const p = new THREE.Vector3(), q = new THREE.Quaternion(), s = new THREE.Vector3();
     const colour = new THREE.Color();
+    const matrices = [];
+    const positions = [];
     insts.forEach((inst, k) => {
       p.set(inst[1], inst[2], inst[3]);
       q.set(inst[4], inst[5], inst[6], inst[7]);
       s.set(inst[8], inst[9], inst[10]);
       m.compose(p, q, s);
       mesh.setMatrixAt(k, m);
+      matrices.push(m.clone());
+      positions.push([inst[1], inst[3]]);
       if (!entry.tex && (inst[11] || inst[12] || inst[13])) {
         colour.setRGB(inst[11] / 255, inst[12] / 255, inst[13] / 255, THREE.SRGBColorSpace);
         mesh.setColorAt(k, colour);
       }
     });
+    mesh.userData.matrices = matrices;
+    mesh.userData.positions = positions;
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     mesh.computeBoundingSphere();
@@ -728,6 +734,8 @@ function applyMeshHides() {
     patterns = (activePhase.hide || []).map(String);
   }
   for (const node of baseMeshNodes) {
+    // 事件残骸由 overlay 自己管理可见性，阶段隐藏仅作用于基础建筑。
+    if (node.mesh.userData.tier === 'event') continue;
     node.mesh.visible = !patterns.some((p) => node.name.includes(p));
   }
 }
