@@ -1,0 +1,30 @@
+{
+  "map": "Mogadishu",
+  "origin": [
+    0.0,
+    -2016.0
+  ],
+  "size": [
+    2048.0,
+    2048.0
+  ],
+  "imageSize": [
+    2016,
+    2016
+  ],
+  "worldExtent": 2048.0,
+  "layerCount": 10,
+  "tiling": [
+    0.25,
+    0.28,
+    0.25,
+    0.25,
+    0.25,
+    0.125,
+    0.25,
+    0.25,
+    0.25,
+    0.25
+  ],
+  "weightEncoding": "id=floor(uint16/2048), fraction=mod(uint16,2048)/2047"
+}
