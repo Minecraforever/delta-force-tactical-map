@@ -1,0 +1,30 @@
+{
+  "map": "Fault",
+  "origin": [
+    0.0,
+    -4064.0
+  ],
+  "size": [
+    4096.0,
+    4096.0
+  ],
+  "imageSize": [
+    2016,
+    2016
+  ],
+  "worldExtent": 4096.0,
+  "layerCount": 10,
+  "tiling": [
+    0.1,
+    0.25,
+    0.15,
+    0.2,
+    0.2,
+    0.25,
+    0.3,
+    0.2,
+    0.2,
+    0.2
+  ],
+  "weightEncoding": "id=floor(uint16/2048), fraction=mod(uint16,2048)/2047"
+}

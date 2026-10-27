@@ -1,0 +1,28 @@
+{
+  "map": "Cracked",
+  "origin": [
+    0.0,
+    -2016.0
+  ],
+  "size": [
+    2048.0,
+    2048.0
+  ],
+  "imageSize": [
+    2016,
+    2016
+  ],
+  "worldExtent": 2048.0,
+  "layerCount": 8,
+  "tiling": [
+    0.3,
+    0.35,
+    0.31,
+    0.3,
+    0.35,
+    0.3,
+    0.31,
+    0.3
+  ],
+  "weightEncoding": "id=floor(uint16/2048), fraction=mod(uint16,2048)/2047"
+}
