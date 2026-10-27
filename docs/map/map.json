@@ -1,1 +1,72 @@
-[{"code":"Iceland","name":"攀升","ready":true,"tiles":105,"tris":105989},{"code":"Cracked","name":"烬区","ready":true,"tiles":118,"tris":235578},{"code":"Gibraltar","name":"临界点","ready":true,"tiles":84,"tris":110501},{"code":"Retrowar","name":"堑壕战","ready":true,"tiles":88,"tris":506195},{"code":"Derail","name":"断轨","ready":true,"tiles":124,"tris":89056},{"code":"NavalBattle","name":"风暴眼","ready":true,"tiles":116,"tris":121698},{"code":"Fault","name":"断层","ready":true,"tiles":124,"tris":179807},{"code":"Monument","name":"金字塔","ready":true,"tiles":164,"tris":645244},{"code":"Collapse","name":"余震","ready":true,"tiles":124,"tris":75096},{"code":"Suez","name":"乌姆斯运河","ready":true,"tiles":328,"tris":633253},{"code":"Colosseum","name":"克劳狄斗兽场","ready":true,"tiles":247,"tris":951273},{"code":"Mogadishu","name":"摩格旧城区","ready":true,"tiles":154,"tris":580707}]
+[
+  {
+    "code": "Iceland",
+    "name": "攀升",
+    "ready": true,
+    "tiles": 121,
+    "tris": 111371
+  },
+  {
+    "code": "Cracked",
+    "name": "烬区",
+    "ready": true,
+    "tiles": 118,
+    "tris": 235578
+  },
+  {
+    "code": "Gibraltar",
+    "name": "临界点",
+    "ready": true,
+    "tiles": 90,
+    "tris": 112757
+  },
+  {
+    "code": "Retrowar",
+    "name": "堑壕战",
+    "ready": true,
+    "tiles": 90,
+    "tris": 507443
+  },
+  {
+    "code": "Derail",
+    "name": "断轨",
+    "ready": true,
+    "tiles": 126,
+    "tris": 89244
+  },
+  {
+    "code": "NavalBattle",
+    "name": "风暴眼",
+    "ready": true,
+    "tiles": 120,
+    "tris": 123466
+  },
+  {
+    "code": "Fault",
+    "name": "断层",
+    "ready": true,
+    "tiles": 124,
+    "tris": 179807
+  },
+  {
+    "code": "Monument",
+    "name": "金字塔",
+    "ready": true,
+    "tiles": 169,
+    "tris": 659453
+  },
+  {
+    "code": "Collapse",
+    "name": "余震",
+    "ready": true,
+    "tiles": 214,
+    "tris": 128188
+  },
+  {
+    "code": "Mogadishu",
+    "name": "摩格旧城区",
+    "ready": true,
+    "tiles": 187,
+    "tris": 637681
+  }
+]
