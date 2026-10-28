@@ -1730,6 +1730,10 @@ async function getMfpk(name) {
     return pkg;
   } catch (error) {
     mfpkCache[name] = null;
+    if (name === 'low') {
+      const reason = error instanceof Error ? error.message : String(error);
+      throw new Error(`低精度地图包加载失败（${MAP}）：${reason}`);
+    }
     return null;
   }
 }
