@@ -1,0 +1,28 @@
+{
+  "map": "Shafted",
+  "origin": [
+    0.0,
+    -1024.0
+  ],
+  "size": [
+    1024.0,
+    1024.0
+  ],
+  "imageSize": [
+    2016,
+    2016
+  ],
+  "worldExtent": 1024.0,
+  "layerCount": 8,
+  "tiling": [
+    0.25,
+    0.3,
+    0.6,
+    0.5,
+    0.5,
+    0.3,
+    0.15,
+    0.25
+  ],
+  "weightEncoding": "id=floor(uint16/2048), fraction=mod(uint16,2048)/2047"
+}
