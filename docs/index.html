@@ -14,8 +14,8 @@
 }
 </script>
 <style>
-  :root { color-scheme: dark; --panel-w: 390px; --bg: #090e16; --line: #243249;
-    --line-soft: #182231; --text: #e8eef7; --muted: #8c9bb0; --accent: #47a8ff; }
+  :root { color-scheme: dark; --panel-w: 390px; --rail-w: 320px; --mm-size: 240px; --bg: #090e16;
+    --line: #243249; --line-soft: #182231; --text: #e8eef7; --muted: #8c9bb0; --accent: #47a8ff; }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background:
     radial-gradient(circle at 70% 10%, #132238 0, var(--bg) 45%, #070b11 100%); color: #e6ebf2;
@@ -30,6 +30,40 @@
   #panel::-webkit-scrollbar-thumb { background: #2b3a51; border-radius: 4px; }
   #panel::-webkit-scrollbar-track { background: transparent; }
   #panel.collapsed { width: 0; padding: 0; overflow: hidden; border-right: none; opacity: 0; }
+  /* 右侧「地图设置」栏：默认隐藏，展开后推挤视口，地图与小地图自动让位。 */
+  #rightRail { width: 0; flex: 0 0 auto; display: flex; flex-direction: column; overflow: hidden;
+    opacity: 0; visibility: hidden; border-left: 0 solid var(--line); position: relative; z-index: 86;
+    background: linear-gradient(180deg, rgba(19,29,43,.98), rgba(11,17,27,.98));
+    box-shadow: -14px 0 34px rgba(0,0,0,.22);
+    transition: width .28s ease, opacity .2s ease, border-left-width .28s ease, visibility 0s linear .28s; }
+  #rightRail.open { width: var(--rail-w); opacity: 1; visibility: visible; border-left-width: 1px;
+    transition: width .28s ease, opacity .2s ease, border-left-width .28s ease, visibility 0s; }
+  .railHead { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    width: var(--rail-w); padding: 16px 16px 10px; border-bottom: 1px solid var(--line-soft); }
+  .railTitle { color: #d7eaff; font-size: 13px; font-weight: 700; letter-spacing: .12em; }
+  #railClose { padding: 2px 8px; font-size: 12px; }
+  .railBody { width: var(--rail-w); flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 26px;
+    scrollbar-width: thin; scrollbar-color: #2b3a51 transparent; }
+  .railBody::-webkit-scrollbar { width: 8px; }
+  .railBody::-webkit-scrollbar-thumb { background: #2b3a51; border-radius: 4px; }
+  #rightRail h2 { font-size: 12px; margin: 18px 0 8px; color: #9ab0ca; font-weight: 700;
+    letter-spacing: .08em; border-left: 3px solid var(--accent); padding-left: 9px; }
+  #rightRail h2:first-child { margin-top: 12px; }
+  #rightRail #mapSelect { width: 100%; }
+  #rightRail .row select { flex: 1 1 auto; min-width: 0; }
+  #rightRail .row input[type=range] { min-width: 56px; }
+  #rightRail #tierButtons { flex-wrap: nowrap; }
+  #rightRail #tierButtons button { flex: 1 1 0; padding: 6px 4px; font-size: 12px; white-space: nowrap; }
+  #railToggle { position: fixed; right: 0; top: max(50%, calc(var(--mm-size) + 105px));
+    transform: translateY(-50%); z-index: 87;
+    width: 30px; height: 112px; padding: 0; display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line); border-right: none; border-radius: 10px 0 0 10px;
+    background: rgba(24,36,52,.96); color: #9db1ca; cursor: pointer; font-size: 12px;
+    backdrop-filter: blur(10px); writing-mode: vertical-rl; letter-spacing: .15em;
+    transition: right .28s ease, background .15s ease, color .15s ease; }
+  body.rail-open #railToggle { right: var(--rail-w); }
+  #railToggle:hover { background: #22344c; color: #d7ebff; border-color: #3f9bff; }
+  #railToggle.on { color: #8fdcff; border-color: #3d8fc8; background: #17314a; }
   #edgeDock { position: fixed; left: var(--panel-w); top: 50%; transform: translateY(-50%); z-index: 73;
     display: flex; flex-direction: column; gap: 0; overflow: hidden;
     border: 1px solid var(--line); border-left: none; border-radius: 0 10px 10px 0;
@@ -57,6 +91,27 @@
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   td { padding: 3px 0; border-bottom: 1px solid #1a2130; vertical-align: top; }
   td:last-child { text-align: right; color: #9ad7ff; font-variant-numeric: tabular-nums; }
+  /* 据点表所有列统一左对齐、同色，避免最后一列被当成数值列高亮 */
+  #capList td { text-align: left; color: #e6ebf2; font-variant-numeric: tabular-nums; }
+  /* 系统信息表：左列标题不换行，右列允许换行并左对齐 */
+  .siTable td:first-child { color: #8fa3bf; white-space: nowrap; width: 96px; }
+  .siTable td:last-child { text-align: left; color: #9ad7ff; word-break: break-all; }
+  /* 阵地支援 */
+  #fsSkills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #fsSkills button { padding: 7px 4px; font-size: 12px; }
+  #fsVehicleRow[hidden] { display: none !important; }
+  #fsAzimuthRow[hidden] { display: none !important; }
+  #fsZoneRow[hidden] { display: none !important; }
+  #fsZoneRow button { flex: 1; padding: 5px 3px; font-size: 10.5px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #fsZoneRow button.on { color: #fff; border-color: #3f9bff; background: #1d3a5c; }
+  .fsTable td:first-child { color: #8fa3bf; white-space: nowrap; width: 86px; }
+  .fsTable td:last-child { text-align: left; color: #9ad7ff; }
+  .fsTable tr.fsGroup td {
+    padding: 9px 0 3px; color: #ffd166; font-weight: 600; font-size: 11.5px;
+    letter-spacing: .5px; border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .fsTable tr.fsGroup:first-child td { border-top: none; padding-top: 2px; }
+  #fsTime { accent-color: #ff9f43; }
   .note { color: #9aabc0; font-size: 12px; background: rgba(19,29,43,.9); border: 1px solid var(--line-soft);
     border-left: 2px solid #2b6cb0; padding: 9px 11px; margin-top: 8px; border-radius: 0 7px 7px 0;
     white-space: pre-line; }
@@ -73,11 +128,21 @@
     border-radius: 7px; padding: 5px 7px; min-height: 30px; }
   .row span { color: #9ad7ff; font-variant-numeric: tabular-nums; }
   #modeSwitch { flex: 1; margin: 0; flex-wrap: nowrap; }
-  #modeSwitch button { flex: 1; padding: 6px 8px; }
+  #modeSwitch button { flex: 1; padding: 6px 5px; font-size: 12px; white-space: nowrap; }
   #modeSwitch button.on { color: #ffe3a6; border-color: #a47b2e; background: #342711; }
-  #modeInfo { margin-top: 6px; }
+  #modeSwitch button.unavailable { opacity: .48; border-style: dashed; color: #8294ab; cursor: not-allowed; }
+  #modeSwitch button.unavailable:hover { background: #1a2436; border-color: #5b6f88; color: #a8b8cc; }
+  #modeSwitch button.unavailable.on { opacity: .85; }
+  .modeNotice { margin-top: 6px; padding: 5px 8px; border: 1px solid #6b5327; border-left: 3px solid #e6a23c;
+    border-radius: 5px; background: rgba(58,43,20,.72); color: #ffd9a0; font-size: 11.5px; line-height: 1.5; }
   body.mode-tdm .commander-only { display: none !important; }
   body.mode-tdm #panel h2 { letter-spacing: .06em; }
+  body.mode-conquest #stageFloat { display: none !important; }
+  body.mode-conquest #stageSection #stageList,
+  body.mode-conquest #stageSection #phaseNotes,
+  body.mode-conquest #stageSection #flightInfo,
+  body.mode-conquest #stageSection #tFlight { display: none !important; }
+  body.mode-conquest #panel h2 { letter-spacing: .06em; }
   .stepBtn { background: #192536; color: #cfe0f5; border: 1px solid var(--line); border-radius: 5px;
     width: 22px; height: 22px; padding: 0; cursor: pointer; font-size: 14px; line-height: 1;
     flex: 0 0 22px; }
@@ -142,13 +207,49 @@
   .markToggle { font-weight: 700; }
   .markToggle.on { background: rgba(90,170,255,.22); border-color: #6cb6ff; color: #fff;
     box-shadow: 0 0 0 1px rgba(108,182,255,.5) inset; }
-  #minimap { position: absolute; right: 12px; top: 12px; width: 240px;
+  #minimap { position: absolute; right: 12px; top: 12px; width: var(--mm-size);
     border: 1px solid #2b3a51; border-radius: 6px; overflow: hidden;
-    background: rgba(11,14,19,.78); box-shadow: 0 4px 18px rgba(0,0,0,.35); }
+    background: rgba(11,14,19,.78); box-shadow: 0 4px 18px rgba(0,0,0,.35);
+    transition: right .2s ease; }
   #minimap .cap { font-size: 11px; color: #8fa3bf; padding: 4px 8px; border-bottom: 1px solid #1e2634; }
-  #minimapBody { position: relative; width: 240px; height: 240px; }
+  #minimapBody { position: relative; width: var(--mm-size); height: var(--mm-size); }
   #minimap img { display: block; width: 100%; height: 100%; object-fit: cover; }
-  #minimap canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #minimap canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; }
+  #minimap { cursor: pointer; }
+  #mmFull { position: fixed; inset: 0; z-index: 90; display: block;
+    background: rgba(4,8,14,.94); color: #d9e8fa; backdrop-filter: blur(10px); }
+  #mmFull[hidden] { display: none !important; }
+  #mmFullBar { position: absolute; left: 0; right: 0; top: 0; z-index: 4;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 9px 16px; border-bottom: 1px solid #22364d;
+    background: linear-gradient(180deg, rgba(16,27,41,.97), rgba(9,15,24,.88)); }
+  #mmFullTitle { font-size: 16px; font-weight: 700; letter-spacing: .08em; color: #e9f3ff; }
+  #mmFullTitle #mmFullScale { margin-left: 8px; font-size: 11px; font-weight: 500; color: #7fb6e8; letter-spacing: .04em; }
+  #mmFullTools { display: flex; align-items: center; gap: 6px; }
+  #mmFullTools button { min-width: 38px; padding: 5px 10px; font-size: 12px; }
+  #mmFullTools button.on { color: #fff; border-color: #ffb347; background: #3a2a14; }
+  #mmFullStage { position: absolute; inset: 0; min-height: 0; overflow: hidden; background: #060b12; }
+  #mmFullCanvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; cursor: crosshair; z-index: 1; }
+  #mmFullInk { position: absolute; inset: 0; display: block; width: 100%; height: 100%; z-index: 2; pointer-events: none; cursor: crosshair; }
+  #mmInkBar { position: absolute; left: 14px; top: 64px; z-index: 5; display: flex; flex-direction: column;
+    align-items: center; gap: 4px; padding: 6px 5px; border: 1px solid #2b3a51; border-radius: 8px;
+    background: rgba(10,17,27,.92); box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+  #mmInkBar button { width: 30px; min-height: 27px; padding: 2px 0; font-size: 14px; line-height: 1; }
+  #mmInkBar button.on { color: #fff; border-color: #ffb347; background: #3a2a14; }
+  #mmInkBar button.inkColor { font-size: 17px; }
+  #mmInkBar button.inkColor.on { box-shadow: 0 0 0 1px #fff inset; background: #182536; }
+  #mmInkBar #mmInkClear { width: 30px; font-size: 9px; }
+  #mmInkBar .inkSep { width: 20px; height: 1px; background: #2c4058; margin: 2px 0; }
+  #mmFullHint { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+    padding: 7px 18px 10px; color: #b8cde4; font-size: 12px; white-space: nowrap;
+    background: linear-gradient(0deg, rgba(6,11,18,.92), rgba(6,11,18,0)); pointer-events: none; }
+  #mmFullCursor { position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px;
+    border: 1px solid #ffd166; border-radius: 50%; box-shadow: 0 0 0 1px rgba(0,0,0,.55) inset;
+    pointer-events: none; display: none; z-index: 3; }
+  #mmFullSupport.on { color: #ffd166; }
+  body.mm-full-open { overflow: hidden; }
+  body.mm-full-open #stageFloat { z-index: 96; }
+  #minimap .cap { cursor: pointer; }
   #panelCrumb { margin: 14px 0 4px; padding: 7px 10px; border: 1px solid #263b55;
     border-radius: 8px; color: #79c4ff; background: linear-gradient(90deg, rgba(25,48,72,.9), rgba(17,29,44,.55));
     font-size: 12px; letter-spacing: .05em; }
@@ -169,10 +270,15 @@
   .navItem.on span { color: #5fd0ff; }
   .navHint { margin-top: 22px; padding: 10px; border-top: 1px solid #233347;
     color: #62758c; font-size: 11px; line-height: 1.65; }
-  #fpToggle { position: absolute; right: 264px; top: 12px; z-index: 20;
+  #fpToggle { position: absolute; right: calc(var(--mm-size) + 24px); top: 12px; z-index: 20;
     background: #1b2534; color: #cfe0f5; border: 1px solid #2b3a51; border-radius: 4px;
-    padding: 5px 10px; cursor: pointer; font-size: 12px; }
+    padding: 5px 10px; cursor: pointer; font-size: 12px;
+    transition: top .2s ease, right .2s ease; }
   #fpToggle.on { color: #ffd27f; border-color: #7a6a2f; }
+  /* 右栏展开后视口变窄，顶部阶段栏会压住它；此时贴到小地图正下方。
+     右侧再留 30px 给「收起」把手，避免把手压住小地图和按钮。 */
+  body.rail-open #minimap { right: 42px; }
+  body.rail-open #fpToggle { top: calc(var(--mm-size) + 49px); right: 42px; }
   #debugPick { position: absolute; pointer-events: none; z-index: 30; max-width: 420px;
     font: 12px/1.5 Consolas, monospace; color: #ffe08a; background: rgba(8,11,16,.92);
     border: 1px solid #7a6a2f; border-radius: 5px; padding: 6px 8px; white-space: pre-wrap; }
@@ -211,48 +317,31 @@
 <div id="navHot" aria-hidden="true"></div>
 <aside id="navDrawer" aria-label="主要功能">
   <div class="navTitle">主要功能</div>
-  <button id="tabSystem" class="navItem on"><span>01</span>系统选项</button>
-  <button id="tabMap" class="navItem"><span>02</span>地图功能</button>
-  <button id="tabVehicles" class="navItem commander-only"><span>03</span>部署系统</button>
+  <button id="tabMap" class="navItem on"><span>01</span>地图功能</button>
+  <button id="tabVehicles" class="navItem commander-only"><span>02</span>部署系统</button>
+  <button id="tabSupport" class="navItem commander-only"><span>03</span>阵地支援</button>
   <button id="tabBallistics" class="navItem commander-only"><span>04</span>弹道解算</button>
   <button id="tabPlan" class="navItem"><span>05</span>方案管理</button>
+  <button id="tabSystem" class="navItem"><span>06</span>系统信息</button>
   <div class="navHint">鼠标移到最左侧自动打开，也可点击「功能」按钮。</div>
 </aside>
 <div id="panel">
   <h1>指挥官三维战术板</h1>
   <div class="sub">作者 SZU丶b0外骨骼｜深圳大学战队、Bilibili 的 <a href="https://space.bilibili.com/670174785" target="_blank" rel="noopener">Minecraforever</a>｜<a href="https://github.com/Minecraforever/delta-force-vehicle-viewer" target="_blank" rel="noopener">载具三维可视化</a></div>
-  <div id="panelCrumb">系统选项</div>
-  <section id="paneSystem">
-  <div class="row">
-    <label>模式</label>
-    <div class="buttons" id="modeSwitch">
-      <button data-mode="commander" class="on">胜者为王</button>
-      <button data-mode="assault">攻防</button>
-      <button data-mode="tdm">团队死斗</button>
-    </div>
-  </div>
-  <div class="row">
-    <label>地图</label>
-    <select id="mapSelect" style="flex:1"></select>
-  </div>
-  <div class="note" id="modeInfo">胜者为王：全面战场地图与攻防、踩点、弹道工具。</div>
+  <div id="panelCrumb">地图功能</div>
+  <section id="paneSystem" hidden>
+  <h2>当前状态</h2>
+  <table class="siTable">
+    <tr><td>模式</td><td id="si-mode">–</td></tr>
+    <tr><td>地图</td><td id="si-map">–</td></tr>
+    <tr><td>精度档</td><td id="si-tier">–</td></tr>
+    <tr><td>当前阶段</td><td id="si-stage">–</td></tr>
+    <tr><td>小地图</td><td id="si-minimap">–</td></tr>
+    <tr><td>视口</td><td id="si-viewport">–</td></tr>
+    <tr><td>海平面</td><td id="si-sea">–</td></tr>
+    <tr><td>低精度数据</td><td id="si-data">–</td></tr>
+  </table>
 
-  <h2>天空</h2>
-  <div class="row">
-    <label>天空</label>
-    <select id="skyPreset" style="flex:1">
-      <option value="black">纯黑 · 默认</option>
-      <option value="sunny">晴朗午后 · Sunny</option>
-      <option value="evening">黄昏 · Evening</option>
-      <option value="overcast">阴天 · Overcast</option>
-      <option value="mistyfog">薄雾 · Mistyfog</option>
-      <option value="sand">沙尘 · Sandy</option>
-      <option value="storm">风暴 · Storm</option>
-      <option value="sunshower">雨后 · Sunshower</option>
-      <option value="twilight">暮色 · CivilTwilight</option>
-      <option value="night">夜色 · Night</option>
-    </select>
-  </div>
   <h2>实测统计</h2>
   <table>
     <tr><td>建筑三角面</td><td id="s-tris">–</td></tr>
@@ -271,34 +360,21 @@
   <div class="note" style="font-size:11px">Win10 独显：设置 → 系统 → 显示 → 图形设置 → 浏览 → 选择浏览器 exe → 选项 → 高性能。
 Win11 独显：设置 → 系统 → 显示 → 图形 → 添加桌面应用 → 选择浏览器 → 选项 → 高性能。
 NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器指定独显。</div>
-  <div class="row">
-    <label>渲染倍率</label>
-    <input type="range" id="renderScale" min="50" max="200" step="25" data-fine="5" value="100" />
-    <span id="renderScaleVal">100%</span>
-  </div>
-  <div class="row">
-    <label>最高帧率</label>
-    <select id="fpsCap">
-      <option value="0">不限</option>
-      <option value="30">30</option>
-      <option value="60">60</option>
-      <option value="120">120</option>
-      <option value="144">144</option>
-    </select>
-  </div>
 
-  <h2>精度档（单选）</h2>
+  <h2>运行环境</h2>
+  <table class="siTable">
+    <tr><td>浏览器</td><td id="si-browser">–</td></tr>
+    <tr><td>平台 / 语言</td><td id="si-platform">–</td></tr>
+    <tr><td>时区</td><td id="si-locale">–</td></tr>
+    <tr><td>屏幕 / 窗口</td><td id="si-screen">–</td></tr>
+    <tr><td>WebGL</td><td id="si-webgl">–</td></tr>
+    <tr><td>页面更新</td><td id="si-updated">–</td></tr>
+    <tr><td>页面参数</td><td id="si-params">–</td></tr>
+  </table>
   <div class="buttons">
-    <button id="tierLow" class="on">低精度</button>
-    <button id="tierMid" hidden aria-hidden="true" tabindex="-1">中精度</button>
-    <button id="tierHigh" hidden aria-hidden="true" tabindex="-1">高精度</button>
+    <button id="copySysInfo">拷贝系统信息</button>
   </div>
-
-  <div class="buttons">
-    <button id="tGround" class="on">地面</button>
-    <button id="tBuild" class="on">建筑</button>
-    <button id="tTex" class="on">贴图</button>
-  </div>
+  <div class="note">系统信息随模式、地图、精度档和阶段切换刷新；「拷贝系统信息」把以上表格复制到剪贴板，便于反馈问题。</div>
 
   <h2>调试</h2>
   <div class="buttons">
@@ -308,7 +384,7 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
   <div class="note">开启调试模式后点击地图上的物体查看信息；「拷贝信息」把最近一次选中的物体信息复制到剪贴板。</div>
 
   </section>
-  <section id="paneMap" hidden>
+  <section id="paneMap">
 
   <h2>视角</h2>
   <div class="buttons" id="viewRow">
@@ -332,18 +408,8 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
     <div class="note">当前海平面：<strong id="seaLevelReadout">–</strong> m。可拖动或输入数值；仅调整本次预览。</div>
   </div>
 
-  <div id="minimapSection">
-  <h2>小地图</h2>
-  <div class="buttons">
-    <button id="tMini" class="on">显示小地图</button>
-  </div>
-  <div class="buttons" id="mmSize">
-    <button data-mm="small">小</button>
-    <button data-mm="medium" class="on">中</button>
-    <button data-mm="large">大</button>
-  </div>
-  <div class="row"><label>范围</label><input type="range" id="mmRange" min="50" max="500" step="10" data-fine="5" value="150" /><span id="mmRangeV">150</span></div>
-  </div>
+  <!-- 小地图设置已移到右侧「地图设置」栏；这里保留空锚点，供 arrangeMapPane 维持区块顺序。 -->
+  <div id="paneMapMinimapSlot" hidden></div>
 
   <div id="infantryMarkSection">
   <h2>步兵标记</h2>
@@ -452,6 +518,17 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
   <h2 class="commander-only">踩点模拟</h2>
   <div class="commander-only" id="simBlock">
   <div class="row">
+    <label>据点</label>
+    <select id="simObj" style="flex:1"></select>
+  </div>
+  <div class="row" id="simStateRow">
+    <label>动作</label>
+    <select id="simState" style="flex:1">
+      <option value="capture">中立 → 占领</option>
+      <option value="neutralize">敌方 → 中立（×2）</option>
+    </select>
+  </div>
+  <div class="row">
     <label>攻方人数</label>
     <input type="range" id="simAtkNum" min="0" max="8" step="1" value="4" />
     <span id="simAtkNumV">4</span>
@@ -500,6 +577,47 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
       <button data-vehcamp="defend">守方</button>
     </div>
     <div class="note" id="vehList">当前图暂无固定载具部署数据。</div>
+  </section>
+  <section id="paneSupport" class="commander-only" hidden>
+    <h2>阵地支援</h2>
+    <div class="buttons fsSkillGrid" id="fsSkills">
+      <button data-fs="guided" class="on">制导导弹</button>
+      <button data-fs="artillery">炮兵齐射</button>
+      <button data-fs="thermobaric">温压弹</button>
+      <button data-fs="smoke">区域烟雾</button>
+      <button data-fs="vehicle">呼叫载具</button>
+    </div>
+    <div class="row" id="fsVehicleRow" hidden>
+      <label>载具</label>
+      <select id="fsVehicle" style="flex:1"></select>
+    </div>
+    <div class="buttons">
+      <button id="fsPlace">选择落点</button>
+      <button id="fsPlay">播放预览</button>
+      <button id="fsStop">停止</button>
+      <button id="fsClear">清除</button>
+    </div>
+    <div class="buttons">
+      <button id="fsMiniPoint" title="在全屏小地图上选择阵地支援落点">小地图选点</button>
+    </div>
+    <div class="row">
+      <label>时间</label>
+      <input type="range" id="fsTime" min="0" max="60" step="0.1" value="0" data-enhanced="1" />
+      <span id="fsTimeV">—</span>
+    </div>
+    <div class="row" id="fsAzimuthRow" hidden>
+      <label>来袭方位</label>
+      <input type="range" id="fsAzimuth" min="0" max="360" step="5" value="315" data-enhanced="1" />
+      <span id="fsAzimuthV">315°</span>
+    </div>
+    <div class="row" id="fsZoneRow" hidden>
+      <label>显示</label>
+      <button id="fsZoneRange">满伤区</button>
+      <button id="fsZoneFull">斩杀线</button>
+      <button id="fsZoneKill"></button>
+    </div>
+    <h2>参数</h2>
+    <table id="fsParams" class="fsTable"></table>
   </section>
   <section id="paneBallistics" class="commander-only" hidden>
     <div class="buttons">
@@ -657,8 +775,8 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
   <div id="labels"></div>
   <div id="hud">左键旋转 · Shift+左键平移 · 滚轮缩放</div>
   <div id="debugPick" hidden></div>
-  <div id="minimap" hidden>
-    <div class="cap" id="minimapCap">M键地图</div>
+  <div id="minimap" hidden title="点击打开全屏战术地图">
+    <div class="cap" id="minimapCap">战术地图 · M键 / 点击预览</div>
     <div id="minimapBody">
       <img id="minimapImg" alt="minimap" />
       <canvas id="minimapCanvas" width="300" height="300"></canvas>
@@ -668,36 +786,175 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
   <div id="loading">正在加载地图…</div>
 </div>
 
+<div id="mmFull" hidden>
+  <div id="mmFullBar">
+    <div id="mmFullTitle">战术地图 <span id="mmFullScale">全图</span></div>
+    <div id="mmFullTools">
+      <button id="mmFullZoomOut" title="缩小">−</button>
+      <button id="mmFullZoomIn" title="放大">+</button>
+      <button id="mmFullReset">全图</button>
+      <button id="mmFullSupport">阵地支援选点</button>
+      <button id="mmFullClose" title="关闭">✕</button>
+    </div>
+  </div>
+  <div id="mmFullStage">
+    <canvas id="mmFullCanvas"></canvas>
+    <canvas id="mmFullInk"></canvas>
+    <div id="mmFullCursor" hidden></div>
+  </div>
+  <div id="mmInkBar" aria-label="平面标记">
+    <button data-ink="pen" title="钢笔">✎</button>
+    <button data-ink="laser" title="激光笔">✦</button>
+    <button data-ink="line" title="直线">╱</button>
+    <button data-ink="arrow" title="箭头">➤</button>
+    <button data-ink="circle" title="圆圈">○</button>
+    <button data-ink="eraser" title="橡皮">⌫</button>
+    <span class="inkSep"></span>
+    <button class="inkColor on" data-ink-color="#ff4d4f" title="红色" style="color:#ff4d4f">●</button>
+    <button class="inkColor" data-ink-color="#ffd166" title="黄色" style="color:#ffd166">●</button>
+    <button class="inkColor" data-ink-color="#4dd0e1" title="青色" style="color:#4dd0e1">●</button>
+    <button class="inkColor" data-ink-color="#69f0ae" title="绿色" style="color:#69f0ae">●</button>
+    <span class="inkSep"></span>
+    <button id="mmInkUndo" title="撤销">↶</button>
+    <button id="mmInkClear" title="清空平面标记">清空</button>
+  </div>
+  <div id="mmFullHint">边界固定不可拖动 · 滚轮缩放 · M 键开关 · Esc 关闭</div>
+</div>
+
+<button id="railToggle" title="打开地图设置侧栏" aria-controls="rightRail" aria-expanded="false">地图设置</button>
+<aside id="rightRail" aria-label="地图设置">
+  <div class="railHead">
+    <span class="railTitle">地图设置</span>
+    <button id="railClose" title="收起地图设置侧栏">✕</button>
+  </div>
+  <div class="railBody">
+    <h2>模式</h2>
+    <div class="buttons" id="modeSwitch">
+      <button data-mode="commander" class="on">胜者为王</button>
+      <button data-mode="assault">攻防</button>
+      <button data-mode="conquest">占领</button>
+      <button data-mode="tdm">团队死斗</button>
+    </div>
+    <div class="modeNotice" id="modeNotice" hidden></div>
+    <h2>地图</h2>
+    <select id="mapSelect"></select>
+    <h2>地图精度</h2>
+    <div class="buttons" id="tierButtons">
+      <button id="tierLow" class="on">低精度</button>
+      <button id="tierMid" hidden aria-hidden="true" tabindex="-1">中精度</button>
+      <button id="tierHigh" hidden aria-hidden="true" tabindex="-1">高精度</button>
+    </div>
+    <h2>天空</h2>
+    <div class="row">
+      <label>天空</label>
+      <select id="skyPreset" style="flex:1">
+        <option value="black">纯黑 · 默认</option>
+        <option value="sunny">晴朗午后 · Sunny</option>
+        <option value="evening">黄昏 · Evening</option>
+        <option value="overcast">阴天 · Overcast</option>
+        <option value="mistyfog">薄雾 · Mistyfog</option>
+        <option value="sand">沙尘 · Sandy</option>
+        <option value="storm">风暴 · Storm</option>
+        <option value="sunshower">雨后 · Sunshower</option>
+        <option value="twilight">暮色 · CivilTwilight</option>
+        <option value="night">夜色 · Night</option>
+      </select>
+    </div>
+    <h2>图层</h2>
+    <div class="buttons">
+      <button id="tGround" class="on">地面</button>
+      <button id="tBuild" class="on">建筑</button>
+      <button id="tTex" class="on">贴图</button>
+    </div>
+    <h2>小地图设置</h2>
+    <div id="minimapSection">
+      <div class="buttons">
+        <button id="tMini" class="on">显示小地图</button>
+      </div>
+      <div class="buttons" id="mmSize">
+        <button data-mm="small">小</button>
+        <button data-mm="medium" class="on">中</button>
+        <button data-mm="large">大</button>
+      </div>
+      <div class="row"><label>范围</label><input type="range" id="mmRange" min="50" max="500" step="10" data-fine="5" value="150" /><span id="mmRangeV">150</span></div>
+    </div>
+    <h2>渲染与帧率</h2>
+    <div class="row">
+      <label>渲染倍率</label>
+      <input type="range" id="renderScale" min="50" max="200" step="25" data-fine="5" value="100" />
+      <span id="renderScaleVal">100%</span>
+    </div>
+    <div class="row">
+      <label>最高帧率</label>
+      <select id="fpsCap">
+        <option value="0">不限</option>
+        <option value="30">30</option>
+        <option value="60">60</option>
+        <option value="120">120</option>
+        <option value="144">144</option>
+      </select>
+    </div>
+  </div>
+</aside>
+
 <script type="module">
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildDeployment } from './deploy_system.js';
+import { createFieldSupport } from './field_support.js';
 
 /* ------------------------------------------------------------------ *
  * 1. 显卡检测 + 画质档
  * ------------------------------------------------------------------ */
 const canvas = document.getElementById('scene');
 const PAGE_PARAMS = new URLSearchParams(location.search);
-const APP_MODE = ['tdm', 'assault'].includes(PAGE_PARAMS.get('mode')) ? PAGE_PARAMS.get('mode') : 'commander';
-const IS_TDM = APP_MODE === 'tdm';
-const IS_ASSAULT = APP_MODE === 'assault';
-const availableMaps = new Set(["Iceland", "Cracked", "Gibraltar", "Retrowar", "Derail", "NavalBattle", "Fault", "Monument", "Collapse", "Mogadishu", "Skyline"]);
+let APP_MODE = ['tdm', 'assault', 'conquest'].includes(PAGE_PARAMS.get('mode')) ? PAGE_PARAMS.get('mode') : 'commander';
+let IS_TDM = APP_MODE === 'tdm';
+let IS_ASSAULT = APP_MODE === 'assault';
+let IS_CONQUEST = APP_MODE === 'conquest';
+let mapManifest = null;
+let mapIndexCache = null;
+let modeCatalogCache = null;
+const vehicleModeCache = new Map();
+let modeStateToken = 0;
+let baseMinimapCfg = null;
+let baseMinimapRange = 150;
+let tdmReturnView = null;
+const availableMaps = new Set(["Iceland", "Cracked", "Gibraltar", "Shafted", "Crest", "Retrowar", "Derail", "NavalBattle", "Fault", "Mogadishu", "Skyline"]);
 const requestedMap = PAGE_PARAMS.get('map') || 'Skyline';
 const normalizedMap = requestedMap.toLowerCase() === 'derail' ? 'Derail' : requestedMap.toLowerCase() === 'skyline' ? 'Skyline' : requestedMap;
 const MAP = availableMaps.has(normalizedMap) ? normalizedMap : 'Skyline';
 const MAP_ROOT = './map/' + (MAP === 'Derail' ? 'derail' : MAP) + '/';
+/* 本地设置读写：地图切换会整页重载，需要跨页面保留两侧栏的状态。 */
+function loadStored(key, fallback = '') {
+  try {
+    const value = localStorage.getItem(key);
+    return value == null ? fallback : value;
+  } catch (error) { return fallback; }
+}
+function saveStored(key, value) {
+  try { localStorage.setItem(key, String(value)); } catch (error) { /* 忽略 */ }
+}
+let fieldSupport = null;
 document.body.classList.toggle('mode-tdm', IS_TDM);
+document.body.classList.toggle('mode-conquest', IS_CONQUEST);
 let viewRoll = 0;
-function mapRollFor(code) {
-  // Top-down view must match the ClipMap's own orientation (the game's
-  // MiniMapSceneRotation), so the 3D plan view and the minimap share the same
-  // world "up" direction and never drift relative to each other.
-  if (minimapCfg && minimapCfg.rotation != null) {
-    return minimapCfg.rotation * Math.PI / 180;
+/* 2026-10-31（第二轮，用户定调）：统一到“游戏世界轴向”。
+   ClipMap 底图本身是世界轴向烘焙的（图像 U=世界X、V=世界Y），MapInfoConfig 的
+   MiniMapSceneRotation / RotationType 只是游戏 UI（M 键地图）的显示朝向，不是世界方向。
+   为保证 15 张图方向一致、且与 3D 世界/俯视/导出同向，默认一律按世界轴向显示（0°）。
+   需要临时对照游戏内每图朝向时，用 URL 参数 ?mmrot=game 切回“整图按游戏显示朝向旋转”。 */
+function minimapDisplayRotationDeg() {
+  if (PAGE_PARAMS.get('mmrot') === 'game' && minimapCfg && minimapCfg.rotation != null) {
+    return Number(minimapCfg.rotation) || 0;
   }
   return 0;
+}
+function mapRollFor(code) {
+  // 3D 俯视跟随小地图的显示朝向；世界轴向模式下恒为 0（不滚转），与底图/据点层同向。
+  return minimapDisplayRotationDeg() * Math.PI / 180;
 }
 const mapSelect = document.getElementById('mapSelect');
 mapSelect.addEventListener('change', () => {
@@ -706,73 +963,209 @@ mapSelect.addEventListener('change', () => {
   url.searchParams.set('map', code);
   if (APP_MODE !== 'commander') url.searchParams.set('mode', APP_MODE);
   else url.searchParams.delete('mode');
+  // 整页切换前把左侧当前页签/滚动和右侧栏滚动落盘，重载后各自恢复。
+  flushLayoutState();
   location.href = url.toString();
 });
+try {
+  const skySelect = document.getElementById('skyPreset');
+  const savedSky = loadStored('df_tactical_sky', '');
+  if (savedSky && [...skySelect.options].some((option) => option.value === savedSky)) {
+    skySelect.value = savedSky;
+  }
+} catch (error) { /* 忽略 */ }
 for (const button of document.querySelectorAll('#modeSwitch button')) {
   button.classList.toggle('on', button.dataset.mode === APP_MODE);
   button.addEventListener('click', () => {
     if (button.dataset.mode === APP_MODE) return;
-    const url = new URL(location.href);
-    url.searchParams.set('map', MAP);
-    if (button.dataset.mode !== 'commander') url.searchParams.set('mode', button.dataset.mode);
-    else url.searchParams.delete('mode');
-    location.href = url.toString();
+    if (!modeAvailableForMap(button.dataset.mode)) {
+      showModeNotice(button.dataset.mode);
+      return;
+    }
+    hideModeNotice();
+    switchMode(button.dataset.mode).catch((error) => {
+      console.error('模式切换失败', error);
+      document.getElementById('hud').textContent = '模式切换失败，请刷新页面重试。';
+    });
   });
 }
-document.getElementById('modeInfo').textContent = IS_TDM
-  ? '团队死斗：仅保留地图、部署区与安全预测；切换后自动俯视死斗区域。'
-  : IS_ASSAULT ? '攻防：使用攻防地图规则、阶段、据点、部署与载具数据。'
-  : '胜者为王：全面战场地图与攻防、踩点、弹道工具。';
-function applyModeCopy() {
-  if (!IS_TDM) return;
-  document.body.classList.add('mode-tdm');
-  document.getElementById('deployHeading').textContent = '团队死斗部署区';
-  document.getElementById('predHeading').textContent = '部署点安全预测';
-  document.querySelector('#tabPlan span').textContent = '03';
-  document.getElementById('tdmInfo').hidden = false;
-  const campLabels = ['双方', 'GTI', 'HAAVK'];
-  document.querySelectorAll('#spawnCampFilter button').forEach((button, index) => {
-    button.textContent = campLabels[index] || button.textContent;
-  });
-  const predCamp = document.getElementById('predCamp');
-  predCamp.options[0].textContent = 'GTI';
-  predCamp.options[1].textContent = 'HAAVK';
-  document.getElementById('tdmPredCountRow').hidden = false;
-  document.getElementById('tdmPredNote').hidden = false;
-  document.getElementById('predPlace').textContent = '布置 1 人';
-  document.getElementById('predRandom').textContent = '随机 8 人';
-  document.getElementById('predResult').textContent =
-    '团队死斗预测已就绪。敌人默认 8 人，可调 1–10 人；每个人独立参与威胁计算。';
-  document.getElementById('predEnemyInfo').textContent = '敌人 0/8 · 0 人';
+function currentModeEntry() {
+  return (modeCatalogCache?.modes || []).find((item) => item.id === APP_MODE) || null;
 }
-applyModeCopy();
-// 部署系统：指挥官模式把步兵部署/预测并入“部署系统”页；TDM 保留在地图页
-if (!IS_TDM) {
-  const infantry = document.getElementById('infantryBlock');
-  const prediction = document.getElementById('predictionBlock');
-  const deployPane = document.getElementById('paneVehicles');
-  if (deployPane && infantry) deployPane.prepend(infantry);
-  if (deployPane && prediction) deployPane.appendChild(prediction);
-  const capList = document.getElementById('capList');
-  const simBlock = document.getElementById('simBlock');
-  if (simBlock && capList) simBlock.appendChild(capList);
-  // 统一按钮行：步兵与载具的部署开关放在同一组
-  const infantryRow = infantry?.querySelector('.buttons');
-  const vehRow = document.getElementById('vehToggleRow');
-  if (infantryRow && vehRow) {
-    while (vehRow.firstChild) infantryRow.appendChild(vehRow.firstChild);
-    vehRow.remove();
+function modeMapCount() {
+  const mode = currentModeEntry();
+  return mode?.maps?.length || (IS_TDM ? 11 : 13);
+}
+function modeDisplayName() {
+  const mode = currentModeEntry();
+  return mode?.mapModeNames?.[MAP] || mode?.name
+    || ({ commander: '胜者为王', assault: '攻防', conquest: '占领', tdm: '团队死斗' }[APP_MODE] || '胜者为王');
+}
+function modeCatalogEntry(modeId) {
+  return (modeCatalogCache?.modes || []).find((item) => item.id === modeId) || null;
+}
+function modeLabelFor(modeId, fallback = '') {
+  const mode = modeCatalogEntry(modeId);
+  return mode?.mapModeNames?.[MAP] || mode?.name || fallback;
+}
+/* 该模式在当前地图是否有数据；没有就置灰并在点击时说明原因。 */
+function modeAvailableForMap(modeId) {
+  const maps = modeCatalogEntry(modeId)?.maps;
+  if (!Array.isArray(maps) || !maps.length) return true;
+  return maps.some((code) => String(code).toLowerCase() === MAP.toLowerCase());
+}
+let modeNoticeTimer = 0;
+function syncModeAvailability() {
+  const mapName = mapManifest?.mapName || MAP;
+  for (const button of document.querySelectorAll('#modeSwitch button')) {
+    const modeId = button.dataset.mode;
+    const available = modeAvailableForMap(modeId);
+    button.classList.toggle('unavailable', !available);
+    button.setAttribute('aria-disabled', available ? 'false' : 'true');
+    if (available) {
+      button.removeAttribute('title');
+      continue;
+    }
+    const label = modeLabelFor(modeId, button.textContent.trim());
+    button.title = `当前地图「${mapName}」没有${label}数据，点击查看提示`;
   }
 }
+function hideModeNotice() {
+  const el = document.getElementById('modeNotice');
+  if (el) el.hidden = true;
+  clearTimeout(modeNoticeTimer);
+}
+function showModeNotice(modeId) {
+  const el = document.getElementById('modeNotice');
+  const label = modeLabelFor(modeId, '该模式');
+  const mapName = mapManifest?.mapName || MAP;
+  if (el) {
+    el.textContent = `当前地图「${mapName}」没有${label}数据；请先在地图下拉中切换到支持${label}的地图，再选择该模式。`;
+    el.hidden = false;
+  }
+  clearTimeout(modeNoticeTimer);
+  modeNoticeTimer = setTimeout(hideModeNotice, 4200);
+}
+function mapModeSuffix(code) {
+  const mode = currentModeEntry();
+  const special = mode?.mapModeNames?.[code];
+  if (special) return ` · ${special}`;
+  return IS_TDM ? ' · TDM' : IS_CONQUEST ? ' · 占领' : IS_ASSAULT ? ' · 攻防' : '';
+}
+function refreshMapSelect() {
+  if (!mapIndexCache || !modeCatalogCache) return;
+  const mode = currentModeEntry();
+  const allowed = new Set((mode?.maps || []).map((code) => String(code).toLowerCase()));
+  const maps = mapIndexCache.filter((item) => allowed.has(String(item.code).toLowerCase()));
+  const current = maps.find((item) => String(item.code).toLowerCase() === MAP.toLowerCase());
+  mapSelect.innerHTML = maps.map((item) =>
+    `<option value="${item.code}" ${current?.code === item.code ? 'selected' : ''}>` +
+    `${item.name}${mapModeSuffix(item.code)}${item.ready ? '' : '（未就绪）'}</option>`).join('');
+}
+function applyModeCopy() {
+  document.body.classList.toggle('mode-tdm', IS_TDM);
+  document.body.classList.toggle('mode-conquest', IS_CONQUEST);
+  const simStateRow = document.getElementById('simStateRow');
+  if (simStateRow) simStateRow.hidden = !IS_CONQUEST;
+  for (const button of document.querySelectorAll('#modeSwitch button')) {
+    button.classList.toggle('on', button.dataset.mode === APP_MODE);
+  }
+  const mapName = mapManifest?.mapName || MAP;
+  const modeTitle = modeDisplayName();
+  document.title = `三角洲行动 · ${modeTitle} · ${mapName}`;
+  document.querySelector('#panel h1').textContent =
+    IS_TDM ? '团队死斗三维战术板'
+      : IS_CONQUEST ? `${modeTitle}三维战术板`
+      : IS_ASSAULT ? '攻防三维战术板' : '指挥官三维战术板';
+  document.getElementById('deployHeading').textContent =
+    IS_TDM ? '团队死斗部署区' : '部署详情';
+  document.getElementById('predHeading').textContent =
+    IS_TDM ? '部署点安全预测' : '复活点预测';
+  document.querySelector('#tabPlan span').textContent = IS_TDM ? '02' : '05';
+  document.querySelector('#tabSystem span').textContent = IS_TDM ? '03' : '06';
+  const stageHeading = document.querySelector('#stageSection h2');
+  if (stageHeading) stageHeading.textContent = IS_CONQUEST ? `${modeTitle}图层` : '攻防阶段';
+  const sectorToggle = document.getElementById('tSector');
+  if (sectorToggle) sectorToggle.textContent = IS_CONQUEST ? '区域' : '阶段区域';
+  const flight = document.getElementById('tFlight');
+  if (flight) flight.hidden = IS_CONQUEST;
+  const campLabels = IS_TDM ? ['双方', 'GTI', 'HAAVK'] : ['双方', '攻方', '守方'];
+  document.querySelectorAll('#spawnCampFilter button').forEach((button, index) => {
+    if (campLabels[index]) button.textContent = campLabels[index];
+  });
+  const predCamp = document.getElementById('predCamp');
+  if (predCamp?.options[0]) predCamp.options[0].textContent = IS_TDM ? 'GTI' : '攻方';
+  if (predCamp?.options[1]) predCamp.options[1].textContent = IS_TDM ? 'HAAVK' : '守方';
+  document.getElementById('tdmInfo').hidden = !IS_TDM;
+  document.getElementById('tdmPredCountRow').hidden = !IS_TDM;
+  document.getElementById('tdmPredNote').hidden = !IS_TDM;
+  document.getElementById('predPlace').textContent = IS_TDM ? '布置 1 人' : '布置 1 队';
+  document.getElementById('predRandom').textContent = IS_TDM ? '随机 8 人' : '随机 5 队';
+  document.getElementById('predResult').textContent = IS_TDM
+    ? '团队死斗预测已就绪。敌人默认 8 人，可调 1–10 人；每个人独立参与威胁计算。'
+    : IS_CONQUEST ? `${modeTitle}：选择旗点和攻/守方后，随机或手动布置敌人小队预测复活安全度。`
+    : '选择据点和阵营，随机或手动布置 5 支敌人小队后预测。';
+  document.getElementById('predEnemyInfo').textContent = IS_TDM ? '敌人 0/8 · 0 人' : '敌人 0/20 · 0 队';
+  refreshMapSelect();
+  syncModeAvailability();
+  scheduleSystemInfo();
+}
+applyModeCopy();
+// 部署系统：非 TDM 把步兵部署/预测并入“部署系统”页；TDM 保留在地图页。
+// 记录原始位置，供无缝切换模式时把 DOM 搬回/搬出。
+const panelLayoutOriginal = (() => {
+  const record = (id) => {
+    const node = document.getElementById(id);
+    return node ? { parent: node.parentNode, next: node.nextSibling } : null;
+  };
+  return {
+    infantry: record('infantryBlock'),
+    prediction: record('predictionBlock'),
+    capList: record('capList'),
+  };
+})();
+function moveNode(node, target, next) {
+  if (!node || !target) return;
+  target.insertBefore(node, next && next.parentNode === target ? next : null);
+}
+function layoutModePanels() {
+  const infantry = document.getElementById('infantryBlock');
+  const prediction = document.getElementById('predictionBlock');
+  const capList = document.getElementById('capList');
+  const deployPane = document.getElementById('paneVehicles');
+  const simBlock = document.getElementById('simBlock');
+  if (!infantry || !prediction || !capList) return;
+  if (IS_TDM) {
+    const paneMap = document.getElementById('paneMap');
+    const simHeading = paneMap ? [...paneMap.querySelectorAll('h2')]
+      .find((h) => h.textContent.trim() === '踩点模拟') : null;
+    if (paneMap && simHeading) {
+      paneMap.insertBefore(infantry, simHeading);
+      paneMap.insertBefore(prediction, simHeading);
+      infantry.appendChild(capList);
+    } else {
+      const original = panelLayoutOriginal;
+      if (original.infantry) moveNode(infantry, original.infantry.parent, original.infantry.next);
+      if (original.prediction) moveNode(prediction, original.prediction.parent, original.prediction.next);
+      if (original.capList) moveNode(capList, original.capList.parent, original.capList.next);
+    }
+  } else {
+    if (deployPane) deployPane.prepend(infantry);
+    if (deployPane) deployPane.appendChild(prediction);
+    if (simBlock) simBlock.appendChild(capList);
+  }
+  arrangeMapPane();
+}
 
-/* 地图功能页顺序：视角 → 攻防阶段 → 步兵标记 → 载具标记 → 小地图 → 踩点模拟 → 飞行提示 */
+/* 地图功能页顺序：视角 → 攻防阶段 → 步兵标记 → 载具标记 → 小地图原位置 → 踩点模拟 → 飞行提示
+   小地图设置已移到右侧「地图设置」栏，这里用留在地图页的空锚点维持顺序。 */
 function arrangeMapPane() {
   const pane = document.getElementById('paneMap');
   if (!pane) return;
   const stage = document.getElementById('stageSection');
   const infantry = document.getElementById('infantryMarkSection');
   const vehicle = document.getElementById('vehicleMarkSection');
-  const mini = document.getElementById('minimapSection');
+  const mini = document.getElementById('paneMapMinimapSlot');
   const capLegend = document.getElementById('capLegend');
   const simBlock = document.getElementById('simBlock');
   const simH2 = [...pane.querySelectorAll('h2')].find((h) => h.textContent.trim() === '踩点模拟');
@@ -781,22 +1174,60 @@ function arrangeMapPane() {
     if (infantry) pane.insertBefore(infantry, mini);
     if (vehicle) pane.insertBefore(vehicle, mini);
   }
-  if (capLegend) pane.appendChild(capLegend);
+  // 图例统一放在踩点结果下面、据点表上面（TDM 下踩点区和图例都是隐藏的）。
   if (simH2) pane.appendChild(simH2);
   if (simBlock) pane.appendChild(simBlock);
+  const simResult = document.getElementById('simResult');
+  const capList = document.getElementById('capList');
+  if (capLegend && simBlock && simResult && simResult.parentNode === simBlock) {
+    simBlock.insertBefore(capLegend, capList && capList.parentNode === simBlock ? capList : null);
+  } else if (capLegend) {
+    pane.appendChild(capLegend);
+  }
 }
-arrangeMapPane();
-function switchTab(name) {
-  if (IS_TDM && (name === 'ballistics' || name === 'vehicles')) name = 'map';
-  const panes = { system: 'paneSystem', map: 'paneMap', ballistics: 'paneBallistics', plan: 'panePlan', vehicles: 'paneVehicles' };
-  const buttons = { system: 'tabSystem', map: 'tabMap', ballistics: 'tabBallistics', plan: 'tabPlan', vehicles: 'tabVehicles' };
-  const labels = { system: '系统选项', map: '地图功能', ballistics: '弹道解算', plan: '方案管理', vehicles: '部署系统' };
+layoutModePanels();
+/* 左侧页签 / 滚动位置跨地图切换保留，与右侧栏互不干扰。 */
+const TAB_STORE = 'df_tactical_tab';
+const TAB_SCROLL_STORE = 'df_tactical_tab_scroll';
+let activeTab = 'map';
+let tabScroll = {};
+try { tabScroll = JSON.parse(loadStored(TAB_SCROLL_STORE, '{}')) || {}; } catch (error) { tabScroll = {}; }
+let tabScrollTimer = 0;
+function saveTabScroll(name = activeTab) {
+  const panel = document.getElementById('panel');
+  if (!name || !panel || panel.classList.contains('collapsed')) return;
+  tabScroll[name] = Math.round(panel.scrollTop);
+  saveStored(TAB_SCROLL_STORE, JSON.stringify(tabScroll));
+}
+function restoreTabScroll(name) {
+  const panel = document.getElementById('panel');
+  if (!panel) return;
+  const top = Number(tabScroll[name] || 0);
+  requestAnimationFrame(() => {
+    if (activeTab !== name) return;
+    const max = Math.max(0, panel.scrollHeight - panel.clientHeight);
+    panel.scrollTop = Math.min(Math.max(0, top), max);
+  });
+}
+function switchTab(name, options = {}) {
+  if (IS_TDM && (name === 'ballistics' || name === 'vehicles' || name === 'support')) name = 'map';
+  const panes = { system: 'paneSystem', map: 'paneMap', ballistics: 'paneBallistics', plan: 'panePlan', vehicles: 'paneVehicles', support: 'paneSupport' };
+  const buttons = { system: 'tabSystem', map: 'tabMap', ballistics: 'tabBallistics', plan: 'tabPlan', vehicles: 'tabVehicles', support: 'tabSupport' };
+  const labels = { system: '系统信息', map: '地图功能', ballistics: '弹道解算', plan: '方案管理', vehicles: '部署系统', support: '阵地支援' };
+  if (!panes[name]) name = 'map';
+  // 首次恢复时不要用当前（尚未恢复的）滚动位置覆盖上次记录。
+  if (options.restore !== true && activeTab && activeTab !== name) saveTabScroll(activeTab);
   for (const [key, paneId] of Object.entries(panes)) {
     document.getElementById(paneId).hidden = (key !== name);
     document.getElementById(buttons[key]).classList.toggle('on', key === name);
   }
-  document.getElementById('panelCrumb').textContent = labels[name] || labels.system;
-  if (name === 'vehicles' && !IS_TDM) {
+  document.getElementById('panelCrumb').textContent = labels[name] || labels.map;
+  activeTab = name;
+  saveStored(TAB_STORE, name);
+  restoreTabScroll(name);
+  if (name === 'system') scheduleSystemInfo();
+  if (name === 'support') fieldSupport?.refresh();
+  if (name === 'vehicles' && !IS_TDM && options.hydrate !== false) {
     if (!vehicleData) loadVehicleSystem();
     else rebuildVehiclePanel();
   }
@@ -825,7 +1256,7 @@ function scheduleNavHide() {
   clearTimeout(navCloseTimer);
   navCloseTimer = setTimeout(() => hideNav(true), 1200);
 }
-for (const [id, name] of [['tabSystem', 'system'], ['tabMap', 'map'], ['tabBallistics', 'ballistics'], ['tabPlan', 'plan'], ['tabVehicles', 'vehicles']]) {
+for (const [id, name] of [['tabSystem', 'system'], ['tabMap', 'map'], ['tabBallistics', 'ballistics'], ['tabPlan', 'plan'], ['tabVehicles', 'vehicles'], ['tabSupport', 'support']]) {
   document.getElementById(id).addEventListener('click', () => {
     switchTab(name);
     setPanelCollapsed(false);
@@ -864,22 +1295,127 @@ sidePanelToggle.addEventListener('click', () => setPanelCollapsed(!sidePanel.cla
 try {
   if (localStorage.getItem('df_tactical_panel_collapsed') === '1') setPanelCollapsed(true, false);
 } catch (error) { /* 忽略 */ }
+sidePanel.addEventListener('scroll', () => {
+  clearTimeout(tabScrollTimer);
+  tabScrollTimer = setTimeout(() => saveTabScroll(activeTab), 180);
+}, { passive: true });
+/* 右侧「地图设置」栏：默认隐藏，记住上次展开状态；展开后视口变窄，小地图与渲染器自动跟随。 */
+const rightRail = document.getElementById('rightRail');
+const railToggle = document.getElementById('railToggle');
+const railClose = document.getElementById('railClose');
+const railBody = rightRail.querySelector('.railBody');
+let railScrollTimer = 0;
+let railAutoClose = false;
+let railCloseTimer = 0;
+let railHoverSuppressUntil = 0;
+function saveRailScroll() {
+  if (!railBody) return;
+  saveStored('df_tactical_rail_scroll', Math.round(railBody.scrollTop));
+}
+function restoreRailScroll() {
+  if (!railBody) return;
+  const top = Number(loadStored('df_tactical_rail_scroll', '0')) || 0;
+  requestAnimationFrame(() => {
+    const max = Math.max(0, railBody.scrollHeight - railBody.clientHeight);
+    railBody.scrollTop = Math.min(Math.max(0, top), max);
+  });
+}
+/* 地图切换整页重载前统一落盘，保证左右两侧各自保持原状。 */
+function flushLayoutState() {
+  saveTabScroll(activeTab);
+  saveRailScroll();
+}
+function setRailOpen(open, persist = true, auto = false) {
+  rightRail.classList.toggle('open', open);
+  railToggle.classList.toggle('on', open);
+  document.body.classList.toggle('rail-open', open);
+  railToggle.textContent = open ? '收起' : '地图设置';
+  railToggle.title = open ? '收起地图设置侧栏' : '打开地图设置侧栏';
+  railToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  railAutoClose = open && auto;
+  if (!open) clearTimeout(railCloseTimer);
+  if (persist) saveStored('df_tactical_rail_open', open ? '1' : '0');
+  setTimeout(resize, 310);
+  if (open) setTimeout(restoreRailScroll, 30);
+}
+
+function scheduleRailAutoClose(delay = 620) {
+  if (!railAutoClose || mmFullOpen) return;
+  clearTimeout(railCloseTimer);
+  railCloseTimer = setTimeout(() => {
+    if (mmFullOpen) return;
+    if (rightRail.matches(':hover') || railToggle.matches(':hover')) return;
+    setRailOpen(false, false);
+  }, delay);
+}
+
+function cancelRailAutoClose() {
+  clearTimeout(railCloseTimer);
+}
+
+/* 右侧栏：鼠标靠近右边缘自动弹出；离开后自动收起。用户点击/进入栏内可固定。 */
+window.addEventListener('mousemove', (event) => {
+  if (mmFullOpen) return;
+  if (window.innerWidth - event.clientX <= 18 && Date.now() >= railHoverSuppressUntil
+    && !rightRail.classList.contains('open')) {
+    cancelRailAutoClose();
+    setRailOpen(true, false, true);
+  } else if (railAutoClose && !rightRail.matches(':hover') && !railToggle.matches(':hover')
+    && window.innerWidth - event.clientX > 28) {
+    scheduleRailAutoClose();
+  }
+}, { passive: true });
+rightRail.addEventListener('mouseenter', () => {
+  cancelRailAutoClose();
+});
+rightRail.addEventListener('mouseleave', () => {
+  scheduleRailAutoClose();
+});
+rightRail.addEventListener('pointerdown', () => {
+  railAutoClose = false;
+  cancelRailAutoClose();
+});
+railToggle.addEventListener('mouseenter', () => {
+  cancelRailAutoClose();
+  if (!rightRail.classList.contains('open')) setRailOpen(true, false, true);
+});
+railToggle.addEventListener('mouseleave', () => {
+  scheduleRailAutoClose();
+});
+railBody?.addEventListener('scroll', () => {
+  clearTimeout(railScrollTimer);
+  railScrollTimer = setTimeout(saveRailScroll, 180);
+}, { passive: true });
+window.addEventListener('pagehide', flushLayoutState);
+railToggle.addEventListener('click', () => {
+  if (rightRail.classList.contains('open') && railAutoClose) {
+    railAutoClose = false;
+    saveStored('df_tactical_rail_open', '1');
+    return;
+  }
+  setRailOpen(!rightRail.classList.contains('open'));
+  if (!rightRail.classList.contains('open')) railHoverSuppressUntil = Date.now() + 800;
+});
+railClose.addEventListener('click', () => {
+  railHoverSuppressUntil = Date.now() + 800;
+  setRailOpen(false, true, false);
+});
+try {
+  if (localStorage.getItem('df_tactical_rail_open') === '1') setRailOpen(true, false);
+} catch (error) { /* 忽略 */ }
 Promise.all([
   fetch('./map/map.json').then((r) => r.json()),
   fetch('./data/game_modes.json').then((r) => r.json()),
 ]).then(([index, catalog]) => {
+  mapIndexCache = index;
+  modeCatalogCache = catalog;
+  refreshMapSelect();
+  syncModeAvailability();
   const mode = (catalog.modes || []).find((item) => item.id === APP_MODE)
     || (catalog.modes || [])[0];
   const allowed = new Set((mode?.maps || []).map((code) => String(code).toLowerCase()));
   const maps = index.filter((item) => allowed.has(String(item.code).toLowerCase()));
   const current = maps.find((item) => String(item.code).toLowerCase() === MAP.toLowerCase());
-  mapSelect.innerHTML = maps.map((item) =>
-    `<option value="${item.code}" ${current?.code === item.code ? 'selected' : ''}>` +
-    `${item.name}${IS_TDM ? ' · TDM' : IS_ASSAULT ? ' · 攻防' : ''}${item.ready ? '' : '（未就绪）'}</option>`).join('');
-  document.getElementById('modeInfo').textContent = IS_TDM
-    ? `团队死斗：${maps.length} 个唯一关卡；仅保留地图、部署区与安全预测，切换后自动俯视死斗区域。`
-    : IS_ASSAULT ? `攻防：${maps.length} 张地图；使用攻防模式的阶段、据点和载具配置。`
-    : `胜者为王：${maps.length} 张全面战场地图；保留攻防、踩点与弹道工具。`;
   if (!current && maps.length) {
     const url = new URL(location.href);
     url.searchParams.set('map', maps[0].code);
@@ -917,8 +1453,25 @@ const PROFILES = {
 };
 let profile = { ...PROFILES[gpuTier] };
 const earlyParams = new URLSearchParams(location.search);
-let renderScale = 1.0;   // 渲染倍率（0.5–2.0）
+function clampNumber(value, lo, hi) {
+  const number = Number(value);
+  return Math.min(hi, Math.max(lo, Number.isFinite(number) ? number : lo));
+}
+/* 渲染倍率 / 最高帧率沿用上次选择；没有记录时用显卡档默认值。 */
+let renderScale = clampNumber(loadStored('df_tactical_render_scale', '1'), 0.5, 2);  // 渲染倍率（0.5–2.0）
 let fpsCap = profile.fpsCap;  // 最高帧率
+try {
+  const scaleSlider = document.getElementById('renderScale');
+  const scalePercent = Math.round(renderScale * 100);
+  scaleSlider.value = String(scalePercent);
+  document.getElementById('renderScaleVal').textContent = `${scalePercent}%`;
+  const fpsSelect = document.getElementById('fpsCap');
+  const savedFps = loadStored('df_tactical_fps_cap', '');
+  if (savedFps !== '' && [...fpsSelect.options].some((option) => Number(option.value) === Number(savedFps))) {
+    fpsCap = Number(savedFps);
+    fpsSelect.value = String(fpsCap);
+  }
+} catch (error) { /* 忽略 */ }
 
 const renderer = new THREE.WebGLRenderer({
   canvas, antialias: profile.antialias, powerPreference: 'high-performance',
@@ -1210,6 +1763,7 @@ function markButtons() {
   document.getElementById('tTex').classList.toggle('on', textured);
   document.getElementById('tMini').classList.toggle('on', !document.getElementById('minimap').hidden);
   document.getElementById('tDebug').classList.toggle('on', debugPick);
+  scheduleSystemInfo();
 }
 
 /* ------------------------------------------------------------------ *
@@ -1239,14 +1793,17 @@ function sampleGrid(t, x, y) {
 
 async function loadGroundTextures(groundUris) {
   const loader = new THREE.TextureLoader();
+  const hdParam = earlyParams.get('hd');
+  const useHd = hdParam === '1' || (hdParam !== '0' && gpuTier === 'discrete');
   const pick = async (i) => {
     if (!groundUris[i]) return null;
     let tex;
-    try {
-      tex = await loader.loadAsync(MAP_ROOT + 'ground_hd/L' + i + '.jpg');
-    } catch (error) {
-      tex = await loader.loadAsync(groundUris[i]);
+    if (useHd) {
+      try {
+        tex = await loader.loadAsync(MAP_ROOT + 'ground_hd/L' + i + '.jpg');
+      } catch (error) { tex = null; }
     }
+    if (!tex) tex = await loader.loadAsync(groundUris[i]);
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
     tex.anisotropy = profile.anisotropy;
     tex.colorSpace = THREE.SRGBColorSpace;
@@ -1647,6 +2204,7 @@ async function loadFlightData() {
     flightData = null;
   }
   const zones = flightData?.zones || [];
+  document.getElementById('tFlight').disabled = false;
   if (!zones.length) {
     document.getElementById('tFlight').disabled = true;
     info.textContent = '当前地图未检测到飞行载具区。';
@@ -1661,7 +2219,7 @@ async function loadFlightData() {
  * ------------------------------------------------------------------ */
 /* MFPK 单文件数据包（可选快速通道）：整档几何 + 其引用的底色贴图打成一个
  * 二进制文件，浏览器每档只发 1 次请求，减少数百/上千次 HTTP 往返。 */
-const SPLIT_MFPK = {"map/Retrowar/Retrowar_low.mfpk":{"parts":["Retrowar_low.mfpk.part01","Retrowar_low.mfpk.part02"],"size":66310276},"map/Monument/Monument_low.mfpk":{"parts":["Monument_low.mfpk.part01","Monument_low.mfpk.part02","Monument_low.mfpk.part03"],"size":97508628},"map/Mogadishu/Mogadishu_low.mfpk":{"parts":["Mogadishu_low.mfpk.part01","Mogadishu_low.mfpk.part02","Mogadishu_low.mfpk.part03"],"size":100469668},"map/Skyline/Skyline_low.mfpk":{"parts":["Skyline_low.mfpk.part01","Skyline_low.mfpk.part02"],"size":54002996}};
+const SPLIT_MFPK = {"map/Crest/Crest_low.mfpk":{"parts":["Crest_low.mfpk.part01","Crest_low.mfpk.part02","Crest_low.mfpk.part03","Crest_low.mfpk.part04"],"size":14875440},"map/Retrowar/Retrowar_low.mfpk":{"parts":["Retrowar_low.mfpk.part01","Retrowar_low.mfpk.part02"],"size":66310276},"map/Mogadishu/Mogadishu_low.mfpk":{"parts":["Mogadishu_low.mfpk.part01","Mogadishu_low.mfpk.part02","Mogadishu_low.mfpk.part03"],"size":100469668},"map/Skyline/Skyline_low.mfpk":{"parts":["Skyline_low.mfpk.part01","Skyline_low.mfpk.part02","Skyline_low.mfpk.part03","Skyline_low.mfpk.part04","Skyline_low.mfpk.part05","Skyline_low.mfpk.part06","Skyline_low.mfpk.part07","Skyline_low.mfpk.part08","Skyline_low.mfpk.part09","Skyline_low.mfpk.part10","Skyline_low.mfpk.part11","Skyline_low.mfpk.part12","Skyline_low.mfpk.part13"],"size":53915284},"map/Skyline/Skyline_lowextra.mfpk":{"parts":["Skyline_lowextra.mfpk.part01","Skyline_lowextra.mfpk.part02","Skyline_lowextra.mfpk.part03","Skyline_lowextra.mfpk.part04","Skyline_lowextra.mfpk.part05","Skyline_lowextra.mfpk.part06","Skyline_lowextra.mfpk.part07","Skyline_lowextra.mfpk.part08","Skyline_lowextra.mfpk.part09","Skyline_lowextra.mfpk.part10","Skyline_lowextra.mfpk.part11","Skyline_lowextra.mfpk.part12"],"size":46245164}};
 async function fetchMfpkBytes(url) {
   const key = url.replace(/^\.\//, '');
   const split = SPLIT_MFPK[key];
@@ -2007,6 +2565,7 @@ async function selectTier(name) {
     document.getElementById(id).classList.toggle('on', key === name);
   }
   collidableDirty = true;
+  scheduleSystemInfo();
 }
 
 async function loadTier(name) {
@@ -2360,6 +2919,11 @@ const ATTACK_COLOR = 0x2ecc71;
 const DEFEND_COLOR = 0xe74c3c;
 function areaColour(area) {
   if (area.kind === 'base') return area.subkind === 'attack' ? ATTACK_COLOR : DEFEND_COLOR;
+  if (IS_CONQUEST) {
+    // 交战区（sector）与其他模式一致用白色；旗点仍用黄色。
+    if (area.kind === 'sector') return 0xffffff;
+    return 0xffd166;
+  }
   if (area.kind === 'sector') return 0xffffff;
   return STAGE_COLOR[area.stage] ?? 0xa0a8b4;
 }
@@ -2380,6 +2944,24 @@ function markerOf(area) {
 let terrainData = null;
 let minimapCfg = null;
 let minimapRange = 150;
+let minimapDpr = 1;
+let minimapLogicalW = 300;
+let minimapView = null;
+let mmFullOpen = false;
+let mmFullZoom = 1;
+let mmFullSupportMode = false;
+let mmFullView = null;
+let mmFullDpr = 1;
+let mmFullCursor = null;
+let mmInkTool = 'none';
+let mmInkColor = '#ff4d4f';
+let mmInkWidth = 3;
+let mmInkMarks = [];
+let mmInkCurrent = null;
+let mmInkDrawing = false;
+let mmLaserPoints = [];
+let mmLaserRaf = 0;
+let mmLaserStrokeId = 0;
 const areaGroups = {};
 const labelNodes = [];
 const areaNodes = [];
@@ -2396,15 +2978,19 @@ let stageFilter = 'all';
    有计划时：阶段按钮由计划生成，normal 阶段常驻覆盖层，event 阶段切换场景。 */
 let phasePlan = null;
 let activePhase = null;
+let phasePlanData = null;
 
 async function loadPhasePlan() {
-  try {
-    const all = await (await fetch('./data/map_phase_plan.json')).json();
-    const code = String(MAP).toLowerCase();
-    phasePlan = (all.maps || []).find((m) => String(m.code).toLowerCase() === code) || null;
-  } catch (error) {
-    phasePlan = null;
+  if (phasePlanData === null) {
+    try {
+      phasePlanData = await (await fetch('./data/map_phase_plan.json')).json();
+    } catch (error) {
+      phasePlanData = { maps: [] };
+    }
   }
+  const code = String(MAP).toLowerCase();
+  phasePlan = IS_CONQUEST ? null
+    : ((phasePlanData.maps || []).find((m) => String(m.code).toLowerCase() === code) || null);
 }
 
 function phaseObjectives(phase) {
@@ -2528,6 +3114,7 @@ function prepareAreas(areas) {
 
 function areaVisible(item) {
   if (kindVisible[item.kind] === false) return false;
+  if (IS_CONQUEST) return true;   // 占领没有阶段：旗点/区域/基地全部可见
   if (activePhase) {
     if (item.kind === 'objective') return activePhase._src.has(item.srcLabel);
     return item.stage === activePhase.stage;
@@ -2563,21 +3150,16 @@ function makeAreaMesh(area) {
 
   const ownZ = pts.reduce((s, p) => s + p[1], 0) / pts.length;
   const groundZ = pts.reduce((s, p) => s + heightAt(p[0], p[2]), 0) / pts.length;
-  const useSourceY = !isObjective;   // 交战区/基地：直接用源数据真实高度
-  const elevated = isObjective && (ownZ - groundZ) > 2.0;
+  // 据点/交战区/基地都使用源数据真实 Z，不再把据点投影到地形。
   const underground = (groundZ - ownZ) > 2.0;
-  const fillLift = useSourceY ? 0.5 : (elevated ? 0.5 : 3.5);
-  const lineLift = useSourceY ? 1.2 : (elevated ? 1.4 : 4.5);
+  const fillLift = 0.5;
+  const lineLift = 1.2;
   const pointY = new Map(pts.map((p) => [`${Math.round(p[0] * 100)},${Math.round(p[2] * 100)}`, p[1]]));
 
   for (let k = 0; k < pos.count; k++) {
     const x = pos.getX(k), z = pos.getZ(k);
-    if (useSourceY) {
-      const y = pointY.get(`${Math.round(x * 100)},${Math.round(z * 100)}`);
-      pos.setY(k, (y ?? ownZ) + fillLift);
-    } else {
-      pos.setY(k, (elevated || underground ? ownZ : heightAt(x, z)) + fillLift);
-    }
+    const y = pointY.get(`${Math.round(x * 100)},${Math.round(z * 100)}`);
+    pos.setY(k, (y ?? ownZ) + fillLift);
   }
   pos.needsUpdate = true;
   const fillOpacity = isObjective ? (isAppendix || isHidden ? 0.16 : 0.34) : area.kind === 'sector' ? 0.16 : 0.10;
@@ -2593,7 +3175,7 @@ function makeAreaMesh(area) {
   fill.renderOrder = underground ? 9 : 10;
 
   const loop = pts.concat([pts[0]]).map((p) => new THREE.Vector3(
-    p[0], (useSourceY ? p[1] : (elevated || underground ? ownZ : heightAt(p[0], p[2]))) + lineLift, p[2]));
+    p[0], p[1] + lineLift, p[2]));
   let line;
   if (isAppendix || isHidden) {
     const lineGeo = new THREE.BufferGeometry().setFromPoints(loop);
@@ -2656,6 +3238,77 @@ function buildAreas(areas) {
   applyAreaVisibility();
 }
 
+function disposeObject3D(root) {
+  if (!root) return;
+  root.traverse((obj) => {
+    if (obj.geometry) obj.geometry.dispose?.();
+    const mats = Array.isArray(obj.material) ? obj.material : (obj.material ? [obj.material] : []);
+    for (const mat of mats) mat.dispose?.();
+  });
+}
+
+function clearAreas() {
+  if (areaGroups.all) {
+    scene.remove(areaGroups.all);
+    disposeObject3D(areaGroups.all);
+    areaGroups.all = null;
+  }
+  for (const item of labelNodes) item.div.remove();
+  labelNodes.length = 0;
+  areaNodes.length = 0;
+  areasData = [];
+}
+
+function clearSpawnOverlays() {
+  if (spawnGroup) {
+    scene.remove(spawnGroup);
+    disposeObject3D(spawnGroup);
+    spawnGroup = null;
+  }
+  if (vehicleOverlayGroup) {
+    scene.remove(vehicleOverlayGroup);
+    disposeObject3D(vehicleOverlayGroup);
+    vehicleOverlayGroup = null;
+  }
+  for (const { div } of deployLabelNodes) div.remove();
+  deployLabelNodes = [];
+}
+
+function clearPredictionOverlay() {
+  if (predGroup) {
+    scene.remove(predGroup);
+    disposeObject3D(predGroup);
+    predGroup = null;
+  }
+  for (const { div } of predLabels) div.remove();
+  predLabels.length = 0;
+  for (const { div } of predTeamLabels) div.remove();
+  predTeamLabels.length = 0;
+  predEnemies = [];
+  predMarkMode = false;
+}
+
+function hideAllEventOverlays() {
+  for (const group of Object.values(eventGroups)) group.visible = false;
+}
+
+function clearStageUi() {
+  activePhase = null;
+  stageFilter = 'all';
+  for (const [id, key] of [['tObj', 'objective'], ['tSector', 'sector'], ['tBase', 'base']]) {
+    kindVisible[key] = true;
+    document.getElementById(id).classList.add('on');
+  }
+  document.getElementById('stageButtons').innerHTML = '';
+  document.getElementById('stageButtonsUnreleased').innerHTML = '';
+  document.getElementById('stageList').innerHTML = '';
+  document.getElementById('phaseNotes').hidden = true;
+  document.getElementById('phaseNotes').textContent = '';
+  for (const button of document.querySelectorAll('#stageButtons button, #stageButtonsUnreleased button')) {
+    button.classList.remove('on');
+  }
+}
+
 function applyAreaVisibility() {
   for (const item of areaNodes) {
     item.node.visible = areaVisible(item);
@@ -2707,38 +3360,94 @@ function drawCanvasArrow(ctx, from, to, color, size) {
   ctx.restore();
 }
 
+function resizeMinimapCanvas() {
+  const canvas = document.getElementById('minimapCanvas');
+  if (!canvas) return;
+  const css = canvas.clientWidth || parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mm-size')) || 240;
+  const dpr = 2; // 固定 2x 超采样，低 DPI 屏也能得到清晰的小地图
+  const px = Math.max(1, Math.round(css * dpr));
+  if (canvas.width !== px || canvas.height !== px) {
+    canvas.width = px;
+    canvas.height = px;
+  }
+  minimapDpr = dpr;
+  minimapLogicalW = css;
+}
+
 function updateMinimap() {
   if (!minimapCtx || document.getElementById('minimap').hidden || (!areasData.length && !IS_TDM)) return;
-  const w = minimapCtx.canvas.width, h = minimapCtx.canvas.height;
+  const canvas = minimapCtx.canvas;
+  const cssSize = canvas.clientWidth;
+  if (!cssSize) return;
+  const dpr = 2; // 固定 2x 超采样
+  const px = Math.max(1, Math.round(cssSize * dpr));
+  if (canvas.width !== px || canvas.height !== px) {
+    canvas.width = px;
+    canvas.height = px;
+  }
+  const w = cssSize, h = cssSize;
   const ctx = minimapCtx;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const ox = controls.target.x, oz = controls.target.z;
   const range = minimapRange;
   const scale = (w / 2) / range;
   const anyStage = stageFilter === 'all';
   ctx.clearRect(0, 0, w, h);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   const bgImg = document.getElementById('minimapImg');
-  let toX, toY;
+  let toX, toY, worldAt;
   if (bgImg && bgImg.naturalWidth && minimapCfg) {
-    // Background ClipMap and the objective/sector polygons must share the SAME
-    // world->canvas transform (including rotation), otherwise they drift apart.
+    // 2026-10-31（第二轮）：minimap_bw.jpg 是游戏 ClipMap 的原始拼接（图像轴=世界轴，
+    // 本身不含旋转）。MapInfoConfig 的 MiniMapSceneRotation/RotationType 只是游戏 UI 的
+    // 显示朝向，不是世界方向；为让 15 张图方向一致、并与 3D 世界/俯视/导出同向，
+    // 默认一律按世界轴向显示（rad=0）；需要对照游戏内每图朝向时用 ?mmrot=game。
+    // 底图与据点层始终共用同一套“图内坐标 -> 画布坐标”映射（含 rad），不会再错位。
     const iw = bgImg.naturalWidth, ih = bgImg.naturalHeight;
     const cx = minimapCfg.centerX, cz = minimapCfg.centerZ, ext = minimapCfg.halfExtent;
-    const rad = (minimapCfg.rotation || 0) * Math.PI / 180;
+    const rad = minimapDisplayRotationDeg() * Math.PI / 180;
     const cos = Math.cos(rad), sin = Math.sin(rad);
-    const ix = (x, z) => ((x - cx) * cos - (z - cz) * sin) / ext * (iw - 1) / 2 + (iw - 1) / 2;
-    const iy = (x, z) => ((x - cx) * sin + (z - cz) * cos) / ext * (ih - 1) / 2 + (ih - 1) / 2;
-    const cix = ix(ox, oz), ciy = iy(ox, oz);
+    const ix = (x) => (x - cx) / ext * (iw - 1) / 2 + (iw - 1) / 2;
+    const iy = (z) => (z - cz) / ext * (ih - 1) / 2 + (ih - 1) / 2;
+    const cix = ix(ox), ciy = iy(oz);
     const ppu = Math.min(iw, ih) / (ext * 2);
     const rp = range * ppu;
-    ctx.drawImage(bgImg, cix - rp, ciy - rp, rp * 2, rp * 2, 0, 0, w, h);
-    toX = (x, z) => (ix(x, z) - (cix - rp)) / (2 * rp) * w;
-    toY = (x, z) => (iy(x, z) - (ciy - rp)) / (2 * rp) * h;
+    const k = (w / 2) / rp;
+    ctx.save();
+    ctx.translate(w / 2, h / 2);
+    ctx.rotate(rad);
+    ctx.filter = 'brightness(1.45) contrast(1.16)';
+    ctx.drawImage(bgImg, cix - rp, ciy - rp, rp * 2, rp * 2, -w / 2, -h / 2, w, h);
+    ctx.restore();
+    ctx.filter = 'none';
+    toX = (x, z) => w / 2 + ((ix(x) - cix) * cos - (iy(z) - ciy) * sin) * k;
+    toY = (x, z) => h / 2 + ((ix(x) - cix) * sin + (iy(z) - ciy) * cos) * k;
+    worldAt = (sx, sy) => {
+      const dx = (sx - w / 2) * cos + (sy - h / 2) * sin;
+      const dy = -(sx - w / 2) * sin + (sy - h / 2) * cos;
+      const ixv = cix + dx / k;
+      const iyv = ciy + dy / k;
+      return {
+        x: cx + ((ixv - (iw - 1) / 2) / ((iw - 1) / 2)) * ext,
+        z: cz + ((iyv - (ih - 1) / 2) / ((ih - 1) / 2)) * ext,
+      };
+    };
   } else {
     ctx.fillStyle = 'rgba(10, 14, 20, 0.82)';
     ctx.fillRect(0, 0, w, h);
     toX = (x, z) => (x - ox) * scale + w / 2;
     toY = (x, z) => (z - oz) * scale + h / 2;
+    worldAt = (sx, sy) => ({ x: ox + (sx - w / 2) / scale, z: oz + (sy - h / 2) / scale });
   }
+  minimapView = {
+    w, h, toX, toY, worldAt,
+    atEvent(event) {
+      const rect = canvas.getBoundingClientRect();
+      const sx = (event.clientX - rect.left) / Math.max(1, rect.width) * w;
+      const sy = (event.clientY - rect.top) / Math.max(1, rect.height) * h;
+      return { sx, sy, world: worldAt(sx, sy) };
+    },
+  };
   if (IS_TDM && tdmData) {
     if ((tdmData.area.points || []).length >= 3) {
       ctx.beginPath();
@@ -2865,12 +3574,716 @@ function updateMinimap() {
     ctx.fillStyle = '#ffffff';
     ctx.fillText(key, x, y - 9);
   }
+  const pv = fieldSupport?.preview?.();
+  if (pv?.center) {
+    const sx = toX(pv.center.x, pv.center.z);
+    const sy = toY(pv.center.x, pv.center.z);
+    const rr = Math.max(0, Number(pv.blastRadius) || 0) * scale;
+    ctx.save();
+    if (rr > 2) {
+      ctx.beginPath();
+      ctx.arc(sx, sy, rr, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 183, 71, .10)';
+      ctx.fill();
+      ctx.setLineDash([4, 3]);
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = 'rgba(255, 196, 100, .95)';
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.beginPath();
+    ctx.arc(sx, sy, 5.5, 0, Math.PI * 2);
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = '#ffcf7a';
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(sx - 8, sy); ctx.lineTo(sx + 8, sy);
+    ctx.moveTo(sx, sy - 8); ctx.lineTo(sx, sy + 8);
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = 'rgba(255, 235, 190, .95)';
+    ctx.stroke();
+    ctx.restore();
+  }
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
   ctx.arc(w / 2, h / 2, 3, 0, Math.PI * 2);
   ctx.fill();
 }
 
+
+/* ===== 全屏战术地图 ===== */
+function mmFullMapBounds() {
+  const cfg = minimapCfg;
+  let cx = cfg && Number.isFinite(Number(cfg.centerX)) ? Number(cfg.centerX) : controls.target.x;
+  let cz = cfg && Number.isFinite(Number(cfg.centerZ)) ? Number(cfg.centerZ) : controls.target.z;
+  let ext = cfg && Number(cfg.halfExtent) > 0 ? Number(cfg.halfExtent) : 0;
+  if (!ext) {
+    const boxes = [];
+    for (const area of areasData) if (area.points?.length) boxes.push(area.points);
+    if (IS_TDM && tdmData?.area?.points?.length) boxes.push(tdmData.area.points);
+    if (boxes.length) {
+      let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+      for (const pts of boxes) for (const p of pts) {
+        minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]);
+        minZ = Math.min(minZ, p[2]); maxZ = Math.max(maxZ, p[2]);
+      }
+      cx = (minX + maxX) / 2; cz = (minZ + maxZ) / 2;
+      ext = Math.max(maxX - minX, maxZ - minZ) / 2;
+    } else {
+      ext = Math.max(300, minimapRange * 2);
+    }
+  }
+  return { cx, cz, ext: Math.max(50, ext) };
+}
+
+function mmFullMinZoom() {
+  const stage = document.getElementById('mmFullStage');
+  const W = stage?.clientWidth || 0;
+  const H = stage?.clientHeight || 0;
+  if (!(W > 0 && H > 0)) return 0.5;
+  return Math.min(1, Math.min(W, H) / Math.max(W, H));
+}
+
+function updateMinimapFullChrome() {
+  const scale = document.getElementById('mmFullScale');
+  if (scale) {
+    const minZoom = mmFullMinZoom();
+    if (mmFullZoom <= minZoom + 0.001) scale.textContent = '全图';
+    else if (mmFullZoom <= 1.001) scale.textContent = '铺满';
+    else scale.textContent = `${mmFullZoom.toFixed(1)}×`;
+  }
+  const support = document.getElementById('mmFullSupport');
+  if (support) {
+    support.classList.toggle('on', mmFullSupportMode);
+    support.textContent = mmFullSupportMode ? '退出支援选点' : '阵地支援选点';
+    support.disabled = !fieldSupport;
+  }
+  const hint = document.getElementById('mmFullHint');
+  if (hint) {
+    if (mmFullSupportMode) {
+      const pv = fieldSupport?.preview?.();
+      hint.textContent = `支援选点：点击地图放置「${pv?.skillName || '阵地支援'}」落点 · 滚轮缩放 · Esc 关闭`;
+    } else {
+      hint.textContent = '边界固定不可拖动 · 滚轮缩放 · M 键开关 · Esc 关闭';
+    }
+  }
+}
+
+function drawSupportOnCanvas(ctx, toX, toY, metersToPx, u) {
+  const pv = fieldSupport?.preview?.();
+  if (!pv?.center) return;
+  const x = toX(pv.center.x, pv.center.z);
+  const y = toY(pv.center.x, pv.center.z);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+  const radius = Math.max(0, Number(pv.blastRadius) || 0) * metersToPx;
+  ctx.save();
+  if (radius > 3) {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 183, 71, .08)';
+    ctx.fill();
+    ctx.setLineDash([7 * u, 5 * u]);
+    ctx.lineWidth = 1.6 * u;
+    ctx.strokeStyle = 'rgba(255, 196, 100, .94)';
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.beginPath();
+  ctx.arc(x, y, 8 * u, 0, Math.PI * 2);
+  ctx.lineWidth = 2 * u;
+  ctx.strokeStyle = '#ffcf7a';
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x - 12 * u, y); ctx.lineTo(x + 12 * u, y);
+  ctx.moveTo(x, y - 12 * u); ctx.lineTo(x, y + 12 * u);
+  ctx.lineWidth = 1.4 * u;
+  ctx.strokeStyle = 'rgba(255, 235, 190, .95)';
+  ctx.stroke();
+  ctx.font = `bold ${11 * u}px "Microsoft YaHei", sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.lineWidth = 4 * u; ctx.strokeStyle = 'rgba(4,8,14,.92)';
+  ctx.strokeText('支援', x, y + 15 * u);
+  ctx.fillStyle = '#ffe0a3';
+  ctx.fillText('支援', x, y + 15 * u);
+  ctx.restore();
+}
+
+function drawFullMinimapFeatures(ctx, layer, u) {
+  const { toX, toY } = layer;
+  if (IS_TDM && tdmData) {
+    if ((tdmData.area.points || []).length >= 3) {
+      ctx.beginPath();
+      tdmData.area.points.forEach((p, index) => {
+        const x = toX(p[0], p[2]), y = toY(p[0], p[2]);
+        if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      ctx.globalAlpha = .10; ctx.fillStyle = '#ffffff'; ctx.fill();
+      ctx.globalAlpha = 1; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2 * u; ctx.stroke();
+    }
+    for (const point of tdmData.deploymentPoints || []) {
+      if (!campVisible(point.camp)) continue;
+      const colour = point.camp === 'attack' ? '#2ecc71'
+        : point.camp === 'defend' ? '#e74c3c' : '#f1c40f';
+      if ((point.points || []).length >= 3) {
+        ctx.beginPath();
+        point.points.forEach((p, index) => {
+          const x = toX(p[0], p[2]), y = toY(p[0], p[2]);
+          if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.globalAlpha = .08; ctx.fillStyle = colour; ctx.fill();
+        ctx.globalAlpha = 1; ctx.strokeStyle = colour; ctx.lineWidth = 1.5 * u; ctx.stroke();
+      }
+      const x = toX(point.pos[0], point.pos[2]), y = toY(point.pos[0], point.pos[2]);
+      ctx.fillStyle = colour;
+      ctx.beginPath(); ctx.arc(x, y, (point.kind === 'base' ? 3.2 : 2.2) * u, 0, Math.PI * 2); ctx.fill();
+    }
+  } else {
+    for (const area of areasData) {
+      if (!areaVisible(area)) continue;
+      const colour = areaColour(area);
+      const css = '#' + colour.toString(16).padStart(6, '0');
+      ctx.beginPath();
+      for (let i = 0; i < area.points.length; i++) {
+        const p = area.points[i];
+        const x = toX(p[0], p[2]), y = toY(p[0], p[2]);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      const alpha = area.kind === 'objective' ? 0.25 : area.kind === 'sector' ? 0.10 : 0.14;
+      ctx.globalAlpha = alpha; ctx.fillStyle = css; ctx.fill();
+      ctx.globalAlpha = 1; ctx.strokeStyle = css; ctx.lineWidth = (area.kind === 'base' ? 2.4 : 1.7) * u; ctx.stroke();
+      if (area.kind === 'objective') {
+        const ax = area.points.reduce((s, p) => s + p[0], 0) / area.points.length;
+        const az = area.points.reduce((s, p) => s + p[2], 0) / area.points.length;
+        const tx = toX(ax, az), ty = toY(ax, az);
+        ctx.font = `bold ${12 * u}px "Microsoft YaHei", sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.lineWidth = 3 * u; ctx.strokeStyle = 'rgba(10,14,20,.92)';
+        ctx.strokeText(areaLabelText(area), tx, ty);
+        ctx.fillStyle = css; ctx.fillText(areaLabelText(area), tx, ty);
+      }
+    }
+  }
+  for (const [letter, pts] of Object.entries(markPoints)) {
+    if (!pts.length) continue;
+    const colour = MARK_COLORS[letter];
+    const css = '#' + colour.toString(16).padStart(6, '0');
+    const xy = pts.map((p) => [toX(p.x, p.z), toY(p.x, p.z)]);
+    for (let i = 0; i < xy.length - 1; i++) {
+      ctx.beginPath(); ctx.moveTo(xy[i][0], xy[i][1]); ctx.lineTo(xy[i + 1][0], xy[i + 1][1]);
+      ctx.strokeStyle = css; ctx.lineWidth = 7 * u; ctx.lineCap = 'round'; ctx.stroke();
+      drawCanvasArrow(ctx, xy[i], xy[i + 1], css, 10 * u);
+    }
+    if (xy.length) {
+      const cx = xy.reduce((sum, p) => sum + p[0], 0) / xy.length;
+      const cy = xy.reduce((sum, p) => sum + p[1], 0) / xy.length;
+      ctx.font = `bold ${12 * u}px "Microsoft YaHei", sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.lineWidth = 2.5 * u; ctx.strokeStyle = 'rgba(10,14,20,.92)';
+      ctx.strokeText(`${letter}队`, cx, cy - 12 * u);
+      ctx.fillStyle = css; ctx.fillText(`${letter}队`, cx, cy - 12 * u);
+    }
+  }
+  for (const key of ROSTER_KEYS) {
+    const p = rosterPositions[key];
+    if (!p) continue;
+    const x = toX(p.x, p.z), y = toY(p.x, p.z);
+    const css = '#' + rosterColor(key).toString(16).padStart(6, '0');
+    ctx.beginPath(); ctx.arc(x, y, 4.2 * u, 0, Math.PI * 2);
+    ctx.fillStyle = css; ctx.fill();
+    ctx.lineWidth = 1.6 * u; ctx.strokeStyle = 'rgba(10,14,20,.92)'; ctx.stroke();
+    ctx.font = `bold ${11 * u}px "Microsoft YaHei", sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineWidth = 2.5 * u; ctx.strokeStyle = 'rgba(10,14,20,.92)';
+    ctx.strokeText(key, x, y - 11 * u);
+    ctx.fillStyle = '#ffffff'; ctx.fillText(key, x, y - 11 * u);
+  }
+  // 当前 3D 视角中心
+  const vx = toX(controls.target.x, controls.target.z);
+  const vy = toY(controls.target.x, controls.target.z);
+  if (Number.isFinite(vx) && Number.isFinite(vy)) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(100,200,255,.9)';
+    ctx.lineWidth = 1.4 * u;
+    ctx.beginPath();
+    ctx.arc(vx, vy, 7 * u, 0, Math.PI * 2);
+    ctx.moveTo(vx - 11 * u, vy); ctx.lineTo(vx + 11 * u, vy);
+    ctx.moveTo(vx, vy - 11 * u); ctx.lineTo(vx, vy + 11 * u);
+    ctx.stroke();
+    ctx.restore();
+  }
+  drawSupportOnCanvas(ctx, toX, toY, layer.metersToPx, u);
+}
+
+/* ===== 平面图标记（仅 2D，不影响 3D） ===== */
+function mmInkPoint(p) {
+  if (!mmFullView) return null;
+  const x = mmFullView.toX(p.x);
+  const y = mmFullView.toY(p.x, p.z);
+  return Number.isFinite(x) && Number.isFinite(y) ? [x, y] : null;
+}
+
+function mmInkStroke(ctx, points, color, width) {
+  if (!points.length) return;
+  const p = points.map(mmInkPoint).filter(Boolean);
+  if (!p.length) return;
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  const paint = () => {
+    ctx.beginPath();
+    if (p.length === 1) {
+      ctx.arc(p[0][0], p[0][1], Math.max(1.5, width / 2), 0, Math.PI * 2);
+    } else {
+      ctx.moveTo(p[0][0], p[0][1]);
+      for (let i = 1; i < p.length; i++) ctx.lineTo(p[i][0], p[i][1]);
+    }
+  };
+  paint();
+  ctx.strokeStyle = 'rgba(3,8,14,.72)';
+  ctx.lineWidth = width + 3;
+  ctx.stroke();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function mmInkArrow(ctx, points, color, width) {
+  const p = points.map(mmInkPoint).filter(Boolean);
+  if (p.length < 2) return;
+  mmInkStroke(ctx, points, color, width);
+  const [x1, y1] = p[p.length - 2];
+  const [x2, y2] = p[p.length - 1];
+  const a = Math.atan2(y2 - y1, x2 - x1);
+  const head = 11 + width * 2;
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - head * Math.cos(a - 0.42), y2 - head * Math.sin(a - 0.42));
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - head * Math.cos(a + 0.42), y2 - head * Math.sin(a + 0.42));
+  ctx.stroke();
+  ctx.restore();
+}
+
+function mmInkCircle(ctx, points, color, width) {
+  const p = points.map(mmInkPoint).filter(Boolean);
+  if (p.length < 2) return;
+  const [x1, y1] = p[0];
+  const [x2, y2] = p[p.length - 1];
+  const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+  const rx = Math.abs(x2 - x1) / 2, ry = Math.abs(y2 - y1) / 2;
+  if (rx < 2 || ry < 2) return;
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+  ctx.fillStyle = color.replace(')', ', .08)').replace('rgb(', 'rgba(');
+  if (color.startsWith('#') && color.length === 7) {
+    ctx.fillStyle = color + '18';
+  }
+  ctx.fill();
+  ctx.lineWidth = width + 3;
+  ctx.strokeStyle = 'rgba(3,8,14,.72)';
+  ctx.stroke();
+  ctx.lineWidth = width;
+  ctx.strokeStyle = color;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function mmInkDrawOne(ctx, mark) {
+  if (!mark) return;
+  if (mark.tool === 'arrow') mmInkArrow(ctx, mark.points, mark.color, mark.width);
+  else if (mark.tool === 'circle') mmInkCircle(ctx, mark.points, mark.color, mark.width);
+  else mmInkStroke(ctx, mark.points, mark.color, mark.width);
+}
+
+function mmInkPruneLaser(now) {
+  const keep = [];
+  for (const p of mmLaserPoints) if (now - p.t < 1100) keep.push(p);
+  mmLaserPoints = keep;
+}
+
+function drawMinimapInk() {
+  if (!mmFullOpen || !mmFullView) return;
+  const canvas = document.getElementById('mmFullInk');
+  if (!canvas) return;
+  const dpr = mmFullDpr || Math.min(window.devicePixelRatio || 1, 2);
+  const W = mmFullView.W, H = mmFullView.H;
+  const pxW = Math.max(1, Math.round(W * dpr));
+  const pxH = Math.max(1, Math.round(H * dpr));
+  if (canvas.width !== pxW || canvas.height !== pxH) {
+    canvas.width = pxW; canvas.height = pxH;
+  }
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  for (const mark of mmInkMarks) mmInkDrawOne(ctx, mark);
+  if (mmInkCurrent) mmInkDrawOne(ctx, mmInkCurrent);
+  const now = performance.now();
+  mmInkPruneLaser(now);
+  if (mmLaserPoints.length > 1) {
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    for (let i = 1; i < mmLaserPoints.length; i++) {
+      const prev = mmLaserPoints[i - 1];
+      const curr = mmLaserPoints[i];
+      if (prev.s !== curr.s) continue;
+      const a = mmInkPoint(prev);
+      const b = mmInkPoint(curr);
+      if (!a || !b) continue;
+      const age = now - curr.t;
+      const alpha = Math.max(0, 1 - age / 1100);
+      ctx.beginPath();
+      ctx.moveTo(a[0], a[1]);
+      ctx.lineTo(b[0], b[1]);
+      ctx.strokeStyle = `rgba(255,77,79,${alpha * .9})`;
+      ctx.lineWidth = 3;
+      ctx.shadowColor = '#ff4d4f';
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+function mmInkLaserTick() {
+  mmLaserRaf = 0;
+  if (!mmFullOpen) { mmLaserPoints = []; return; }
+  drawMinimapInk();
+  if (mmLaserPoints.length) mmLaserRaf = requestAnimationFrame(mmInkLaserTick);
+}
+
+function mmInkScheduleLaser() {
+  if (!mmLaserRaf) mmLaserRaf = requestAnimationFrame(mmInkLaserTick);
+}
+
+function mmInkCancelLaser() {
+  if (mmLaserRaf) cancelAnimationFrame(mmLaserRaf);
+  mmLaserRaf = 0;
+  mmLaserPoints = [];
+}
+
+function mmInkAddLaser(world) {
+  if (!world) return;
+  const now = performance.now();
+  mmLaserPoints.push({ x: world.x, z: world.z, t: now, s: mmLaserStrokeId });
+  if (mmLaserPoints.length > 180) mmLaserPoints.shift();
+  drawMinimapInk();
+  mmInkScheduleLaser();
+}
+
+function mmInkEraseAt(world) {
+  const p = mmInkPoint(world);
+  if (!p) return false;
+  for (let i = mmInkMarks.length - 1; i >= 0; i--) {
+    const mark = mmInkMarks[i];
+    const pts = mark.points.map(mmInkPoint).filter(Boolean);
+    if (!pts.length) continue;
+    let hit = false;
+    if (mark.tool === 'circle' && pts.length >= 2) {
+      const x1 = Math.min(pts[0][0], pts[pts.length - 1][0]) - 10;
+      const x2 = Math.max(pts[0][0], pts[pts.length - 1][0]) + 10;
+      const y1 = Math.min(pts[0][1], pts[pts.length - 1][1]) - 10;
+      const y2 = Math.max(pts[0][1], pts[pts.length - 1][1]) + 10;
+      hit = p[0] >= x1 && p[0] <= x2 && p[1] >= y1 && p[1] <= y2;
+    } else {
+      for (let j = 1; j < pts.length && !hit; j++) {
+        const ax = pts[j - 1][0], ay = pts[j - 1][1];
+        const bx = pts[j][0], by = pts[j][1];
+        const dx = bx - ax, dy = by - ay;
+        const len = dx * dx + dy * dy || 1;
+        const t = Math.max(0, Math.min(1, ((p[0] - ax) * dx + (p[1] - ay) * dy) / len));
+        const qx = ax + dx * t, qy = ay + dy * t;
+        hit = Math.hypot(p[0] - qx, p[1] - qy) < 15;
+      }
+    }
+    if (hit) {
+      mmInkMarks.splice(i, 1);
+      drawMinimapInk();
+      return true;
+    }
+  }
+  return false;
+}
+
+function mmInkUpdateUi() {
+  document.querySelectorAll('#mmInkBar [data-ink]').forEach((b) => {
+    b.classList.toggle('on', b.dataset.ink === mmInkTool);
+  });
+  document.querySelectorAll('#mmInkBar [data-ink-color]').forEach((b) => {
+    b.classList.toggle('on', b.dataset.inkColor === mmInkColor);
+  });
+  const ink = document.getElementById('mmFullInk');
+  if (ink) ink.style.pointerEvents = mmInkTool === 'none' ? 'none' : 'auto';
+  if (mmInkTool !== 'none') {
+    const cursor = document.getElementById('mmFullCursor');
+    if (cursor) cursor.hidden = true;
+  }
+}
+
+function mmInkWorldFromEvent(event) {
+  return mmFullCanvasWorldAt(event);
+}
+
+function mmInkStart(event) {
+  if (!mmFullOpen || mmInkTool === 'none' || event.button !== 0) return;
+  const world = mmInkWorldFromEvent(event);
+  if (!world) return;
+  mmInkDrawing = true;
+  if (mmInkTool === 'eraser') {
+    mmInkEraseAt(world);
+    return;
+  }
+  if (mmInkTool === 'laser') {
+    mmLaserStrokeId += 1;
+    mmInkAddLaser(world);
+    return;
+  }
+  mmInkCurrent = {
+    tool: mmInkTool, color: mmInkColor, width: mmInkWidth,
+    points: mmInkTool === 'pen' ? [world] : [world, world],
+  };
+  drawMinimapInk();
+  try { event.target.setPointerCapture?.(event.pointerId); } catch (error) { /* 忽略 */ }
+}
+
+function mmInkMove(event) {
+  if (!mmFullOpen || mmInkTool === 'none') return;
+  const world = mmInkWorldFromEvent(event);
+  if (!world) return;
+  if (mmInkTool === 'laser') {
+    if (!mmInkDrawing) return;
+    mmInkAddLaser(world);
+    return;
+  }
+  if (!mmInkDrawing) return;
+  if (mmInkTool === 'eraser') {
+    mmInkEraseAt(world);
+    return;
+  }
+  if (!mmInkCurrent) return;
+  if (mmInkTool === 'pen') {
+    const last = mmInkCurrent.points[mmInkCurrent.points.length - 1];
+    if (!last || Math.hypot(world.x - last.x, world.z - last.z) > 0.6) mmInkCurrent.points.push(world);
+  } else {
+    mmInkCurrent.points[mmInkCurrent.points.length - 1] = world;
+  }
+  drawMinimapInk();
+}
+
+function mmInkEnd(event) {
+  if (!mmFullOpen) return;
+  if (mmInkDrawing && mmInkCurrent) {
+    const mark = mmInkCurrent;
+    const valid = mark.tool === 'pen'
+      ? mark.points.length >= 2 || (mark.points[0] && mark.color)
+      : Math.hypot(mark.points[1].x - mark.points[0].x, mark.points[1].z - mark.points[0].z) > 0.8;
+    if (valid) mmInkMarks.push(mark);
+    mmInkCurrent = null;
+    drawMinimapInk();
+  }
+  mmInkDrawing = false;
+  try { event?.target?.releasePointerCapture?.(event.pointerId); } catch (error) { /* 忽略 */ }
+}
+
+function mmInkClearAll() {
+  mmInkMarks = [];
+  mmInkCurrent = null;
+  mmInkCancelLaser();
+  drawMinimapInk();
+}
+
+function drawMinimapFull() {
+  if (!mmFullOpen) return;
+  const canvas = document.getElementById('mmFullCanvas');
+  const stage = document.getElementById('mmFullStage');
+  if (!canvas || !stage) return;
+  const W = stage.clientWidth, H = stage.clientHeight;
+  if (!(W > 0 && H > 0)) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const pxW = Math.max(1, Math.round(W * dpr));
+  const pxH = Math.max(1, Math.round(H * dpr));
+  if (canvas.width !== pxW || canvas.height !== pxH) {
+    canvas.width = pxW; canvas.height = pxH;
+  }
+  mmFullDpr = dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#060b12';
+  ctx.fillRect(0, 0, W, H);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  const bounds = mmFullMapBounds();
+  const baseScale = Math.max(W, H) / (2 * bounds.ext);
+  const zoom = Math.max(mmFullMinZoom(), mmFullZoom);
+  mmFullZoom = zoom;
+  const scale = baseScale * zoom;
+  const halfW = W / (2 * scale), halfH = H / (2 * scale);
+  const centerX = bounds.cx, centerZ = bounds.cz;
+  const left = centerX - halfW, top = centerZ - halfH;
+  const toX = (x) => (x - left) * scale;
+  const toY = (x, z) => (z - top) * scale;
+  const mapW = bounds.ext * 2 * scale, mapH = bounds.ext * 2 * scale;
+  const mapX = (W - mapW) / 2, mapY = (H - mapH) / 2;
+  const mapRect = zoom >= 1 - 1e-6
+    ? { x: 0, y: 0, w: W, h: H }
+    : { x: mapX, y: mapY, w: mapW, h: mapH };
+  const bg = document.getElementById('minimapImg');
+  if (bg && bg.naturalWidth && bg.naturalHeight) {
+    const iw = bg.naturalWidth, ih = bg.naturalHeight;
+    ctx.save();
+    ctx.filter = 'brightness(1.75) contrast(1.2)';
+    if (zoom >= 1 - 1e-6) {
+      const ix = (x) => (x - bounds.cx) / bounds.ext * (iw - 1) / 2 + (iw - 1) / 2;
+      const iy = (z) => (z - bounds.cz) / bounds.ext * (ih - 1) / 2 + (ih - 1) / 2;
+      const sx = ix(left), sy = iy(top);
+      const sw = ((halfW * 2) / (bounds.ext * 2)) * (iw - 1);
+      const sh = ((halfH * 2) / (bounds.ext * 2)) * (ih - 1);
+      ctx.drawImage(bg, sx, sy, sw, sh, 0, 0, W, H);
+    } else {
+      // 低于“铺满”倍率：整张方形地图完整显示，最大到“适配屏幕的最大方形”
+      ctx.drawImage(bg, 0, 0, iw, ih, mapX, mapY, mapW, mapH);
+    }
+    ctx.restore();
+    ctx.filter = 'none';
+  } else {
+    ctx.fillStyle = '#0d1622';
+    ctx.fillRect(0, 0, W, H);
+  }
+  const u = Math.max(1, Math.min(W, H) / 760);
+  ctx.save();
+  ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
+  drawFullMinimapFeatures(ctx, { toX, toY, metersToPx: scale }, u);
+  ctx.restore();
+  // 比例尺（右下角，避开顶部工具栏/底部提示）
+  const mpp = 1 / scale;
+  const nice = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000];
+  let bar = nice.find((v) => v / mpp <= W * 0.20) || nice[0];
+  const barPx = bar / mpp;
+  const bx = W - barPx - 30, by = H - 54;
+  ctx.font = `bold ${11 * u}px "Microsoft YaHei", sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.lineWidth = 3 * u; ctx.strokeStyle = 'rgba(4,8,14,.9)';
+  ctx.strokeText(`${bar} m`, bx + barPx / 2, by - 8 * u);
+  ctx.fillStyle = '#cfe6ff';
+  ctx.fillText(`${bar} m`, bx + barPx / 2, by - 8 * u);
+  ctx.strokeStyle = '#cfe6ff'; ctx.lineWidth = 2 * u;
+  ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + barPx, by); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx, by - 4 * u); ctx.lineTo(bx, by + 4 * u);
+  ctx.moveTo(bx + barPx, by - 4 * u); ctx.lineTo(bx + barPx, by + 4 * u); ctx.stroke();
+  mmFullView = { W, H, left, top, scale, halfW, halfH, mapRect, toX, toY };
+  updateMinimapFullChrome();
+  drawMinimapInk();
+}
+
+function resizeMinimapFull() {
+  const canvas = document.getElementById('mmFullCanvas');
+  const stage = document.getElementById('mmFullStage');
+  if (!canvas || !stage) return;
+  const W = stage.clientWidth, H = stage.clientHeight;
+  if (!(W > 0 && H > 0)) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const pxW = Math.max(1, Math.round(W * dpr));
+  const pxH = Math.max(1, Math.round(H * dpr));
+  if (canvas.width !== pxW || canvas.height !== pxH) {
+    canvas.width = pxW; canvas.height = pxH;
+  }
+  mmFullDpr = dpr;
+  drawMinimapFull();
+}
+
+function openMinimapFull(opts = {}) {
+  const el = document.getElementById('mmFull');
+  if (!el || el.hidden === false) return;
+  el.hidden = false;
+  mmFullOpen = true;
+  mmFullZoom = 1;
+  mmInkTool = 'none';
+  mmInkUpdateUi();
+  mmFullSupportMode = !!opts.support || !!fieldSupport?.isPlacing();
+  if (mmFullSupportMode && fieldSupport) fieldSupport.beginPlacement();
+  updateMinimapFullChrome();
+  document.body.classList.add('mm-full-open');
+  requestAnimationFrame(() => { resizeMinimapFull(); });
+}
+
+function closeMinimapFull() {
+  const el = document.getElementById('mmFull');
+  if (!el) return;
+  el.hidden = true;
+  mmFullOpen = false;
+  mmInkTool = 'none';
+  mmInkUpdateUi();
+  mmInkCancelLaser();
+  const cursor = document.getElementById('mmFullCursor');
+  if (cursor) cursor.hidden = true;
+  if (mmFullSupportMode) {
+    fieldSupport?.cancelPlacement?.();
+    mmFullSupportMode = false;
+  }
+  document.body.classList.remove('mm-full-open');
+}
+
+function toggleMinimapFull() {
+  if (mmFullOpen) closeMinimapFull();
+  else openMinimapFull();
+}
+
+function mmFullCanvasWorldAt(event) {
+  if (!mmFullView) return null;
+  const canvas = document.getElementById('mmFullCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const sx = (event.clientX - rect.left) / Math.max(1, rect.width) * mmFullView.W;
+  const sy = (event.clientY - rect.top) / Math.max(1, rect.height) * mmFullView.H;
+  const { left, top, scale, mapRect } = mmFullView;
+  if (mapRect && (sx < mapRect.x || sx > mapRect.x + mapRect.w
+    || sy < mapRect.y || sy > mapRect.y + mapRect.h)) return null;
+  return { x: left + sx / scale, z: top + sy / scale };
+}
+
+function placeSupportFromMinimap(world) {
+  if (!world || !fieldSupport) return false;
+  const point = supportWorldPointAt(world.x, world.z);
+  if (!point) return false;
+  fieldSupport.placeAt(point);
+  mmFullSupportMode = false;
+  updateMinimapFullChrome();
+  drawMinimapFull();
+  const hint = document.getElementById('mmFullHint');
+  if (hint) {
+    const pv = fieldSupport.preview?.();
+    hint.textContent = `已放置「${pv?.skillName || '阵地支援'}」落点 · 点击地图可再次选点 · Esc 关闭`;
+  }
+  return true;
+}
+
+function setMinimapFullSupportMode(on) {
+  if (!fieldSupport) return;
+  if (on) {
+    fieldSupport.beginPlacement();
+    mmFullSupportMode = true;
+  } else {
+    fieldSupport.cancelPlacement?.();
+    mmFullSupportMode = false;
+  }
+  updateMinimapFullChrome();
+  drawMinimapFull();
+}
+
+function setMinimapFullZoom(value) {
+  const minZoom = mmFullMinZoom();
+  mmFullZoom = Math.max(minZoom, Math.min(64, Number(value) || 1));
+  drawMinimapFull();
+}
 
 const labelProjection = new THREE.Vector3();
 function updateLabels() {
@@ -3049,7 +4462,7 @@ function applyTdmWorldContext() {
   rangeSlider.value = String(Math.ceil(wantedRange / 10) * 10);
   minimapRange = Number(rangeSlider.value);
   document.getElementById('mmRangeV').textContent = String(minimapRange);
-  document.getElementById('minimapCap').textContent = `团队死斗 · ${tdmData.mapName}`;
+  document.getElementById('minimapCap').textContent = `战术地图 · 团队死斗 · ${tdmData.mapName}`;
   spawnVisible = true;
   document.getElementById('tSpawns').classList.add('on');
   document.querySelector('#panel h1').textContent = '团队死斗三维战术板';
@@ -3376,16 +4789,24 @@ function drawVehicleOverlays() {
 
 async function loadVehicleSystem() {
   if (IS_TDM) return;
-  try {
-    const vehiclePath = (IS_ASSAULT || MAP.toLowerCase() === 'skyline')
+  const vehiclePath = IS_CONQUEST ? './data/vehicles_conquest.json'
+    : (IS_ASSAULT || MAP.toLowerCase() === 'skyline')
       ? './data/vehicles_assault.json' : './data/vehicles.json';
+  try {
+    if (vehicleModeCache.has(vehiclePath)) {
+      vehicleData = vehicleModeCache.get(vehiclePath);
+      rebuildVehiclePanel();
+      return;
+    }
     vehicleData = await (await fetch(vehiclePath, { cache: 'no-store' })).json();
     const loader = new THREE.TextureLoader();
     for (const id of Object.keys(vehicleData.catalog || {})) {
+      if (vehicleSpriteCache.has(id)) continue;
       try {
         vehicleSpriteCache.set(id, await loader.loadAsync('./data/vehicle_icons/' + id + '.png'));
       } catch (error) { /* 图标缺失不影响标记 */ }
     }
+    vehicleModeCache.set(vehiclePath, vehicleData);
     rebuildVehiclePanel();
   } catch (error) {
     const el = document.getElementById('vehSectorInfo');
@@ -3395,18 +4816,15 @@ async function loadVehicleSystem() {
 
 async function run() {
   const manifest = await (await fetch(MAP_ROOT + 'manifest.json')).json();
+  mapManifest = manifest;
   mapMeta = manifest;
-  document.title = IS_TDM
-    ? `三角洲行动 · 团队死斗 · ${manifest.mapName || MAP}`
-    : IS_ASSAULT ? `三角洲行动 · 攻防 · ${manifest.mapName || MAP}`
-    : `三角洲行动 · 胜者为王 · ${manifest.mapName || MAP}`;
-  document.querySelector('#panel h1').textContent =
-    IS_TDM ? '团队死斗三维战术板' : IS_ASSAULT ? '攻防三维战术板' : '指挥官三维战术板';
+  applyModeCopy();
     const minimapImg = document.getElementById('minimapImg');
     minimapImg.onerror = () => { document.getElementById('minimap').hidden = true; };
     minimapImg.src = MAP_ROOT + 'minimap_bw.jpg' + '?v=' + Date.now();
     minimapCtx = document.getElementById('minimapCanvas').getContext('2d');
   document.getElementById('minimap').hidden = false;
+  requestAnimationFrame(resizeMinimapCanvas);
   const t = manifest.terrain;
   let zmin = Infinity, zmax = -Infinity;
   for (const row of t.heights) {
@@ -3505,11 +4923,20 @@ async function run() {
   applySkyPreset(document.getElementById('skyPreset').value);
   document.getElementById('skyPreset').addEventListener('change', (event) => {
     applySkyPreset(event.target.value);
+    saveStored('df_tactical_sky', event.target.value);
   });
 
   const w = (t.nx - 1) * t.stepX, d = (t.ny - 1) * t.stepY;
   centre.set(t.originX + w / 2, 20, t.originY + d / 2);
   radius = Math.max(w, d) * 0.85;
+  // 地图可在 manifest 中给出更适合内容的初始视距（如刀锋/贯穿这类场地远小于 CDLOD 全图）。
+  if (Number(manifest.viewRadius) > 0) {
+    const mm = manifest.minimap;
+    if (mm && Number.isFinite(Number(mm.centerX)) && Number.isFinite(Number(mm.centerZ))) {
+      centre.set(Number(mm.centerX), 20, Number(mm.centerZ));
+    }
+    radius = Number(manifest.viewRadius);
+  }
   controls.target.copy(centre);
 
   grid = new THREE.GridHelper(Math.max(w, d) * 1.15, 16, 0x2c3b52, 0x1b2534);
@@ -3522,18 +4949,9 @@ async function run() {
     await loadCbdPatch();
     await loadGasPatch();
   }
-  await loadPhasePlan();
-  await loadCaptureData();
-  await loadFlightData();
-  await loadVehicleSystem();
-  const breakthrough = prepareAreas(manifest.breakthrough || []);
-  buildAreas(breakthrough);
-  applyTdmWorldContext();
-  buildStageList(breakthrough);
-  buildDevices();
-  activateMarkContext();
-  buildCapturePanel(breakthrough);
-  buildSpawnOverlay();
+  baseMinimapCfg = manifest.minimap || null;
+  baseMinimapRange = Number(document.getElementById('mmRange').value) || 150;
+  await applyModeState({ initial: true });
   await selectTier('low');
   const params = new URLSearchParams(location.search);
   const zoom = parseFloat(params.get('zoom') || '1');
@@ -3559,24 +4977,13 @@ async function run() {
   window.__mapReady = {
     tiles: manifest.totals.tiles, gpu: gpuName, tier: gpuTier, profile,
     mode: APP_MODE, map: MAP, tdmLoaded: !!tdmData,
+    conquestLoaded: IS_CONQUEST && !!captureData?.objectives,
   };
   window.__scene = scene;
   window.__renderer = renderer;
   window.__camera = camera;
   window.__controls = controls;
   markButtons();
-  if (IS_TDM) {
-    // 死斗沿用所在区域的震前/事件前原始建筑场景，不加载事件后的破坏状态。
-    await loadTdmOriginalScene();
-  } else if (phasePlan) {
-    // 大事件已并入阶段：默认（全部阶段）先把常驻覆盖层挂上
-    applyOverlays();
-  } else {
-    // 未纳入阶段计划的地图回退到旧的「大事件」开关
-    fetch(MAP_ROOT + 'events/events.json').then((r) => r.json()).then((list) => {
-      buildEventButtons(list);
-    }).catch(() => {});
-  }
   // 加载完成后立刻出图一次，避免无头截图抓到只有地形的中间帧
   resize();
   controls.update();
@@ -3584,6 +4991,190 @@ async function run() {
   requestAnimationFrame(() => { controls.update(); renderer.render(scene, camera); });
   // 截图模式：定时补一帧，避免无头浏览器只截到中间帧
   if (earlyParams.get('shot')) setInterval(() => { controls.update(); renderer.render(scene, camera); }, 150);
+}
+
+function captureViewState() {
+  const slider = document.getElementById('mmRange');
+  return {
+    pos: camera.position.clone(),
+    target: controls.target.clone(),
+    radius,
+    viewRoll,
+    minimapCfg,
+    minimapRange,
+    mmMax: slider.max,
+    mmValue: slider.value,
+    minimapCap: document.getElementById('minimapCap').textContent,
+    spawnVisible,
+  };
+}
+
+function restoreViewState(state) {
+  if (!state) return;
+  camera.position.copy(state.pos);
+  controls.target.copy(state.target);
+  radius = state.radius;
+  viewRoll = state.viewRoll;
+  minimapCfg = state.minimapCfg;
+  minimapRange = state.minimapRange;
+  const slider = document.getElementById('mmRange');
+  slider.max = state.mmMax;
+  slider.value = state.mmValue;
+  document.getElementById('mmRangeV').textContent = String(minimapRange);
+  document.getElementById('minimapCap').textContent = state.minimapCap;
+  spawnVisible = state.spawnVisible;
+  document.getElementById('tSpawns').classList.toggle('on', spawnVisible);
+  if (spawnGroup) spawnGroup.visible = spawnVisible;
+  if (vehicleOverlayGroup) vehicleOverlayGroup.visible = spawnVisible;
+  controls.update();
+}
+
+function leaveTdmView() {
+  if (tdmReturnView) {
+    const state = tdmReturnView;
+    tdmReturnView = null;
+    restoreViewState(state);
+    return;
+  }
+  minimapCfg = baseMinimapCfg;
+  minimapRange = baseMinimapRange;
+  const slider = document.getElementById('mmRange');
+  slider.max = '500';
+  slider.value = String(baseMinimapRange);
+  document.getElementById('mmRangeV').textContent = String(baseMinimapRange);
+  document.getElementById('minimapCap').textContent = '战术地图 · M键 / 点击预览';
+  spawnVisible = false;
+  document.getElementById('tSpawns').classList.remove('on');
+  if (spawnGroup) spawnGroup.visible = false;
+  if (vehicleOverlayGroup) vehicleOverlayGroup.visible = false;
+  applyView('top');
+}
+
+async function applyModeState({ initial = false, previousMode = null } = {}) {
+  const token = ++modeStateToken;
+  const enteringTdm = IS_TDM && !initial;
+  const leavingTdm = !IS_TDM && previousMode === 'tdm';
+  if (enteringTdm) tdmReturnView = captureViewState();
+  const keepSpawn = !IS_TDM && previousMode && previousMode !== 'tdm' ? spawnVisible : false;
+  marking = false;
+  rosterSelected = null;
+  predMarkMode = false;
+  stopVehicleMark();
+  updateMarkToggle();
+  updateRosterButtons();
+  updateRosterHint();
+  applyModeCopy();
+  layoutModePanels();
+  if (IS_TDM) fieldSupport?.clear(); else fieldSupport?.refresh();
+  if (IS_TDM && ['部署系统', '弹道解算', '阵地支援'].includes(document.getElementById('panelCrumb').textContent)) {
+    switchTab('map');
+  }
+
+  clearAreas();
+  clearSpawnOverlays();
+  clearPredictionOverlay();
+  clearEscortOverlay();
+  clearStageUi();
+  hideAllEventOverlays();
+  if (!IS_TDM) tdmData = null;
+  spawnData = null;
+  deployData = null;
+  captureData = null;
+
+  await loadPhasePlan();
+  await loadCaptureData();
+  await loadFlightData();
+  await loadVehicleSystem();
+  if (token !== modeStateToken) return;
+
+  const breakthrough = IS_CONQUEST
+    ? (captureData?.areas || [])
+    : prepareAreas(mapManifest?.breakthrough || []);
+  buildAreas(breakthrough);
+  applyTdmWorldContext();
+
+  spawnVisible = IS_TDM ? true : keepSpawn;
+  document.getElementById('tSpawns').classList.toggle('on', spawnVisible);
+
+  if (IS_CONQUEST) {
+    document.getElementById('stageList').innerHTML = '';
+    layoutMarkFloat();
+  } else {
+    buildStageList(breakthrough);
+  }
+  buildDevices();
+  activateMarkContext();
+  buildCapturePanel(breakthrough);
+  initSimPanel();
+  buildSpawnOverlay();
+  if (spawnGroup) spawnGroup.visible = spawnVisible;
+  if (vehicleOverlayGroup) vehicleOverlayGroup.visible = spawnVisible;
+  updateSeaLevelForStage();
+
+  if (IS_TDM) {
+    await loadTdmOriginalScene();
+    if (!initial) applyView('top');
+  } else if (phasePlan) {
+    await applyOverlays();
+  } else if (IS_CONQUEST) {
+    applyLowTierVisibility();
+  } else {
+    applyLowTierVisibility();
+    fetch(MAP_ROOT + 'events/events.json').then((r) => r.json()).then((list) => {
+      buildEventButtons(list);
+    }).catch(() => {});
+  }
+  if (leavingTdm) leaveTdmView();
+
+  window.__mapReady = {
+    ...(window.__mapReady || {}),
+    tiles: mapManifest?.totals?.tiles,
+    mode: APP_MODE,
+    map: MAP,
+    tdmLoaded: !!tdmData,
+    conquestLoaded: IS_CONQUEST && !!captureData?.objectives,
+  };
+  markButtons();
+  layoutMarkFloat();
+  resize();
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+async function switchMode(newMode) {
+  if (!window.__mapReady) return;
+  if (!['commander', 'assault', 'conquest', 'tdm'].includes(newMode)) return;
+  if (newMode === APP_MODE) return;
+  const mode = (modeCatalogCache?.modes || []).find((item) => item.id === newMode);
+  const allowed = (mode?.maps || []).map((code) => String(code).toLowerCase());
+  if (allowed.length && !allowed.includes(MAP.toLowerCase())) {
+    document.getElementById('hud').textContent =
+      `当前地图没有「${mode?.name || newMode}」数据，请先在地图下拉中切换地图。`;
+    return;
+  }
+  const previousMode = APP_MODE;
+  if (viewMode === 'fp') toggleViewMode();
+  try {
+    syncMarks();
+    persistPlan();
+  } catch (error) { /* 方案保存失败不阻塞模式切换 */ }
+
+  APP_MODE = newMode;
+  IS_TDM = APP_MODE === 'tdm';
+  IS_ASSAULT = APP_MODE === 'assault';
+  IS_CONQUEST = APP_MODE === 'conquest';
+  PLAN_KEY = IS_CONQUEST ? 'df_tactical_plan_v1_conquest'
+    : IS_ASSAULT ? 'df_tactical_plan_v1_assault' : 'df_tactical_plan_v1';
+  plan = loadPlanFromStorage();
+
+  const url = new URL(location.href);
+  url.searchParams.set('map', MAP);
+  if (APP_MODE !== 'commander') url.searchParams.set('mode', APP_MODE);
+  else url.searchParams.delete('mode');
+  history.replaceState(null, '', url.toString());
+
+  await applyModeState({ previousMode });
+  updatePlanStatus();
 }
 
 function toggleRotate() {
@@ -3597,6 +5188,11 @@ function layoutMarkFloat() {
   const stage = document.getElementById('stageFloat');
   const mark = document.getElementById('markFloat');
   if (!stage || !mark) return;
+  if (stage.offsetParent === null) {   // 占领模式隐藏阶段栏
+    mark.style.top = '12px';
+    mark.style.left = '50%';
+    return;
+  }
   const rect = stage.getBoundingClientRect();
   mark.style.top = Math.round(rect.bottom + 6) + 'px';
   mark.style.left = '50%';
@@ -3703,13 +5299,17 @@ async function loadCaptureData() {
     }
     return;
   }
-  try {
-    captureConfig = await (await fetch('./data/capture_config.json')).json();
-  } catch (error) {
-    captureConfig = null;
+  if (!captureConfig) {
+    try {
+      captureConfig = await (await fetch('./data/capture_config.json')).json();
+    } catch (error) {
+      captureConfig = null;
+    }
   }
   try {
-    captureData = await (await fetch(MAP_ROOT + (IS_ASSAULT ? 'capture_assault.json' : 'capture.json'))).json();
+    const captureFile = IS_CONQUEST ? 'capture_conquest.json'
+      : IS_ASSAULT ? 'capture_assault.json' : 'capture.json';
+    captureData = await (await fetch(MAP_ROOT + captureFile)).json();
   } catch (error) {
     captureData = null;
   }
@@ -3720,20 +5320,27 @@ async function loadCaptureData() {
     }
   }
   try {
-    spawnData = await (await fetch(MAP_ROOT + 'spawns.json')).json();
+    spawnData = await (await fetch(MAP_ROOT + (IS_CONQUEST ? 'spawns_conquest.json' : 'spawns.json'))).json();
   } catch (error) {
     spawnData = null;
   }
   try {
-    deployData = await (await fetch(MAP_ROOT + 'deploy.json')).json();
+    deployData = await (await fetch(MAP_ROOT + (IS_CONQUEST ? 'deploy_conquest.json' : 'deploy.json'))).json();
   } catch (error) {
     deployData = null;
   }
 }
 
-/* 占点人数 → 耗时(秒)：SpeedCurve 线性插值，x=人数-1，末档封顶 20s */
-function speedTimeFor(n) {
-  const pts = captureConfig?.curves?.speedCurves?.breakthrough || [[0, 50], [1, 30], [2, 25], [6, 20]];
+/* 当前模式的占点基础曲线：占领用 conquest（客户端用基础 SpeedCurve 回退），
+   攻防/胜者为王用 breakthrough。 */
+function modeSpeedCurveKey() {
+  return IS_CONQUEST ? 'conquest' : 'breakthrough';
+}
+
+/* 占点人数 → 耗时(秒)：曲线线性插值，x=人数-1，末档封顶 */
+function speedTimeFor(n, curveKey = modeSpeedCurveKey()) {
+  const curves = captureConfig?.curves?.speedCurves || {};
+  const pts = curves[curveKey] || curves.breakthrough || [[0, 50], [1, 30], [2, 25], [6, 20]];
   const x = Math.max(0, n - 1);
   if (x <= pts[0][0]) return pts[0][1];
   for (let i = 1; i < pts.length; i++) {
@@ -3772,7 +5379,47 @@ function captureCell(value, suffix = '') {
   return value + suffix;
 }
 
+function factorText(value, fallback = 1) {
+  const num = Number(value ?? fallback);
+  if (!Number.isFinite(num)) return '—';
+  return `${num.toFixed(2).replace(/0$/, '')}×`;
+}
+
 function buildCapturePanel(areas) {
+  if (IS_CONQUEST) {
+    document.getElementById('capList').hidden = false;
+    const flags = captureData?.objectives || [];
+    const sectorLabel = new Map((captureData?.sectors || []).map((s) => [s.name, s.label || s.nameText || '']));
+    const rows = flags.map((f) => {
+      const atk = factorText(f.camp0OccupySpeedFactor);
+      const def = factorText(f.camp1OccupySpeedFactor);
+      const area = sectorLabel.get(f.sector);
+      return `<tr><td>${f.label}</td><td>${f.displayName || '—'}${area ? ` · ${area}` : ''}</td>` +
+        `<td>${atk}</td><td>${def}</td><td>${factorText(f.occupySpeedMultiplier)}</td></tr>`;
+    }).join('');
+    document.getElementById('capList').innerHTML =
+      '<tr><td>旗点</td><td>名称</td><td>攻方倍率</td><td>守方倍率</td><td>占领倍率</td></tr>' + rows;
+    const total = captureData?.matchDuration ? `${Math.round(captureData.matchDuration / 60)} 分钟` : '—';
+    const mul2 = flags.filter((f) => Number(f.occupySpeedMultiplier) === 2).length;
+    const defCount = flags.filter((f) => f.camp1OccupySpeedFactor != null).length;
+    const pts = captureConfig?.curves?.speedCurves?.conquest
+      || captureConfig?.curves?.speedCurves?.breakthrough
+      || [[0, 50], [1, 30], [2, 25], [6, 20]];
+    const fmt = (v) => Number(Number(v).toFixed(1));
+    const base = pts.map(([x, y]) => `${Math.round(x) + 1}人 ${fmt(y)}s`).join(' · ') + '（封顶）';
+    document.getElementById('capLegend').textContent = [
+      `基础耗时：${base}`,
+      '计算：攻/守人数 × 位置倍率 × 据点攻/守倍率 × 占领倍率 → 有效人数；按 conquest 曲线线性插值。',
+      `守方倍率：本图 ${defCount} 个旗点有 Camp1 配置，其余按 1.0×`,
+      mul2 === flags.length
+        ? `占领倍率：本图全部 ${flags.length} 个旗点 2.0×；表中单列。`
+        : `占领倍率：本图 ${mul2}/${flags.length} 个旗点 2.0×，其余 1.0×；表中单列。`,
+      '中立化：敌方 → 中立按 2× 进度/时间（Captured2NeutralNeedValue）；模拟可选动作。',
+      `${modeDisplayName()}：${flags.length} 个旗点 · 比赛时长 ${total} · 击杀目标 ${captureData?.targetKillCount ?? '—'}`,
+      '旗点名称/标号取自关卡 BP_BattleSectorAnchor 的 NameInIcon；名称后为区域。',
+    ].join('\n');
+    return;
+  }
   if (IS_TDM) {
     const table = document.getElementById('capList');
     table.innerHTML = '';
@@ -3785,21 +5432,28 @@ function buildCapturePanel(areas) {
       : '团队死斗关卡数据加载失败。';
     return;
   }
+  document.getElementById('capList').hidden = false;
   const objectives = areas.filter((a) => a.kind === 'objective');
   const rows = objectives
     .slice()
     .sort((a, b) => (a.stage || 0) - (b.stage || 0) ||
       String(a.displayLabel || a.label).localeCompare(String(b.displayLabel || b.label)))
     .map((a) => {
-      const cap = objectiveCapture(a.srcLabel || simpleLabel(a.label));
-      const occ = cap.anchor?.camp0OccupySpeedFactor ?? 1;
-      const occText = occ === 1 ? '1.0×' : `${occ}×`;
-      return `<tr data-src="${a.srcLabel || simpleLabel(a.label)}" class="capRow">
+      const src = a.srcLabel || simpleLabel(a.label);
+      const cap = objectiveCapture(src);
+      const name = cap.objective?.displayName
+        || (captureData?.objectives || []).find((o) => String(o.label) === String(src))?.displayName
+        || a.displayName || '—';
+      const occText = factorText(cap.anchor?.camp0OccupySpeedFactor);
+      const defText = factorText(cap.anchor?.camp1OccupySpeedFactor);
+      return `<tr data-src="${src}" class="capRow">
         <td>${areaLabelText(a)}</td>
-        <td>${occText}</td></tr>`;
+        <td>${name}</td>
+        <td>${occText}</td>
+        <td>${defText}</td></tr>`;
     }).join('');
   document.getElementById('capList').innerHTML =
-    `<tr><td>据点</td><td>攻方倍率</td></tr>` + rows;
+    `<tr><td>据点</td><td>名称</td><td>攻方倍率</td><td>守方倍率</td></tr>` + rows;
 
   const legend = document.getElementById('capLegend');
   if (captureConfig) {
@@ -3807,9 +5461,15 @@ function buildCapturePanel(areas) {
     const pts = captureConfig?.curves?.speedCurves?.breakthrough || [[0, 50], [1, 30], [2, 25], [6, 20]];
     const fmt = (v) => Number(Number(v).toFixed(1));
     const base = pts.map(([x, y]) => `${Math.round(x) + 1}人 ${fmt(y)}s`).join(' · ') + '（封顶）';
+    const defCount = objectives.filter((a) => {
+      const cap = objectiveCapture(a.srcLabel || simpleLabel(a.label));
+      return cap.anchor?.camp1OccupySpeedFactor != null;
+    }).length;
     legend.textContent = [
       `基础耗时：${base}`,
-      '计算方法：占点耗时 = 基础耗时 ÷（贴旗倍率 × 攻方倍率）',
+      '计算：攻/守人数 × 位置倍率 × 据点倍率 → 净人数；再按基础曲线计时。',
+      `守方倍率：${defCount ? `${defCount} 个据点有 Camp1 配置` : '本模式未配置，按 1.0'}`,
+
     ].join('\n');
   } else {
     legend.textContent = '未加载到占点配置。';
@@ -4142,12 +5802,15 @@ function drawPrediction() {
     pos: new THREE.Vector3(best.p[0], best.p[1] + (IS_TDM ? 6 : 10), best.p[2]),
   });
 
+  const campValue = document.getElementById('predCamp').value;
   const campName = IS_TDM
-    ? (document.getElementById('predCamp').value === 'attack'
+    ? (campValue === 'attack'
       ? (tdmData?.campLabels?.attack || 'GTI')
       : (tdmData?.campLabels?.defend || 'HAAVK'))
-    : (document.getElementById('predCamp').value === 'attack' ? '攻方' : '守方');
-  const focusName = IS_TDM ? '死斗区域' : `据点 ${objectiveDisplayName(ob)}`;
+    : (campValue === 'attack' ? '攻方' : '守方');
+  const focusName = IS_TDM ? '死斗区域'
+    : IS_CONQUEST ? `旗点 ${objectiveDisplayName(ob)}`
+    : `据点 ${objectiveDisplayName(ob)}`;
   const lines = [IS_TDM
     ? `${focusName} · ${campName} · 敌人 ${predEnemies.length}/${predictionEnemyLimit()} 人（独立计算）`
     : `${focusName} · ${campName} · 敌人 ${predEnemies.length}（${predSquads().length} 队）`];
@@ -4428,7 +6091,7 @@ function initPredictionPanel() {
   drawPrediction();
 }
 
-function buildTdmSpawnOverlay(linkGroup, groundY, mk) {
+function buildTdmSpawnOverlay(linkGroup, mk) {
   if (!tdmData) return;
   const ATK = 0x2ecc71, DEF = 0xe74c3c, NEUTRAL = 0xf1c40f, AREA = 0xffffff;
   const colorFor = (point) => point.camp === 'attack'
@@ -4436,7 +6099,7 @@ function buildTdmSpawnOverlay(linkGroup, groundY, mk) {
 
   if ((tdmData.area.points || []).length >= 3) {
     const loop = tdmData.area.points.concat([tdmData.area.points[0]])
-      .map((p) => new THREE.Vector3(p[0], groundY(p[0], p[2]) + 1.2, p[2]));
+      .map((p) => new THREE.Vector3(p[0], Number(p[1]) + 1.2, p[2]));
     const boundary = new THREE.Line(
       new THREE.BufferGeometry().setFromPoints(loop),
       new THREE.LineBasicMaterial({
@@ -4456,7 +6119,7 @@ function buildTdmSpawnOverlay(linkGroup, groundY, mk) {
     const col = colorFor(point);
     if ((point.points || []).length >= 3) {
       const pts = point.points.concat([point.points[0]])
-        .map((p) => new THREE.Vector3(p[0], groundY(p[0], p[2]) + 0.85, p[2]));
+        .map((p) => new THREE.Vector3(p[0], Number(p[1]) + 0.85, p[2]));
       const outline = new THREE.Line(
         new THREE.BufferGeometry().setFromPoints(pts),
         new THREE.LineBasicMaterial({
@@ -4559,13 +6222,8 @@ function buildSpawnOverlayLegacy() {
   });
   const areaOf = (label) => areasData.find((a) => a.kind === 'objective' &&
     (a.srcLabel || simpleLabel(a.label)) === label);
-  const groundY = (x, z) => {
-    const h = heightAt(x, z);
-    return Number.isFinite(h) ? h : 0;
-  };
-
   if (IS_TDM) {
-    buildTdmSpawnOverlay(linkGroup, groundY, mk);
+    buildTdmSpawnOverlay(linkGroup, mk);
     scene.add(spawnGroup);
     spawnGroup.visible = spawnVisible;
     initPredictionPanel();
@@ -4586,7 +6244,7 @@ function buildSpawnOverlayLegacy() {
       new THREE.LineBasicMaterial({ color: col, depthTest: false, transparent: true, opacity: 0.3 }));
     spawnGroup.add(stem);
     if (option) {
-      const oy = Math.max(groundY(option.x, option.z), option.y) + 1;
+      const oy = option.y + 1;
       linkGroup.add(dashedLink(
         new THREE.Vector3(option.x, oy, option.z),
         new THREE.Vector3(p[0], y, p[2]), linkColor));
@@ -4609,24 +6267,52 @@ function buildSpawnOverlayLegacy() {
       if (!campVisible(camp)) continue;
       for (const p of ob.spawns?.[key] || []) putMarker(p, col, size, lift, flagV, col);
     }
-    // 贴旗 1.35× 圈（黄色环代表旗杆区）
+    // 最大占点倍率区：据点边界按旗杆中心缩放 10%，保留采样点的真实高度。
     const area = areaOf(ob.label);
-    if (area && (area.points || []).length) {
-      let r = 0;
-      for (const p of area.points) r += Math.hypot(p[0] - ob.pos[0], p[2] - ob.pos[2]);
-      r = (r / area.points.length) * 0.1;
-      const ring = new THREE.RingGeometry(r - 0.9, r + 0.9, 48);
-      ring.rotateX(-Math.PI / 2);
-      const ringMesh = new THREE.Mesh(ring, new THREE.MeshBasicMaterial({
-        color: BONUS, depthTest: false, transparent: true, opacity: 0.9, side: THREE.DoubleSide,
+    if (area && (area.points || []).length >= 3) {
+      const RATIO = 0.1;
+      const source = area.points;
+      const step = Math.max(1, Math.ceil(source.length / 48));
+      const sampled = [];
+      for (let i = 0; i < source.length; i += step) sampled.push(source[i]);
+      if (sampled[sampled.length - 1] !== source[source.length - 1]) sampled.push(source[source.length - 1]);
+      const ringPts = sampled.map((p) => {
+        const py = Number.isFinite(Number(p[1])) ? Number(p[1]) : ob.pos[1];
+        return new THREE.Vector3(
+          ob.pos[0] + (p[0] - ob.pos[0]) * RATIO,
+          ob.pos[1] + (py - ob.pos[1]) * RATIO + 1.2,
+          ob.pos[2] + (p[2] - ob.pos[2]) * RATIO,
+        );
+      });
+      const shape = new THREE.Shape();
+      ringPts.forEach((p, i) => (i ? shape.lineTo(p.x, -p.z) : shape.moveTo(p.x, -p.z)));
+      const fillGeo = new THREE.ShapeGeometry(shape);
+      fillGeo.rotateX(-Math.PI / 2);
+      const yByKey = new Map(ringPts.map((p) =>
+        [`${Math.round(p.x * 100)},${Math.round(p.z * 100)}`, p.y]));
+      const fillPos = fillGeo.attributes.position;
+      for (let k = 0; k < fillPos.count; k++) {
+        const y = yByKey.get(`${Math.round(fillPos.getX(k) * 100)},${Math.round(fillPos.getZ(k) * 100)}`);
+        fillPos.setY(k, (y ?? ob.pos[1] + 1.2) + 0.15);
+      }
+      fillPos.needsUpdate = true;
+      const fill = new THREE.Mesh(fillGeo, new THREE.MeshBasicMaterial({
+        color: BONUS, depthTest: false, transparent: true, opacity: 0.18,
+        side: THREE.DoubleSide, depthWrite: false,
       }));
-      ringMesh.position.set(ob.pos[0], groundY(ob.pos[0], ob.pos[2]) + 1.2, ob.pos[2]);
-      ringMesh.renderOrder = 22;
-      spawnGroup.add(ringMesh);
+      fill.renderOrder = 21;
+      spawnGroup.add(fill);
+      const curve = new THREE.CatmullRomCurve3(ringPts, true);
+      const tube = new THREE.TubeGeometry(curve, Math.max(32, ringPts.length * 2), 0.75, 6, true);
+      const outline = new THREE.Mesh(tube, new THREE.MeshBasicMaterial({
+        color: BONUS, depthTest: false, transparent: true, opacity: 0.98,
+      }));
+      outline.renderOrder = 23;
+      spawnGroup.add(outline);
     }
     if ((ob.reborn || []).length >= 3) {
       const pts = ob.reborn.concat([ob.reborn[0]])
-        .map((p) => new THREE.Vector3(p[0], groundY(p[0], p[2]) + 0.5, p[2]));
+        .map((p) => new THREE.Vector3(p[0], p[1] + 0.5, p[2]));
       const line = new THREE.Line(
         new THREE.BufferGeometry().setFromPoints(pts),
         new THREE.LineBasicMaterial({ color: REBORN, depthTest: false, transparent: true, opacity: 0.75 }));
@@ -4704,35 +6390,79 @@ document.querySelectorAll('#spawnCampFilter button').forEach((b) => b.addEventLi
   if (spawnGroup) buildSpawnOverlay();
 }));
 
-/* 踩点模拟：等效人数 = 人数 × 位置倍率，攻守相减得净推进，再按 SpeedCurve 计时 */
+function simObjective() {
+  const select = document.getElementById('simObj');
+  const label = select?.value;
+  return (captureData?.objectives || []).find((o) => String(o.label) === String(label)) || null;
+}
+
+function initSimPanel() {
+  const select = document.getElementById('simObj');
+  if (!select) return;
+  const objectives = captureData?.objectives || [];
+  const previous = select.value;
+  select.innerHTML = objectives.map((o) =>
+    `<option value="${o.label}">${o.label}${o.displayName ? ` · ${o.displayName}` : ''}</option>`).join('');
+  if (objectives.some((o) => String(o.label) === String(previous))) select.value = previous;
+  const stateRow = document.getElementById('simStateRow');
+  const stateSelect = document.getElementById('simState');
+  if (stateRow) stateRow.hidden = !IS_CONQUEST;
+  if (stateSelect) {
+    if (!IS_CONQUEST) stateSelect.value = 'capture';
+    stateSelect.onchange = () => recomputeSim();
+  }
+  select.onchange = () => recomputeSim();
+  recomputeSim();
+}
+
+/* 踩点模拟：人数 × 位置倍率 × 据点攻/守倍率 × 占领倍率，攻守相减得有效人数；
+   再按当前模式曲线插值；敌方 → 中立按 2× 进度计算。 */
 function recomputeSim() {
   const atkN = Number(document.getElementById('simAtkNum').value);
   const defN = Number(document.getElementById('simDefNum').value);
   const atkP = Number(document.getElementById('simAtkPos').value) / 100;
   const defP = Number(document.getElementById('simDefPos').value) / 100;
-  const atkForce = atkN * atkP;
-  const defForce = defN * defP;
+  const ob = simObjective();
+  const state = IS_CONQUEST ? (document.getElementById('simState')?.value || 'capture') : 'capture';
+  const stateMul = state === 'neutralize' ? 2 : 1;
+  const atkMul = Number(ob?.camp0OccupySpeedFactor ?? 1);
+  const defMul = Number(ob?.camp1OccupySpeedFactor ?? 1);
+  const pointMul = Number(ob?.occupySpeedMultiplier ?? 1);
+  const atkForce = atkN * atkP * atkMul * pointMul;
+  const defForce = defN * defP * defMul * pointMul;
   const net = atkForce - defForce;
+  const curveKey = modeSpeedCurveKey();
   const lines = [];
-  lines.push(`攻方 ${atkN} 人 × ${atkP.toFixed(2)} = ${atkForce.toFixed(1)}`);
-  lines.push(`守方 ${defN} 人 × ${defP.toFixed(2)} = ${defForce.toFixed(1)}`);
+  if (ob) {
+    const parts = [`攻 ${factorText(atkMul)}`, `守 ${factorText(defMul)}`];
+    if (IS_CONQUEST) parts.push(`占领 ${factorText(pointMul)}`);
+    lines.push(`据点 ${ob.label}${ob.displayName ? ` · ${ob.displayName}` : ''}：${parts.join(' / ')}`);
+  }
+  if (IS_CONQUEST) {
+    lines.push(`动作：${state === 'neutralize' ? '敌方 → 中立（进度 ×2）' : '中立 → 占领'}`);
+  }
+  const pointPart = IS_CONQUEST ? ` × ${pointMul}` : '';
+  lines.push(`攻方 ${atkN} 人 × ${atkP.toFixed(2)} × ${atkMul}${pointPart} = ${atkForce.toFixed(1)}`);
+  lines.push(`守方 ${defN} 人 × ${defP.toFixed(2)} × ${defMul}${pointPart} = ${defForce.toFixed(1)}`);
   lines.push(`净等效人数：${net.toFixed(1)}`);
   if (atkN <= 0) {
     lines.push('进攻方人数为 0，无法推进');
   } else if (net <= 0) {
     lines.push('防守方压制：据点僵持、无法推进');
   } else {
-    const t = simCaptureTime(net);
-    const capped = net > 7;
-    lines.push(`占点耗时：${t.toFixed(1)}s${capped ? '（7 人封顶 20s，8 人及以上不再更快）' : ''}`);
+    const t = simCaptureTime(net, curveKey) * stateMul;
+    const curvePts = captureConfig?.curves?.speedCurves?.[curveKey] || [];
+    const capPlayers = curvePts.length ? Math.round(curvePts[curvePts.length - 1][0]) + 1 : 7;
+    const capped = net > capPlayers;
+    lines.push(`${state === 'neutralize' ? '中立化耗时' : '占点耗时'}：${t.toFixed(1)}s${capped ? '（已达曲线封顶档，继续加人不再更快）' : ''}`);
   }
   document.getElementById('simResult').textContent = lines.join('\n');
 }
 
-/* 净等效人数 → 占点耗时：≥1 人查 SpeedCurve，0~1 人按 50s/净人数 等比变慢 */
-function simCaptureTime(net) {
-  if (net >= 1) return speedTimeFor(net);
-  return 50 / net;
+/* 净等效人数 → 占点耗时：≥1 人查当前模式曲线；0~1 人按首档耗时/净人数等比变慢 */
+function simCaptureTime(net, curveKey = modeSpeedCurveKey()) {
+  if (net >= 1) return speedTimeFor(net, curveKey);
+  return speedTimeFor(1, curveKey) / Math.max(net, 0.001);
 }
 
 for (const [slider, valId, fmt] of [
@@ -4760,17 +6490,138 @@ document.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('clic
 document.getElementById('fpPanel').addEventListener('click', () => toggleViewMode());
 document.getElementById('noclipPanel').addEventListener('click', () => { fpNoclip = !fpNoclip; updateFpToggle(); });
 const MM_SIZES = { small: 180, medium: 240, large: 300 };
-document.querySelectorAll('#mmSize button').forEach((b) => b.addEventListener('click', () => {
-  const size = MM_SIZES[b.dataset.mm] || 240;
-  const minimap = document.getElementById('minimap');
-  const body = document.getElementById('minimapBody');
-  const fpBtn = document.getElementById('fpToggle');
-  minimap.style.width = size + 'px';
-  body.style.width = size + 'px';
-  body.style.height = size + 'px';
-  fpBtn.style.right = (size + 24) + 'px';
-  document.querySelectorAll('#mmSize button').forEach((x) => x.classList.toggle('on', x === b));
-}));
+function applyMinimapSize(key, persist = true) {
+  const size = MM_SIZES[key] || MM_SIZES.medium;
+  // 尺寸走 CSS 变量，小地图与「观察视角」按钮的相对位置由样式表统一定义。
+  document.documentElement.style.setProperty('--mm-size', size + 'px');
+  document.querySelectorAll('#mmSize button').forEach((b) => b.classList.toggle('on', b.dataset.mm === key));
+  requestAnimationFrame(resizeMinimapCanvas);
+  if (persist) saveStored('df_tactical_mm_size', key);
+}
+document.querySelectorAll('#mmSize button').forEach((b) => {
+  b.addEventListener('click', () => applyMinimapSize(b.dataset.mm));
+});
+try {
+  const savedSize = loadStored('df_tactical_mm_size', '');
+  if (MM_SIZES[savedSize]) applyMinimapSize(savedSize, false);
+} catch (error) { /* 忽略 */ }
+window.addEventListener('resize', () => {
+  resizeMinimapCanvas();
+  if (mmFullOpen) resizeMinimapFull();
+});
+
+/* 小地图交互：支援放置中点击=落点；否则打开全屏战术地图 */
+document.getElementById('minimap').addEventListener('click', (event) => {
+  if (event.target.closest('button')) return;
+  if (event.target.id === 'minimapCanvas' && fieldSupport?.isPlacing()) {
+    const hit = minimapView?.atEvent?.(event);
+    if (hit?.world) {
+      placeSupportFromMinimap(hit.world);
+      return;
+    }
+  }
+  openMinimapFull();
+  if (fieldSupport?.isPlacing()) setMinimapFullSupportMode(true);
+});
+
+document.getElementById('fsMiniPoint')?.addEventListener('click', () => {
+  if (!fieldSupport) return;
+  fieldSupport.beginPlacement();
+  openMinimapFull({ support: true });
+});
+
+const mmFullCanvas = document.getElementById('mmFullCanvas');
+if (mmFullCanvas) {
+  mmFullCanvas.addEventListener('click', (event) => {
+    if (!mmFullSupportMode && !fieldSupport?.isPlacing()) {
+      const hint = document.getElementById('mmFullHint');
+      if (hint) hint.textContent = '正常预览模式 · 边界固定不可拖动 · 滚轮缩放 · 点击「阵地支援选点」后放置落点';
+      return;
+    }
+    const world = mmFullCanvasWorldAt(event);
+    if (world) placeSupportFromMinimap(world);
+  });
+  mmFullCanvas.addEventListener('mousemove', (event) => {
+    const cursor = document.getElementById('mmFullCursor');
+    const stage = document.getElementById('mmFullStage');
+    if (!cursor || !stage) return;
+    const rect = stage.getBoundingClientRect();
+    cursor.hidden = !mmFullSupportMode;
+    if (cursor.hidden) return;
+    cursor.style.left = `${event.clientX - rect.left}px`;
+    cursor.style.top = `${event.clientY - rect.top}px`;
+    const world = mmFullCanvasWorldAt(event);
+    const hint = document.getElementById('mmFullHint');
+    const pv = fieldSupport?.preview?.();
+    if (world && hint) {
+      hint.textContent = `支援选点：X ${world.x.toFixed(0)} / Z ${world.z.toFixed(0)} · 滚轮缩放 · 点击放置「${pv?.skillName || '阵地支援'}」`;
+    }
+  });
+  mmFullCanvas.addEventListener('mouseleave', () => {
+    const cursor = document.getElementById('mmFullCursor');
+    if (cursor) cursor.hidden = true;
+  });
+  mmFullCanvas.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    setMinimapFullZoom(mmFullZoom * (event.deltaY < 0 ? 1.25 : 0.8));
+  }, { passive: false });
+}
+document.getElementById('mmFullClose')?.addEventListener('click', closeMinimapFull);
+document.getElementById('mmFullSupport')?.addEventListener('click', () => {
+  if (!mmFullSupportMode) {
+    mmInkTool = 'none';
+    mmInkUpdateUi();
+  }
+  setMinimapFullSupportMode(!mmFullSupportMode);
+});
+document.getElementById('mmFullZoomIn')?.addEventListener('click', () => setMinimapFullZoom(mmFullZoom * 1.5));
+document.getElementById('mmFullZoomOut')?.addEventListener('click', () => setMinimapFullZoom(mmFullZoom / 1.5));
+document.getElementById('mmFullReset')?.addEventListener('click', () => {
+  setMinimapFullZoom(mmFullMinZoom());
+});
+document.querySelectorAll('#mmInkBar [data-ink]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const tool = button.dataset.ink;
+    mmInkTool = mmInkTool === tool ? 'none' : tool;
+    if (mmInkTool !== 'none' && mmFullSupportMode) setMinimapFullSupportMode(false);
+    mmInkUpdateUi();
+    const hint = document.getElementById('mmFullHint');
+    if (hint) {
+      const label = button.title || tool;
+      hint.textContent = mmInkTool === 'none'
+        ? '平面标记已关闭 · 边界固定 · 滚轮缩放 · Esc 关闭'
+        : `平面标记：${label}${tool === 'laser' ? '（按住左键拖动）' : ''} · 仅在全屏地图上生效 · 点同一工具关闭`;
+    }
+    drawMinimapInk();
+  });
+});
+document.querySelectorAll('#mmInkBar [data-ink-color]').forEach((button) => {
+  button.addEventListener('click', () => {
+    mmInkColor = button.dataset.inkColor || '#ff4d4f';
+    mmInkUpdateUi();
+  });
+});
+document.getElementById('mmInkUndo')?.addEventListener('click', () => {
+  mmInkMarks.pop();
+  drawMinimapInk();
+});
+document.getElementById('mmInkClear')?.addEventListener('click', mmInkClearAll);
+const mmFullInk = document.getElementById('mmFullInk');
+if (mmFullInk) {
+  mmFullInk.addEventListener('pointerdown', mmInkStart);
+  mmFullInk.addEventListener('pointermove', mmInkMove);
+  mmFullInk.addEventListener('pointerup', mmInkEnd);
+  mmFullInk.addEventListener('pointercancel', mmInkEnd);
+  mmFullInk.addEventListener('pointerleave', () => { mmInkDrawing = false; mmInkCurrent = null; drawMinimapInk(); });
+  mmFullInk.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    setMinimapFullZoom(mmFullZoom * (event.deltaY < 0 ? 1.25 : 0.8));
+  }, { passive: false });
+}
+mmInkUpdateUi();
+document.getElementById('minimapImg')?.addEventListener('load', () => {
+  if (mmFullOpen) drawMinimapFull();
+});
 document.getElementById('tGround').addEventListener('click', () => { if (terrain) terrain.visible = !terrain.visible; markButtons(); });
 document.getElementById('tBuild').addEventListener('click', () => {
   buildingsVisible = !buildingsVisible;
@@ -4850,6 +6701,84 @@ document.getElementById('copyInfo').addEventListener('click', async (event) => {
   flashButton(button, ok ? '已复制' : '复制失败');
 });
 
+/* ------------------------------------------------------------------ *
+ * 系统信息：当前状态 / 运行环境（左侧「系统信息」页）
+ * ------------------------------------------------------------------ */
+var systemInfoTimer = 0;
+function compactUserAgent(ua) {
+  const text = String(ua || '');
+  const edge = text.match(/(Edg|EdgA)\/([\d.]+)/);
+  if (edge) return `Edge ${edge[2].split('.')[0]}`;
+  const match = text.match(/(Chrome|CriOS|Firefox|FxiOS|Safari)\/([\d.]+)/);
+  if (!match) return text.slice(0, 60) || '—';
+  const names = { Chrome: 'Chrome', CriOS: 'Chrome', Firefox: 'Firefox', FxiOS: 'Firefox', Safari: 'Safari' };
+  return `${names[match[1]] || match[1]} ${match[2].split('.')[0]}`;
+}
+function refreshSystemInfo() {
+  if (!document.getElementById('si-mode')) return;
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+  setText('si-mode', `${modeDisplayName()} · ${modeMapCount()} 图`);
+  setText('si-map', `${mapManifest?.mapName || MAP}（${MAP}）`);
+  setText('si-tier', tierState.high ? '高精度' : tierState.mid ? '中精度' : '低精度');
+  setText('si-stage', activePhase
+    ? phaseButtonText(activePhase)
+    : (stageFilter === 'all'
+      ? '全部阶段'
+      : (mapManifest?.stageLabels?.[String(stageFilter)] || `阶段 ${stageFilter}`)));
+  const minimapEl = document.getElementById('minimap');
+  const mmSize = getComputedStyle(document.documentElement).getPropertyValue('--mm-size').trim() || '240px';
+  setText('si-minimap', minimapEl && !minimapEl.hidden ? `显示 · ${mmSize}` : '隐藏');
+  setText('si-viewport', `${canvas.clientWidth} × ${canvas.clientHeight} · ${Number(devicePixelRatio || 1).toFixed(2)}x`);
+  setText('si-sea', mapManifest?.seaLevel == null ? '—' : `${Number(mapManifest.seaLevel).toFixed(2)} m`);
+  const totals = mapManifest?.totals;
+  setText('si-data', totals
+    ? `${totals.tiles} 瓦片 · ${Number(totals.tris || 0).toLocaleString('en-US')} 三角面 · ${(Number(totals.bytes || 0) / 1048576).toFixed(1)} MB`
+    : '—');
+  const ua = navigator.userAgent || '';
+  const browserEl = document.getElementById('si-browser');
+  if (browserEl) { browserEl.textContent = compactUserAgent(ua); browserEl.title = ua; }
+  setText('si-platform', `${navigator.platform || '—'} · ${navigator.language || '—'}`);
+  let timeZone = '—';
+  try { timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || '—'; } catch (error) { /* 忽略 */ }
+  setText('si-locale', timeZone);
+  setText('si-screen', `${screen.width} × ${screen.height} · 窗口 ${window.innerWidth} × ${window.innerHeight}`);
+  let webgl = '—';
+  try {
+    const gl = renderer.getContext();
+    webgl = `${gl.getParameter(gl.VERSION)} · 纹素上限 ${gl.getParameter(gl.MAX_TEXTURE_SIZE)}`;
+  } catch (error) { /* 忽略 */ }
+  setText('si-webgl', webgl);
+  const updated = new Date(document.lastModified);
+  setText('si-updated', Number.isNaN(updated.getTime()) ? '—' : updated.toLocaleString('zh-CN', { hour12: false }));
+  setText('si-params', location.search || '（无）');
+}
+function scheduleSystemInfo() {
+  const pane = document.getElementById('paneSystem');
+  if (!pane || pane.hidden) return;
+  if (systemInfoTimer) return;
+  systemInfoTimer = setTimeout(() => {
+    systemInfoTimer = 0;
+    try { refreshSystemInfo(); } catch (error) { /* 忽略 */ }
+  }, 80);
+}
+document.getElementById('copySysInfo').addEventListener('click', async (event) => {
+  const button = event.currentTarget;
+  try { refreshSystemInfo(); } catch (error) { /* 忽略 */ }
+  const lines = ['三角洲行动 · 三维战术板 · 系统信息'];
+  document.querySelectorAll('#paneSystem table').forEach((table) => {
+    [...table.rows].forEach((row) => {
+      const cells = [...row.cells].map((cell) => cell.textContent.trim().replace(/\s+/g, ' '));
+      if (cells.length >= 2) lines.push(`${cells[0]}: ${cells.slice(1).join(' | ')}`);
+    });
+  });
+  lines.push(`页面: ${location.href}`);
+  const ok = await copyToClipboard(lines.join('\n'));
+  flashButton(button, ok ? '已复制' : '复制失败');
+});
+
 /* 调试模式：点击物体查看信息（优先于划线、站位、弹道设点） */
 function runDebugPick(event) {
   const viewport = document.getElementById('viewport').getBoundingClientRect();
@@ -4889,11 +6818,44 @@ function runDebugPick(event) {
   el.style.top = Math.min(viewport.height - 120, event.clientY - viewport.top + 16) + 'px';
 }
 
+/* 阵地支援：优先命中建筑，建筑下方才回退到地形 */
+function pickSupportPoint(event) {
+  const viewport = document.getElementById('viewport').getBoundingClientRect();
+  pickPointer.x = ((event.clientX - viewport.left) / viewport.width) * 2 - 1;
+  pickPointer.y = -((event.clientY - viewport.top) / viewport.height) * 2 + 1;
+  raycaster.setFromCamera(pickPointer, camera);
+  const buildingTargets = [root, ...Object.values(tierGroups), ...Object.values(eventGroups), cbdGroup, gasGroup]
+    .filter((group) => group && group.visible);
+  const buildingHits = raycaster.intersectObjects(buildingTargets, true);
+  if (buildingHits.length) return buildingHits[0].point.clone();
+  const terrainHits = raycaster.intersectObject(terrain, true);
+  return terrainHits.length ? terrainHits[0].point.clone() : null;
+}
+
+/* 小地图点击：从世界 x/z 向下射线取最高建筑面（含大事件），否则地形 */
+function supportWorldPointAt(x, z) {
+  const buildingTargets = [root, ...Object.values(tierGroups), ...Object.values(eventGroups), cbdGroup, gasGroup]
+    .filter((group) => group && group.visible);
+  raycaster.set(new THREE.Vector3(x, 3000, z), new THREE.Vector3(0, -1, 0));
+  const buildingHits = raycaster.intersectObjects(buildingTargets, true);
+  if (buildingHits.length) return buildingHits[0].point.clone();
+  if (terrain) {
+    const terrainHits = raycaster.intersectObject(terrain, true);
+    if (terrainHits.length) return terrainHits[0].point.clone();
+  }
+  return new THREE.Vector3(x, heightAt(x, z), z);
+}
+
 renderer.domElement.addEventListener('click', (event) => {
   if (event.button !== 0) return;
   if (suppressMarkClick) { suppressMarkClick = false; return; }
   if (rosterJustDragged) { rosterJustDragged = false; return; }
   if (rosterJustPicked) { rosterJustPicked = false; return; }
+  if (fieldSupport?.isPlacing()) {
+    const point = pickSupportPoint(event);
+    if (point) fieldSupport.placeAt(point);
+    return;
+  }
   if (debugPick) { runDebugPick(event); return; }
   if (vehicleMarkType || vehicleMarkTeam) {
     if (vehicleMarkType && vehicleMarkTeam) addVehicleMarkAt(event);
@@ -5004,7 +6966,7 @@ renderer.domElement.addEventListener('pointerup', (event) => {
   const start = markPointerStart;
   markPointerStart = null;
   if (!start || event.button !== 0) return;
-  if (rosterSelected || rosterDragging || rosterJustPicked || debugPick || predMarkMode || balMarkMode) return;
+  if (rosterSelected || rosterDragging || rosterJustPicked || debugPick || predMarkMode || balMarkMode || fieldSupport?.isPlacing()) return;
   if (!marking) return;
   const moved = Math.hypot(event.clientX - start.x, event.clientY - start.y);
   suppressMarkClick = true;
@@ -5065,9 +7027,12 @@ function onStageButtonClick(event) {
   renderPhaseNotes();
   loadEscortOverlay(activePhase);
   if (vehicleData && spawnData) updateVehiclePanel();
-  else if (spawnGroup) buildSpawnOverlay();
+  // 阶段切换后必须重建部署点，否则仍显示上一阶段的 Hub/部署方块。
+  if (spawnData && deployData) buildSpawnOverlay();
   activateMarkContext();
   layoutMarkFloat();
+  scheduleSystemInfo();
+  if (mmFullOpen) drawMinimapFull();
 }
 document.getElementById('stageButtons').addEventListener('click', onStageButtonClick);
 document.getElementById('stageButtonsUnreleased').addEventListener('click', onStageButtonClick);
@@ -5119,12 +7084,14 @@ document.getElementById('tFlight').addEventListener('click', () => {
 });
 document.getElementById('renderScale').addEventListener('input', (event) => {
   renderScale = Number(event.target.value) / 100;
+  saveStored('df_tactical_render_scale', renderScale);
   resize();
   document.getElementById('g-res').textContent =
     `${Math.round(canvas.clientWidth * profile.pr * renderScale)} × ${Math.round(canvas.clientHeight * profile.pr * renderScale)}`;
 });
 document.getElementById('fpsCap').addEventListener('change', (event) => {
   fpsCap = Number(event.target.value);
+  saveStored('df_tactical_fps_cap', fpsCap);
 });
 
 
@@ -5519,7 +7486,8 @@ function clearRosterPositions() {
  * ------------------------------------------------------------------ */
 const PLAN_SCHEMA = 'df-tactical-plan';
 const PLAN_VERSION = 1;
-const PLAN_KEY = IS_ASSAULT ? 'df_tactical_plan_v1_assault' : 'df_tactical_plan_v1';
+let PLAN_KEY = IS_CONQUEST ? 'df_tactical_plan_v1_conquest'
+  : IS_ASSAULT ? 'df_tactical_plan_v1_assault' : 'df_tactical_plan_v1';
 let mapMeta = null;
 let planDirty = false;
 let applyingPlan = false;
@@ -5897,16 +7865,24 @@ function exportTacticalMinimap() {
   canvas.width = iw;
   canvas.height = ih;
   const ctx = canvas.getContext('2d');
-  ctx.drawImage(img, 0, 0, iw, ih);
 
   const cx = minimapCfg.centerX;
   const cz = minimapCfg.centerZ;
   const ext = minimapCfg.halfExtent;
-  const rad = (minimapCfg.rotation || 0) * Math.PI / 180;
+  const rad = minimapDisplayRotationDeg() * Math.PI / 180;
   const cos = Math.cos(rad);
   const sin = Math.sin(rad);
-  const toX = (x, z) => ((x - cx) * cos - (z - cz) * sin) / ext * (iw - 1) / 2 + (iw - 1) / 2;
-  const toY = (x, z) => ((x - cx) * sin + (z - cz) * cos) / ext * (ih - 1) / 2 + (ih - 1) / 2;
+  const ix = (x) => (x - cx) / ext * (iw - 1) / 2 + (iw - 1) / 2;
+  const iy = (z) => (z - cz) / ext * (ih - 1) / 2 + (ih - 1) / 2;
+  const icx = (iw - 1) / 2, icy = (ih - 1) / 2;
+  // 与页面小地图同一套显示朝向：默认世界轴向（rad=0）；?mmrot=game 时按游戏显示朝向。
+  ctx.save();
+  ctx.translate(iw / 2, ih / 2);
+  ctx.rotate(rad);
+  ctx.drawImage(img, -iw / 2, -ih / 2, iw, ih);
+  ctx.restore();
+  const toX = (x, z) => icx + ((ix(x) - icx) * cos - (iy(z) - icy) * sin);
+  const toY = (x, z) => icy + ((ix(x) - icx) * sin + (iy(z) - icy) * cos);
   const scale = iw / 1920;
 
   ctx.save();
@@ -7012,6 +8988,10 @@ function updateFp(dt) {
 }
 
 window.addEventListener('keydown', (e) => {
+  if (e.code === 'Escape' && mmFullOpen) { e.preventDefault(); closeMinimapFull(); return; }
+  if (e.code === 'KeyM' && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '')) {
+    e.preventDefault(); toggleMinimapFull(); return;
+  }
   if (e.code === 'KeyF') { e.preventDefault(); toggleViewMode(); return; }
   if (e.code === 'KeyN') { e.preventDefault(); fpNoclip = !fpNoclip; updateFpToggle(); return; }
   if (e.code === 'Space') e.preventDefault();
@@ -7083,6 +9063,26 @@ function tick(now) {
       `${Math.round(canvas.clientWidth * profile.pr * renderScale)} × ${Math.round(canvas.clientHeight * profile.pr * renderScale)}`;
   }
 }
+
+/* 阵地支援：3D 预览模块（参数来自 data/field_support.json） */
+try {
+  const supportData = await fetch('./data/field_support.json').then((r) => r.json());
+  fieldSupport = createFieldSupport({
+    THREE, scene, heightAt, data: supportData,
+    getMapCode: () => MAP,
+    getMode: () => APP_MODE,
+  });
+} catch (error) {
+  console.error('阵地支援数据加载失败', error);
+}
+
+/* 恢复上次的左侧页签/滚动与右侧栏滚动：切换地图后两侧各自保持原状。 */
+try {
+  const savedTab = loadStored(TAB_STORE, '');
+  if (savedTab) switchTab(savedTab, { hydrate: false, restore: true });
+  else restoreTabScroll(activeTab);
+  restoreRailScroll();
+} catch (error) { /* 忽略 */ }
 
 run().catch((error) => {
   const el = document.getElementById('loading');
