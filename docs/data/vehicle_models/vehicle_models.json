@@ -1,0 +1,1828 @@
+{
+ "source": "D:/DF/载具可视化/web（MFPK 外观包）",
+ "scale": "UE 厘米；读取时 x/z 交换并 ×0.01",
+ "vehicles": {
+  "1101001": {
+   "id": 1101001,
+   "name": "M1A4主战坦克",
+   "folder": "TankM1",
+   "parts": [
+    {
+     "name": "tank_M1_Body_3P",
+     "url": "models/TankM1/tank_M1_Body_3P.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_tank_M1_3": "models/TankM1/tex/T_VMGen_BaseColorMap_8bbc5bbbfb88fabc908beb823cef0d5f.jpg",
+      "MI_tank_M1_5": "models/TankM1/tex/T_VMGen_BaseColorMap_a78d81eb4dc01a28b356addae5e5e89f.jpg"
+     }
+    },
+    {
+     "name": "tank_M1_Turret_3P",
+     "url": "models/TankM1/tank_M1_Turret_3P.glb",
+     "loc": [
+      -100.21546,
+      0.0,
+      175.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_tank_M1_2": "models/TankM1/tex/T_VMGen_BaseColorMap_4112c850ee60e0bd0cf9f3e22e0d7dde.jpg",
+      "MI_tank_M1_5": "models/TankM1/tex/T_VMGen_BaseColorMap_a78d81eb4dc01a28b356addae5e5e89f.jpg"
+     }
+    },
+    {
+     "name": "tank_M1_MainGun_3P_2",
+     "url": "models/TankM1/tank_M1_MainGun_3P_2.glb",
+     "loc": [
+      54.78454000000001,
+      0.0,
+      215.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_tank_M1_1": "models/TankM1/tex/T_VMGen_BaseColorMap_6868efa509690b930954c3a4ec77216c.jpg"
+     }
+    },
+    {
+     "name": "Tank_WheelWeldMesh",
+     "url": "models/TankM1/Tank_WheelWeldMesh.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Instance_tank_M1_4": "models/TankM1/tex/T_VMGen_BaseColorMap_f1893c876d8541cb47c1a8fa040d7952.jpg"
+     }
+    }
+   ],
+   "wheels": []
+  },
+  "1101002": {
+   "id": 1101002,
+   "name": "LAV-AA防空车",
+   "folder": "LAVAD",
+   "parts": [
+    {
+     "name": "LAVAD_Body_3P",
+     "url": "models/LAVAD/LAVAD_Body_3P.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAVAD_3": "models/LAVAD/tex/T_VMGen_BaseColorMap_124ef861bdefa3dda76afacb632f7520.jpg",
+      "MI_LAVAD_4": "models/LAVAD/tex/T_VMGen_BaseColorMap_15ab83d44687a8d099e0c4a99819c2bc.jpg"
+     }
+    },
+    {
+     "name": "LAVAD_Turret_3P",
+     "url": "models/LAVAD/LAVAD_Turret_3P.glb",
+     "loc": [
+      -120.34802,
+      0.0,
+      271.4032
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAVAD_2": "models/LAVAD/tex/T_VMGen_BaseColorMap_018c5450e096497925d5bb25f22af952.jpg"
+     }
+    },
+    {
+     "name": "LAVAD_Base_3P",
+     "url": "models/LAVAD/LAVAD_Base_3P.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAVAD_3": "models/LAVAD/tex/T_VMGen_BaseColorMap_124ef861bdefa3dda76afacb632f7520.jpg"
+     }
+    },
+    {
+     "name": "40mmweaponstation_03_Anim_3P",
+     "url": "models/LAVAD/40mmweaponstation_03_Anim_3P.glb",
+     "loc": [
+      -73.56348,
+      53.0,
+      390.4032
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "40mmweaponstation": "models/LAVAD/tex/T_VMGen_BaseColorMap_537edd57fa4683a3196fa216b5865429.jpg"
+     }
+    },
+    {
+     "name": "LAVAD_Antenna_3P",
+     "url": "models/LAVAD/LAVAD_Antenna_3P.glb",
+     "loc": [
+      -254.34802000000002,
+      81.0,
+      338.4032
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAVAD_2": "models/LAVAD/tex/T_VMGen_BaseColorMap_018c5450e096497925d5bb25f22af952.jpg"
+     }
+    },
+    {
+     "name": "LAVAD_Bar_02_3P",
+     "url": "models/LAVAD/LAVAD_Bar_02_3P.glb",
+     "loc": [
+      -62.348020000000005,
+      0.0,
+      342.4032
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAVAD_Bar_02": "models/LAVAD/tex/T_VMGen_BaseColorMap_2f8126546936331e38f3354e91350a77.jpg"
+     }
+    },
+    {
+     "name": "LAVAD_Rocket_L2_3P",
+     "url": "models/LAVAD/LAVAD_Rocket_L2_3P.glb",
+     "loc": [
+      -152.143201,
+      -101.0,
+      319.40784
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAVAD_6": "models/LAVAD/tex/T_VMGen_BaseColorMap_22ddea527b2d25ef742c4e6190cad990.jpg"
+     }
+    },
+    {
+     "name": "LAVAD_Rocket_R2_3P",
+     "url": "models/LAVAD/LAVAD_Rocket_R2_3P.glb",
+     "loc": [
+      -152.143201,
+      101.0,
+      319.40784
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAVAD_6": "models/LAVAD/tex/T_VMGen_BaseColorMap_22ddea527b2d25ef742c4e6190cad990.jpg"
+     }
+    },
+    {
+     "name": "40mmweaponstation_02_Bady_3P",
+     "url": "models/LAVAD/40mmweaponstation_02_Bady_3P.glb",
+     "loc": [
+      -73.56348,
+      53.0,
+      350.4032
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "40mmweaponstation": "models/LAVAD/tex/T_VMGen_BaseColorMap_537edd57fa4683a3196fa216b5865429.jpg"
+     }
+    },
+    {
+     "name": "LAVAD_Rocket_Base_3P",
+     "url": "models/LAVAD/LAVAD_Rocket_Base_3P.glb",
+     "loc": [
+      -153.34802000000002,
+      0.0,
+      317.4032
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAVAD_6": "models/LAVAD/tex/T_VMGen_BaseColorMap_22ddea527b2d25ef742c4e6190cad990.jpg"
+     }
+    },
+    {
+     "name": "LAVAD_WheelWeldMesh",
+     "url": "models/LAVAD/LAVAD_WheelWeldMesh.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Instance_LAVAD_5": "models/LAVAD/tex/T_VMGen_BaseColorMap_4d2217f6eba53c6e7f92af6e26d642e6.jpg"
+     }
+    }
+   ],
+   "wheels": []
+  },
+  "1101003": {
+   "id": 1101003,
+   "name": "LAV-G1步战车",
+   "folder": "LAV25",
+   "parts": [
+    {
+     "name": "LAV25_Body_3P",
+     "url": "models/LAV25/LAV25_Body_3P.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAV25_3": "models/LAV25/tex/T_VMGen_BaseColorMap_6ef04510965785a5cd12f33fc5bc2465.jpg",
+      "MI_LAV25_4": "models/LAV25/tex/T_VMGen_BaseColorMap_15ab83d44687a8d099e0c4a99819c2bc.jpg"
+     }
+    },
+    {
+     "name": "LAV25_Turret_3P",
+     "url": "models/LAV25/LAV25_Turret_3P.glb",
+     "loc": [
+      -120.34802,
+      0.0,
+      271.4032
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAV25_2": "models/LAV25/tex/T_VMGen_BaseColorMap_b9035ecb79e2c7fc34f5c4b583ee7f2b.jpg"
+     }
+    },
+    {
+     "name": "LAV25_Base_3P",
+     "url": "models/LAV25/LAV25_Base_3P.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAV25_3": "models/LAV25/tex/T_VMGen_BaseColorMap_6ef04510965785a5cd12f33fc5bc2465.jpg"
+     }
+    },
+    {
+     "name": "40mmweaponstation_03_Anim_3P",
+     "url": "models/LAV25/40mmweaponstation_03_Anim_3P.glb",
+     "loc": [
+      -75.56348,
+      53.0,
+      390.4032
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "40mmweaponstation": "models/LAV25/tex/T_VMGen_BaseColorMap_537edd57fa4683a3196fa216b5865429.jpg"
+     }
+    },
+    {
+     "name": "LAV25_Antenna_3P",
+     "url": "models/LAV25/LAV25_Antenna_3P.glb",
+     "loc": [
+      -254.34802000000002,
+      81.0,
+      338.4032
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAV25_2": "models/LAV25/tex/T_VMGen_BaseColorMap_b9035ecb79e2c7fc34f5c4b583ee7f2b.jpg"
+     }
+    },
+    {
+     "name": "LAV25_Bar_Ani_3P",
+     "url": "models/LAV25/LAV25_Bar_Ani_3P.glb",
+     "loc": [
+      -65.34802,
+      0.0,
+      334.4032
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_LAV25_1": "models/LAV25/tex/T_VMGen_BaseColorMap_0aadbbbef6459c119e6aa1a31c3480c8.jpg"
+     }
+    },
+    {
+     "name": "LAV25_Lau_02_L_3P",
+     "url": "models/LAV25/LAV25_Lau_02_L_3P.glb",
+     "loc": [
+      -97.795179,
+      -86.0,
+      350.00464
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "LAV25_Lau_02": "models/LAV25/tex/T_VMGen_BaseColorMap_700779170403c064c034f7787ed64978.jpg"
+     }
+    },
+    {
+     "name": "LAV25_Lau_02_R_3P",
+     "url": "models/LAV25/LAV25_Lau_02_R_3P.glb",
+     "loc": [
+      -97.795179,
+      86.0,
+      350.00464
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "LAV25_Lau_02": "models/LAV25/tex/T_VMGen_BaseColorMap_700779170403c064c034f7787ed64978.jpg"
+     }
+    },
+    {
+     "name": "40mmweaponstation_02_Bady_3P",
+     "url": "models/LAV25/40mmweaponstation_02_Bady_3P.glb",
+     "loc": [
+      -73.56348,
+      53.0,
+      350.4032
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "40mmweaponstation": "models/LAV25/tex/T_VMGen_BaseColorMap_537edd57fa4683a3196fa216b5865429.jpg"
+     }
+    },
+    {
+     "name": "LAV25_WheelWeldMesh",
+     "url": "models/LAV25/LAV25_WheelWeldMesh.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Instance_LAV25_5": "models/LAV25/tex/T_VMGen_BaseColorMap_5afe55c42f96feb11c1f2dbc3aa3d6a9.jpg"
+     }
+    }
+   ],
+   "wheels": []
+  },
+  "1101004": {
+   "id": 1101004,
+   "name": "FSV轮式突击炮",
+   "folder": "WheeledTank",
+   "parts": [
+    {
+     "name": "WheeledTank_Body_3P",
+     "url": "models/WheeledTank/WheeledTank_Body_3P.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_WheeledTank": "models/WheeledTank/tex/T_VMGen_BaseColorMap_48ff9c4e7c4c34f4d6a62706c39e18ff.jpg",
+      "MI_WheeledTank_Light": "models/WheeledTank/tex/T_VMGen_BaseColorMap_194a541781e3834cdabc7e4371ff717c.jpg"
+     }
+    },
+    {
+     "name": "WheeledTank_Turret_3P",
+     "url": "models/WheeledTank/WheeledTank_Turret_3P.glb",
+     "loc": [
+      -12.064533,
+      -0.000176,
+      192.14285
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_WheeledTank_Turret": "models/WheeledTank/tex/T_VMGen_BaseColorMap_917ef128961287822950f5fd535d3817.jpg"
+     }
+    },
+    {
+     "name": "WheeledTank_Base_3P",
+     "url": "models/WheeledTank/WheeledTank_Base_3P.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_WheeledTank": "models/WheeledTank/tex/T_VMGen_BaseColorMap_48ff9c4e7c4c34f4d6a62706c39e18ff.jpg"
+     }
+    },
+    {
+     "name": "40mmweaponstation_03_Anim_3P",
+     "url": "models/WheeledTank/40mmweaponstation_03_Anim_3P.glb",
+     "loc": [
+      -6.064533000000001,
+      -52.000176,
+      285.14285
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "40mmweaponstation": "models/WheeledTank/tex/T_VMGen_BaseColorMap_537edd57fa4683a3196fa216b5865429.jpg"
+     }
+    },
+    {
+     "name": "WheeledTank_Bar_02_3P_A",
+     "url": "models/WheeledTank/WheeledTank_Bar_02_3P_A.glb",
+     "loc": [
+      16.935467,
+      -0.000176,
+      228.14285
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_WheeledTank_Bar_02": "models/WheeledTank/tex/T_VMGen_BaseColorMap_723e2e83e01efc6b0fab089358b54512.jpg"
+     }
+    },
+    {
+     "name": "WheeledTank_Missile01_3P",
+     "url": "models/WheeledTank/WheeledTank_Missile01_3P.glb",
+     "loc": [
+      -225.08716,
+      -22.0,
+      186.9962
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_WheeledTank": "models/WheeledTank/tex/T_VMGen_BaseColorMap_48ff9c4e7c4c34f4d6a62706c39e18ff.jpg"
+     }
+    },
+    {
+     "name": "WheeledTank_Missile02_3P",
+     "url": "models/WheeledTank/WheeledTank_Missile02_3P.glb",
+     "loc": [
+      -225.08716,
+      22.0,
+      186.9962
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_WheeledTank": "models/WheeledTank/tex/T_VMGen_BaseColorMap_48ff9c4e7c4c34f4d6a62706c39e18ff.jpg"
+     }
+    },
+    {
+     "name": "40mmweaponstation_02_Bady_3P",
+     "url": "models/WheeledTank/40mmweaponstation_02_Bady_3P.glb",
+     "loc": [
+      -6.064533000000001,
+      -52.000176,
+      245.14285
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "40mmweaponstation": "models/WheeledTank/tex/T_VMGen_BaseColorMap_537edd57fa4683a3196fa216b5865429.jpg"
+     }
+    },
+    {
+     "name": "WheeledTank_Door_04_3P",
+     "url": "models/WheeledTank/WheeledTank_Door_04_3P.glb",
+     "loc": [
+      -222.56262,
+      -23.0,
+      168.14908
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_WheeledTank": "models/WheeledTank/tex/T_VMGen_BaseColorMap_48ff9c4e7c4c34f4d6a62706c39e18ff.jpg"
+     }
+    },
+    {
+     "name": "WheeledTank_Door_05_3P",
+     "url": "models/WheeledTank/WheeledTank_Door_05_3P.glb",
+     "loc": [
+      -222.56262,
+      23.0,
+      168.14908
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_WheeledTank": "models/WheeledTank/tex/T_VMGen_BaseColorMap_48ff9c4e7c4c34f4d6a62706c39e18ff.jpg"
+     }
+    }
+   ],
+   "wheels": [
+    {
+     "url": "models/WheeledTank/WheeledTank_Wheel_3P.glb",
+     "materials": {
+      "MI_Instance_WheeledTank_tire": "models/WheeledTank/tex/T_VMGen_BaseColorMap_a8dc16960e99e75fc77a6cf4d6756e79.jpg"
+     },
+     "transforms": [
+      {
+       "loc": [
+        182.73137,
+        -90.0,
+        59.35701
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        182.73137,
+        90.0,
+        59.356995
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -154.71454,
+        -90.0,
+        59.334175
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -154.71454,
+        90.0,
+        59.334167
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "1101005": {
+   "id": 1101005,
+   "name": "GTQ-35轻型坦克",
+   "folder": "Tank_GTQ35",
+   "parts": [
+    {
+     "name": "Tank_GTQ35_Body_01",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Body_01.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Tank_GTQ35_3": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_3d6b97f890627b34d85bb40e950fd178.jpg",
+      "MI_Tank_GTQ35_6": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_b0021cf6fabb134966643a143145f9b4.jpg"
+     }
+    },
+    {
+     "name": "Tank_GTQ35_Turret_01",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Turret_01.glb",
+     "loc": [
+      10.5,
+      0.0,
+      140.8
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Tank_GTQ35_2": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_fa74a4e78ffea67a7622d4abff5a4e28.jpg"
+     }
+    },
+    {
+     "name": "Tank_GTQ35_Base",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Base.glb",
+     "loc": [
+      0.0,
+      0.0,
+      1.1285799999999995
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Tank_GTQ35_2": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_fa74a4e78ffea67a7622d4abff5a4e28.jpg"
+     }
+    },
+    {
+     "name": "Tank_GTQ35_Bar_01_3P_A",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Bar_01_3P_A.glb",
+     "loc": [
+      110.74,
+      0.0,
+      179.86
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Tank_GTQ35_1": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_2471016105c1b882dc199de8d4628282.jpg"
+     }
+    },
+    {
+     "name": "Tank_GTQ35_Wheel_03",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Wheel_03.glb",
+     "loc": [
+      -291.82742,
+      -133.80083,
+      77.59849
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Instance_Tank_GTQ35_4": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_64f57d53efa8f2df461f0766d80630a8.jpg"
+     }
+    },
+    {
+     "name": "Tank_GTQ35_Wheel_03",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Wheel_03.glb",
+     "loc": [
+      -291.8273,
+      132.41412,
+      77.59849
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Instance_Tank_GTQ35_4": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_64f57d53efa8f2df461f0766d80630a8.jpg"
+     }
+    },
+    {
+     "name": "Tank_GTQ35_Wheel_01",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Wheel_01.glb",
+     "loc": [
+      292.58017,
+      -133.80113,
+      79.63511
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Instance_Tank_GTQ35_4": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_64f57d53efa8f2df461f0766d80630a8.jpg"
+     }
+    },
+    {
+     "name": "Tank_GTQ35_Wheel_01",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Wheel_01.glb",
+     "loc": [
+      292.5803,
+      132.41385,
+      79.63511
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Instance_Tank_GTQ35_4": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_64f57d53efa8f2df461f0766d80630a8.jpg"
+     }
+    },
+    {
+     "name": "DualWeaponStation_Bar_01",
+     "url": "models/Tank_GTQ35/DualWeaponStation_Bar_01.glb",
+     "loc": [
+      -76.5124309,
+      26.1143608,
+      286.69299
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_DualWeaponStation": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_68678447fda98676b4e9f7acfc0f9a69.jpg"
+     }
+    },
+    {
+     "name": "Tank_GTQ35_Capstan01",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Capstan01.glb",
+     "loc": [
+      68.93143,
+      -173.065,
+      132.32721
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Tank_GTQ35_5": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_5ad401c201560f7df1f05620b7f667fc.jpg"
+     }
+    },
+    {
+     "name": "Tank_GTQ35_Capstan02",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Capstan02.glb",
+     "loc": [
+      68.93143,
+      173.065,
+      132.32721
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Tank_GTQ35_5": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_5ad401c201560f7df1f05620b7f667fc.jpg"
+     }
+    },
+    {
+     "name": "Tank_GTQ35_Capstan03",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Capstan03.glb",
+     "loc": [
+      -251.20436,
+      -164.70369,
+      132.32721
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Tank_GTQ35_5": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_5ad401c201560f7df1f05620b7f667fc.jpg"
+     }
+    },
+    {
+     "name": "Tank_GTQ35_Capstan04",
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Capstan04.glb",
+     "loc": [
+      -251.20421,
+      164.70409,
+      132.32721
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Tank_GTQ35_5": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_5ad401c201560f7df1f05620b7f667fc.jpg"
+     }
+    },
+    {
+     "name": "DualWeaponStation_Body_01",
+     "url": "models/Tank_GTQ35/DualWeaponStation_Body_01.glb",
+     "loc": [
+      -75.02719,
+      29.296936,
+      227.69299
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_DualWeaponStation": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_68678447fda98676b4e9f7acfc0f9a69.jpg"
+     }
+    }
+   ],
+   "wheels": [
+    {
+     "url": "models/Tank_GTQ35/Tank_GTQ35_Wheel_02.glb",
+     "materials": {
+      "MI_Instance_Tank_GTQ35_4": "models/Tank_GTQ35/tex/T_VMGen_BaseColorMap_64f57d53efa8f2df461f0766d80630a8.jpg"
+     },
+     "transforms": [
+      {
+       "loc": [
+        219.02115,
+        -133.8011,
+        43.282604
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        219.02129,
+        132.41388,
+        43.282604
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        138.61813,
+        -133.80104,
+        43.312866
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        138.61826,
+        132.41391,
+        43.312866
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        43.30008,
+        -133.80098,
+        43.312866
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        43.30021,
+        132.41397,
+        43.312866
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -61.40667,
+        -133.80095,
+        43.312866
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -61.406525,
+        132.414,
+        43.312866
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -152.59293,
+        -133.80089,
+        43.265408
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -152.59282,
+        132.41406,
+        43.265408
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -231.73297,
+        -133.80089,
+        43.265408
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -231.73283,
+        132.4141,
+        43.265408
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "1201003": {
+   "id": 1201003,
+   "name": "冲锋艇",
+   "folder": "AgainstBoat",
+   "parts": [
+    {
+     "name": "AgainstBoat_Body_3P",
+     "url": "models/AgainstBoat/AgainstBoat_Body_3P.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "carrier_boat_RCB90_003": "models/AgainstBoat/tex/T_VMGen_BaseColorMap_ff49cf95be5ecf7cb0ea679a62ce0496.jpg",
+      "carrier_boat_RCB90_004": "models/AgainstBoat/tex/T_VMGen_BaseColorMap_4b0c7c2d00034e5f725fadeee2a015ba.jpg",
+      "carrier_boat_RCB90_001": "models/AgainstBoat/tex/T_VMGen_BaseColorMap_1f3d75874467be715b295b622b2a7392.jpg",
+      "carrier_boat_RCB90_002": "models/AgainstBoat/tex/T_VMGen_BaseColorMap_cb2b58cc6d3b8d480853b6b5857d0ac7.jpg"
+     }
+    },
+    {
+     "name": "Turret02_3P",
+     "url": "models/AgainstBoat/Turret02_3P.glb",
+     "loc": [
+      278.67563,
+      3.0517578e-05,
+      328.11755
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "carrier_boat_RCB90_001": "models/AgainstBoat/tex/T_VMGen_BaseColorMap_1f3d75874467be715b295b622b2a7392.jpg"
+     }
+    },
+    {
+     "name": "TOWATMissile_03_Bar_Anim_3P",
+     "url": "models/AgainstBoat/TOWATMissile_03_Bar_Anim_3P.glb",
+     "loc": [
+      -58.0,
+      0.0,
+      359.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "TOWATMissile": "models/AgainstBoat/tex/T_VMGen_BaseColorMap_0451bb99964c3a3821be569920c2f700.jpg"
+     }
+    },
+    {
+     "name": "TOWATMissile_02_Body_3P",
+     "url": "models/AgainstBoat/TOWATMissile_02_Body_3P.glb",
+     "loc": [
+      -45.0,
+      0.0,
+      295.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "TOWATMissile": "models/AgainstBoat/tex/T_VMGen_BaseColorMap_0451bb99964c3a3821be569920c2f700.jpg"
+     }
+    },
+    {
+     "name": "Turret01_3P",
+     "url": "models/AgainstBoat/Turret01_3P.glb",
+     "loc": [
+      666.71545,
+      1.0000628,
+      211.25516
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "carrier_boat_RCB90_001": "models/AgainstBoat/tex/T_VMGen_BaseColorMap_1f3d75874467be715b295b622b2a7392.jpg"
+     }
+    }
+   ],
+   "wheels": []
+  },
+  "1101006": {
+   "id": 1101006,
+   "name": "AAV装甲两栖运输车",
+   "folder": "AAV7",
+   "parts": [
+    {
+     "name": "AAV7_Body_01",
+     "url": "models/AAV7/AAV7_Body_01.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_AAV7_1": "models/AAV7/tex/T_VMGen_BaseColorMap_a9ee5ad3d18a8077584f62ca4da7ca23.jpg",
+      "MI_AAV7_2": "models/AAV7/tex/T_VMGen_BaseColorMap_1aee5e01b10068a0d94ec1633ce16dc8.jpg"
+     }
+    },
+    {
+     "name": "AAV7_Turret_01",
+     "url": "models/AAV7/AAV7_Turret_01.glb",
+     "loc": [
+      221.78957,
+      98.419014,
+      270.10022
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_AAV7_3": "models/AAV7/tex/T_VMGen_BaseColorMap_0b947d4ff84e200e0352a6f7e4a52f1d.jpg"
+     }
+    },
+    {
+     "name": "AAV7_Base",
+     "url": "models/AAV7/AAV7_Base.glb",
+     "loc": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_AAV7_1": "models/AAV7/tex/T_VMGen_BaseColorMap_a9ee5ad3d18a8077584f62ca4da7ca23.jpg",
+      "MI_Instance_AAV7_4": "models/AAV7/tex/T_VMGen_BaseColorMap_ba84da30155b7c9b778dc26b71fdd702.jpg"
+     }
+    },
+    {
+     "name": "AAV7_Back_Door",
+     "url": "models/AAV7/AAV7_Back_Door.glb",
+     "loc": [
+      515.22766,
+      -0.000196,
+      199.36255
+     ],
+     "quat": [
+      -0.501544,
+      -0.498451,
+      0.498451,
+      0.501544
+     ],
+     "materials": {
+      "MI_AAV7_1": "models/AAV7/tex/T_VMGen_BaseColorMap_a9ee5ad3d18a8077584f62ca4da7ca23.jpg"
+     }
+    },
+    {
+     "name": "40mmweaponstation_03_Anim_3P",
+     "url": "models/AAV7/40mmweaponstation_03_Anim_3P.glb",
+     "loc": [
+      223.01466729999999,
+      -120.042112,
+      312.66205
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "40mmweaponstation": "models/AAV7/tex/T_VMGen_BaseColorMap_537edd57fa4683a3196fa216b5865429.jpg"
+     }
+    },
+    {
+     "name": "AAV7_Bar_01_3P_A",
+     "url": "models/AAV7/AAV7_Bar_01_3P_A.glb",
+     "loc": [
+      260.175503,
+      98.419014,
+      303.273686
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_AAV7_3": "models/AAV7/tex/T_VMGen_BaseColorMap_0b947d4ff84e200e0352a6f7e4a52f1d.jpg"
+     }
+    },
+    {
+     "name": "50mmCannon_3P",
+     "url": "models/AAV7/50mmCannon_3P.glb",
+     "loc": [
+      -199.28987,
+      -99.13555,
+      254.35333
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_50mmCannon": "models/AAV7/tex/T_VMGen_BaseColorMap_896fbd6dfbc05d1c4294a49eb2bab940.jpg"
+     }
+    },
+    {
+     "name": "AAV7_Smoke_L",
+     "url": "models/AAV7/AAV7_Smoke_L.glb",
+     "loc": [
+      77.84354,
+      -161.67511,
+      208.15956
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_AAV7_1": "models/AAV7/tex/T_VMGen_BaseColorMap_a9ee5ad3d18a8077584f62ca4da7ca23.jpg"
+     }
+    },
+    {
+     "name": "AAV7_Smoke_R",
+     "url": "models/AAV7/AAV7_Smoke_R.glb",
+     "loc": [
+      77.84354,
+      161.67511,
+      208.15956
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_AAV7_1": "models/AAV7/tex/T_VMGen_BaseColorMap_a9ee5ad3d18a8077584f62ca4da7ca23.jpg"
+     }
+    },
+    {
+     "name": "Wheel_Capstan",
+     "url": "models/AAV7/Wheel_Capstan.glb",
+     "loc": [
+      -240.0664,
+      -132.21417,
+      61.41697
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Instance_AAV7_4": "models/AAV7/tex/T_VMGen_BaseColorMap_ba84da30155b7c9b778dc26b71fdd702.jpg"
+     }
+    },
+    {
+     "name": "Wheel_Capstan",
+     "url": "models/AAV7/Wheel_Capstan.glb",
+     "loc": [
+      -240.06625,
+      132.21542,
+      61.41697
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Instance_AAV7_4": "models/AAV7/tex/T_VMGen_BaseColorMap_ba84da30155b7c9b778dc26b71fdd702.jpg"
+     }
+    },
+    {
+     "name": "Wheel_Inducer",
+     "url": "models/AAV7/Wheel_Inducer.glb",
+     "loc": [
+      332.8154,
+      -132.21443,
+      77.646225
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Instance_AAV7_4": "models/AAV7/tex/T_VMGen_BaseColorMap_ba84da30155b7c9b778dc26b71fdd702.jpg"
+     }
+    },
+    {
+     "name": "Wheel_Inducer",
+     "url": "models/AAV7/Wheel_Inducer.glb",
+     "loc": [
+      332.81555,
+      132.21516,
+      77.646225
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_Instance_AAV7_4": "models/AAV7/tex/T_VMGen_BaseColorMap_ba84da30155b7c9b778dc26b71fdd702.jpg"
+     }
+    },
+    {
+     "name": "50mmCannon_02",
+     "url": "models/AAV7/50mmCannon_02.glb",
+     "loc": [
+      -199.28987,
+      -99.13555,
+      254.35333
+     ],
+     "quat": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ],
+     "materials": {
+      "MI_50mmCannon": "models/AAV7/tex/T_VMGen_BaseColorMap_896fbd6dfbc05d1c4294a49eb2bab940.jpg"
+     }
+    }
+   ],
+   "wheels": [
+    {
+     "url": "models/AAV7/Wheel.glb",
+     "materials": {
+      "MI_Instance_AAV7_4": "models/AAV7/tex/T_VMGen_BaseColorMap_ba84da30155b7c9b778dc26b71fdd702.jpg"
+     },
+     "transforms": [
+      {
+       "loc": [
+        246.93997,
+        -132.2144,
+        45.810493
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        246.93997,
+        132.2144,
+        45.810493
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        165.70724,
+        -132.2144,
+        45.63146
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        165.70724,
+        132.2144,
+        45.63146
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        84.509964,
+        -132.2144,
+        45.63146
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        84.509964,
+        132.2144,
+        45.63146
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        3.450372,
+        -132.2144,
+        45.63146
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        3.450372,
+        132.2144,
+        45.63146
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -78.95419,
+        -132.2144,
+        45.720917
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -78.95419,
+        132.2144,
+        45.720917
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -159.97565,
+        -132.2144,
+        45.805782
+       ],
+       "quat": [
+        0.0,
+        0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      },
+      {
+       "loc": [
+        -159.97565,
+        132.2144,
+        45.805782
+       ],
+       "quat": [
+        0.0,
+        -0.707107,
+        0.0,
+        0.707107
+       ],
+       "scale": [
+        1.0,
+        1.0,
+        1.0
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

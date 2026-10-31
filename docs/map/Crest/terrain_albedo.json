@@ -1,0 +1,28 @@
+{
+  "map": "Crest",
+  "origin": [
+    0.0,
+    -4096.0
+  ],
+  "size": [
+    4096.0,
+    4096.0
+  ],
+  "imageSize": [
+    2016,
+    2016
+  ],
+  "worldExtent": 4096.0,
+  "layerCount": 8,
+  "tiling": [
+    0.05,
+    0.15,
+    0.45,
+    0.4,
+    0.3,
+    0.45,
+    0.3,
+    0.25
+  ],
+  "weightEncoding": "id=floor(uint16/2048), fraction=mod(uint16,2048)/2047"
+}

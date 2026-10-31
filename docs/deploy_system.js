@@ -3,7 +3,7 @@
 
 export function buildDeployment(ctx) {
   const {
-    THREE, scene, labelsEl, heightAt, areasData, spawnData, deployData, vehicleData,
+    THREE, scene, labelsEl, areasData, spawnData, deployData, vehicleData,
     simpleLabel, objectiveStage, spawnStageVisible, campVisible, dashedLink,
     vehicleMarkerColor, vehicleSerialOf, vehicleSerialFromName, vehicleSelectedSector,
     vehicleSpawnVisible, vehicleIconVisible, vehicleHighlightId,
@@ -24,11 +24,6 @@ export function buildDeployment(ctx) {
   });
   const areaOf = (label) => areasData.find((a) => a.kind === 'objective' &&
     (a.srcLabel || simpleLabel(a.label)) === label);
-  const groundY = (x, z) => {
-    const h = heightAt(x, z);
-    return Number.isFinite(h) ? h : 0;
-  };
-
   const putMarker = (p, col, size, lift, option, linkColor) => {
     const gy = p[1];
     const y = gy + lift;
@@ -64,22 +59,53 @@ export function buildDeployment(ctx) {
       for (const p of ob.spawns?.[key] || []) putMarker(p, col, size, lift, flagV, col);
     }
     const area = areaOf(ob.label);
-    if (area && (area.points || []).length) {
-      let r = 0;
-      for (const p of area.points) r += Math.hypot(p[0] - ob.pos[0], p[2] - ob.pos[2]);
-      r = (r / area.points.length) * 0.1;
-      const ring = new THREE.RingGeometry(r - 0.9, r + 0.9, 48);
-      ring.rotateX(-Math.PI / 2);
-      const ringMesh = new THREE.Mesh(ring, new THREE.MeshBasicMaterial({
-        color: BONUS, depthTest: false, transparent: true, opacity: 0.9, side: THREE.DoubleSide,
+    if (area && (area.points || []).length >= 3) {
+      // 最大占点倍率区：将据点边界按旗杆中心缩放 10%，保留边界采样点的真实高度。
+      const RATIO = 0.1;
+      const source = area.points;
+      const step = Math.max(1, Math.ceil(source.length / 48));
+      const sampled = [];
+      for (let i = 0; i < source.length; i += step) sampled.push(source[i]);
+      if (sampled[sampled.length - 1] !== source[source.length - 1]) sampled.push(source[source.length - 1]);
+      const ringPts = sampled.map((p) => {
+        const py = Number.isFinite(Number(p[1])) ? Number(p[1]) : ob.pos[1];
+        return new THREE.Vector3(
+          ob.pos[0] + (p[0] - ob.pos[0]) * RATIO,
+          ob.pos[1] + (py - ob.pos[1]) * RATIO + 1.2,
+          ob.pos[2] + (p[2] - ob.pos[2]) * RATIO,
+        );
+      });
+      // 半透明填充：小区域在远景下也能看见范围
+      const shape = new THREE.Shape();
+      ringPts.forEach((p, i) => (i ? shape.lineTo(p.x, -p.z) : shape.moveTo(p.x, -p.z)));
+      const fillGeo = new THREE.ShapeGeometry(shape);
+      fillGeo.rotateX(-Math.PI / 2);
+      const yByKey = new Map(ringPts.map((p) =>
+        [`${Math.round(p.x * 100)},${Math.round(p.z * 100)}`, p.y]));
+      const fillPos = fillGeo.attributes.position;
+      for (let k = 0; k < fillPos.count; k++) {
+        const y = yByKey.get(`${Math.round(fillPos.getX(k) * 100)},${Math.round(fillPos.getZ(k) * 100)}`);
+        fillPos.setY(k, (y ?? ob.pos[1] + 1.2) + 0.15);
+      }
+      fillPos.needsUpdate = true;
+      const fill = new THREE.Mesh(fillGeo, new THREE.MeshBasicMaterial({
+        color: BONUS, depthTest: false, transparent: true, opacity: 0.18,
+        side: THREE.DoubleSide, depthWrite: false,
       }));
-      ringMesh.position.set(ob.pos[0], groundY(ob.pos[0], ob.pos[2]) + 1.2, ob.pos[2]);
-      ringMesh.renderOrder = 22;
-      spawnGroup.add(ringMesh);
+      fill.renderOrder = 21;
+      spawnGroup.add(fill);
+      // 粗边界：LineBasicMaterial 的 linewidth 在多数浏览器无效，用 Tube 代替
+      const curve = new THREE.CatmullRomCurve3(ringPts, true);
+      const tube = new THREE.TubeGeometry(curve, Math.max(32, ringPts.length * 2), 0.75, 6, true);
+      const outline = new THREE.Mesh(tube, new THREE.MeshBasicMaterial({
+        color: BONUS, depthTest: false, transparent: true, opacity: 0.98,
+      }));
+      outline.renderOrder = 23;
+      spawnGroup.add(outline);
     }
     if ((ob.reborn || []).length >= 3) {
       const pts = ob.reborn.concat([ob.reborn[0]])
-        .map((p) => new THREE.Vector3(p[0], groundY(p[0], p[2]) + 0.5, p[2]));
+        .map((p) => new THREE.Vector3(p[0], p[1] + 0.5, p[2]));
       spawnGroup.add(new THREE.Line(
         new THREE.BufferGeometry().setFromPoints(pts),
         new THREE.LineBasicMaterial({ color: REBORN, depthTest: false, transparent: true, opacity: 0.75 })));
@@ -87,7 +113,9 @@ export function buildDeployment(ctx) {
   }
 
   // ---- 步兵部署：基地/增援 hub + 该 hub 的载具呼叫点 ----
-  const vehicleMap = vehicleData?.maps?.[mapCode] || null;
+  const vehicleMaps = vehicleData?.maps || {};
+  const vehicleKey = Object.keys(vehicleMaps).find((key) => key.toLowerCase() === String(mapCode).toLowerCase());
+  const vehicleMap = (vehicleKey && vehicleMaps[vehicleKey]) || null;
   const spawnerByName = new Map();
   for (const s of vehicleMap?.spawners || []) {
     spawnerByName.set(s.name, s);
