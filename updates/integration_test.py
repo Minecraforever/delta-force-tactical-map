@@ -45,10 +45,10 @@ def make_patch(root, edition, contents):
 
 def install_fixture(root, edition):
     folder = root / edition
-    (folder / "web").mkdir(parents=True)
+    (folder / "web/data").mkdir(parents=True)
     shutil.copy2(SOURCE, folder / "update_client.py")
     (folder / "web/map.html").write_text("old", encoding="utf-8")
-    (folder / "web/remove.json").write_text("obsolete", encoding="utf-8")
+    (folder / "web/data/remove.json").write_text("obsolete", encoding="utf-8")
     (folder / "__edition.txt").write_text("test-" + edition, encoding="utf-8")
     write_json(folder / "update_state.json", {"edition": edition, "version": "0"})
     return folder
@@ -74,9 +74,9 @@ def main():
             patches = {}
             for edition in ("full", "szu"):
                 contents = {"web/map.html": ("new-" + edition).encode(),
-                            "web/added.json": ("added-" + edition).encode()}
+                            "web/data/added.json": ("added-" + edition).encode()}
                 archive = make_patch(root, edition, contents)
-                patches[edition] = {"from": "0", "to": "1", "delete": ["web/remove.json"],
+                patches[edition] = {"from": "0", "to": "1", "delete": ["web/data/remove.json"],
                                     "assets": [{"name": archive.name, "url": base + "/" + archive.name,
                                                 "size": archive.stat().st_size, "sha256": sha(archive)}]}
             index = {"schema": 1, "editions": {edition: {"latest": "1", "patches": [patches[edition]]}
@@ -87,8 +87,8 @@ def main():
                 run_client(folder, base + "/stable.json", 0)
                 assert json.loads((folder / "update_state.json").read_text())["version"] == "1"
                 assert (folder / "web/map.html").read_text() == "new-" + edition
-                assert (folder / "web/added.json").read_text() == "added-" + edition
-                assert not (folder / "web/remove.json").exists()
+                assert (folder / "web/data/added.json").read_text() == "added-" + edition
+                assert not (folder / "web/data/remove.json").exists()
             bad = install_fixture(root, "bad")
             write_json(bad / "update_state.json", {"edition": "full", "version": "0"})
             broken = json.loads((root / "stable.json").read_text())
@@ -127,7 +127,18 @@ def main():
             run_client(traversal, base + "/traversal.json", 2)
             assert not (root / "escape").exists()
             assert (traversal / "web/map.html").read_text() == "old"
-            print("PASS: two editions, hashes, corruption, cross-edition, path traversal, rollback")
+            map_pack = install_fixture(root, "map_pack")
+            write_json(map_pack / "update_state.json", {"edition": "full", "version": "0"})
+            forbidden = make_patch(root, "full", {"web/map/Iceland/Iceland_low.mfpk": b"map"})
+            map_index = json.loads((root / "stable.json").read_text())
+            map_index["editions"]["full"]["patches"][0]["assets"] = [
+                {"name": forbidden.name, "url": base + "/" + forbidden.name,
+                 "size": forbidden.stat().st_size, "sha256": sha(forbidden)}]
+            write_json(root / "map_index.json", map_index)
+            run_client(map_pack, base + "/map_index.json", 2)
+            assert not (map_pack / "web/map/Iceland/Iceland_low.mfpk").exists()
+            assert (map_pack / "web/map.html").read_text() == "old"
+            print("PASS: two editions, hashes, corruption, cross-edition, path traversal, map-pack rejection, rollback")
         finally:
             server.shutdown()
             server.server_close()

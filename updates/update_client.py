@@ -27,6 +27,7 @@ CHANNEL_URL = os.environ.get(
 )
 MAX_INDEX = 2 << 20
 MAX_ASSET = 2 << 30
+MAX_FRONTEND_FILE = 16 << 20
 CHUNK = 4 << 20
 
 
@@ -40,12 +41,28 @@ def atomic_json(path: Path, data: dict) -> None:
     os.replace(temporary, path)
 
 
+def frontend_path(name: str) -> bool:
+    if name in {"README.md", "serve.py", "serve_mac.py"}:
+        return True
+    parts = PurePosixPath(name).parts
+    if len(parts) < 2 or parts[0] != "web":
+        return False
+    suffix = PurePosixPath(name).suffix.lower()
+    if len(parts) == 2:
+        return suffix in {".html", ".js", ".css"}
+    if parts[1] == "vendor":
+        return suffix == ".js"
+    if parts[1] == "data" and parts[2] not in {"tdm", "vehicle_models"}:
+        return suffix in {".json", ".png", ".jpg", ".webp", ".svg"}
+    return False
+
+
 def safe_path(name: str) -> Path:
     item = PurePosixPath(name)
     if (not name or "\\" in name or ":" in name or item.is_absolute()
             or any(part in ("", ".", "..") for part in name.split("/"))):
         raise ValueError(f"不安全的更新路径：{name!r}")
-    if not (name.startswith("web/") or name in ("README.md", "serve.py", "serve_mac.py")):
+    if not frontend_path(name):
         raise ValueError(f"更新路径不在应用范围内：{name}")
     path = ROOT.joinpath(*item.parts)
     for parent in (path, *path.parents):
@@ -180,7 +197,7 @@ def stage_asset(asset: dict, edition: str, source: str, target: str, stage: Path
             expected.add(member)
             info = archive.getinfo(member)
             if (info.is_dir() or (info.external_attr >> 16) & 0o170000 == 0o120000
-                    or info.file_size != item["size"] or info.file_size > MAX_ASSET):
+                    or info.file_size != item["size"] or info.file_size > MAX_FRONTEND_FILE):
                 raise ValueError(f"更新附件文件属性错误：{name}")
             destination = stage / name
             if destination.exists():

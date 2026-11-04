@@ -6,6 +6,7 @@
 
 from hashlib import sha256
 from pathlib import Path
+from pathlib import PurePosixPath
 from zipfile import ZipFile, ZIP_DEFLATED
 import json
 
@@ -20,6 +21,7 @@ RELEASE_TAG = "v2026.11.06.1"  # 先创建草稿 Release，上传附件后再公
 OUTPUT = ROOT / "更新附件_下一版"
 INDEX = ROOT / ".cloud_repo/updates/stable.json"
 MAX_RAW_PER_ASSET = 1200 << 20
+MAX_FRONTEND_FILE = 16 << 20
 EDITIONS = {"full": "三维战术板", "szu": "指挥官三维战术板·深大校队专用版"}
 
 
@@ -31,8 +33,23 @@ def digest(path: Path) -> str:
     return value.hexdigest()
 
 
+def frontend_path(name: str) -> bool:
+    if name in {"README.md", "serve.py", "serve_mac.py"}:
+        return True
+    parts = PurePosixPath(name).parts
+    if len(parts) < 2 or parts[0] != "web":
+        return False
+    suffix = PurePosixPath(name).suffix.lower()
+    if len(parts) == 2:
+        return suffix in {".html", ".js", ".css"}
+    if parts[1] == "vendor":
+        return suffix == ".js"
+    if parts[1] == "data" and parts[2] not in {"tdm", "vehicle_models"}:
+        return suffix in {".json", ".png", ".jpg", ".webp", ".svg"}
+    return False
+
+
 def application_files(folder: Path) -> dict[str, Path]:
-    allowed = {"README.md", "serve.py", "serve_mac.py"}
     files = {}
     for path in folder.rglob("*"):
         if not path.is_file() or path.is_symlink():
@@ -40,7 +57,9 @@ def application_files(folder: Path) -> dict[str, Path]:
         name = path.relative_to(folder).as_posix()
         if any(part.startswith(".") for part in Path(name).parts):
             continue
-        if name.startswith("web/") or name in allowed:
+        if frontend_path(name):
+            if path.stat().st_size > MAX_FRONTEND_FILE:
+                raise ValueError(f"前端单文件超过 16 MiB，请改用完整安装包：{name}")
             files[name] = path
     return files
 
