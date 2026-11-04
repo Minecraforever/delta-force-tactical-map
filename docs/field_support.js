@@ -5,7 +5,7 @@
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 export function createFieldSupport(options) {
-  const { THREE, scene, heightAt, data, getMapCode, getMode } = options;
+  const { THREE, scene, heightAt, surfaceHeightAt, surfaceEpoch, data, getMapCode, getMode } = options;
   const $ = (id) => document.getElementById(id);
   const ui = {
     skills: $('fsSkills'),
@@ -437,8 +437,7 @@ export function createFieldSupport(options) {
       impactTimes.push(delivery.flyTime || 0);
     } else if (skill.kind === 'airdrop') {
       const air = skill.airdrop || {};
-      const dropTime = Number(air.dropTime) || 12;
-      impactTimes.push(dropTime + vehicleFallTime(air));
+      impactTimes.push(airDropTiming(air).total);
     }
 
     // 范围圈：齐射/烟雾的覆盖范围（始终显示，不占用显示按钮）
@@ -488,6 +487,8 @@ export function createFieldSupport(options) {
     const points = scatter(count, delivery.areaRadius, delivery.extraOffset, skillSeed(skill.id), missileLike);
     const salvoKillRadius = skill.kind === 'salvo' ? radiusForDamage(blast, 100) : 0;
     const impactList = [];
+    // 炮兵齐射/区域烟雾：每发炮弹、每团烟幕落到各自正下方“最上方物体”表面（屋顶/平台/地形）
+    const impactOffsets = impactSurfaceOffsets(points);
     if (skill.kind !== 'airdrop') {
       for (let i = 0; i < points.length; i++) {
         const point = points[i];
@@ -522,7 +523,7 @@ export function createFieldSupport(options) {
           if (zones.b && salvoKillRadius) addMarkerRing(salvoKillRadius, 0.3, 0xffe066, 0.95, 0.41);
           if (zones.c && blast.radius) addMarkerRing(blast.radius, 0.5, 0xff8a5a, 0.8, 0.44);
         }
-        marker.position.set(point.x, 0, point.z);
+        marker.position.set(point.x, impactOffsets ? impactOffsets[i] : 0, point.z);
         group.add(marker);
         const item = { mesh: marker, time: impactTimes[i] ?? 0, radius: blast.radius || 0 };
         objects.impacts.push(item);
@@ -563,7 +564,7 @@ export function createFieldSupport(options) {
           }),
         );
         cloud.scale.set(smokeInfo.radius || 6, (smokeInfo.height || 4) / 2, smokeInfo.radius || 6);
-        cloud.position.set(point.x, (smokeInfo.height || 4) / 2 + 0.4, point.z);
+        cloud.position.set(point.x, (impactOffsets ? impactOffsets[i] : 0) + (smokeInfo.height || 4) / 2 + 0.4, point.z);
         cloud.renderOrder = 45;
         group.add(cloud);
         objects.smokes.push({ mesh: cloud, time: impactTimes[i] ?? 0, lifetime: smokeInfo.lifetime || 15 });
@@ -620,11 +621,47 @@ export function createFieldSupport(options) {
 
   function clamp01(value) { return Math.min(1, Math.max(0, value)); }
 
-  // 空投载具：伞降结束后从 vehicleFallingHeight 处自由落体到地面（g=9.8 m/s²）
+  /* 炮兵齐射 / 区域烟雾：每个落点以正下方“最上方物体表面”为命中目标
+     （屋顶/平台/独立物顶/地形），不再共用落点高度那一层平面；选点本身也取可见最高面，
+     不会穿透建筑落到地形。按 技能 + 落点中心 + 场景可见性代次 缓存，拖方位/切范围时复用。 */
+  let impactSurfaceCacheKey = '';
+  let impactSurfaceCache = null;
+  function impactSurfaceOffsets(points) {
+    const skill = skills[state.skill];
+    if (!state.center || !points || (skill?.kind !== 'salvo' && skill?.kind !== 'smoke')) return null;
+    const epoch = typeof surfaceEpoch === 'function' ? surfaceEpoch() : '';
+    const key = [
+      state.skill,
+      state.center.x.toFixed(2), state.center.y.toFixed(2), state.center.z.toFixed(2),
+      epoch, points.length,
+    ].join('|');
+    if (impactSurfaceCacheKey === key && impactSurfaceCache) return impactSurfaceCache;
+    impactSurfaceCache = points.map((point) => {
+      const wx = state.center.x + point.x;
+      const wz = state.center.z + point.z;
+      const sy = typeof surfaceHeightAt === 'function' ? surfaceHeightAt(wx, wz) : heightAt(wx, wz);
+      if (!Number.isFinite(sy)) return 0;
+      // placeAt 把落点抬高 0.25 m，这里按同样基准对齐；同一表面时偏移为 0
+      return sy + 0.25 - state.center.y;
+    });
+    impactSurfaceCacheKey = key;
+    return impactSurfaceCache;
+  }
+
+  // 空投载具时序：游戏 AirDropTime 视为「总空投时间」；最后 vehicleFallingHeight
+  // 段为自由落体（g=9.8），其余时间为伞降段。旧数据只有 dropTime（伞降时长）时
+  // 兼容按「dropTime + 自由落体」计算总时长。
   const FALL_GRAVITY = 9.8;
-  function vehicleFallTime(airdrop) {
-    const height = Number(airdrop?.vehicleFallingHeight) || 14.5;
-    return Math.sqrt(Math.max(0, height) * 2 / FALL_GRAVITY);
+  function airDropTiming(airdrop) {
+    const fallHeight = Math.max(0, Number(airdrop?.vehicleFallingHeight) || 14.5);
+    const fallTime = Math.sqrt(fallHeight * 2 / FALL_GRAVITY);
+    const explicitTotal = Number(airdrop?.totalDropTime);
+    const legacyChute = Number(airdrop?.dropTime) || 12;
+    const total = Number.isFinite(explicitTotal) && explicitTotal > 0
+      ? explicitTotal
+      : legacyChute + fallTime;
+    const chuteTime = Math.max(0.1, total - fallTime);
+    return { total, chuteTime, fallHeight, fallTime };
   }
 
   function applyTime(t) {
@@ -680,22 +717,20 @@ export function createFieldSupport(options) {
     if (objects.vehicleRoot) {
       const skill = skills[state.skill] || {};
       const drop = skill.airdrop || {};
-      const dropTime = Number(drop.dropTime) || 12;
-      const spawnHeight = Number(drop.spawnHeight) || 80;
-      const fallingHeight = Number(drop.vehicleFallingHeight) || 14.5;
-      const fallTime = vehicleFallTime(drop);
+      const spawnHeight = Number(drop.spawnHeight) || 45;
+      const timing = airDropTiming(drop);
       objects.vehicleRoot.visible = true;
-      if (staticView || time >= dropTime + fallTime) {
+      if (staticView || time >= timing.total) {
         // 全时段定格或已落地
         objects.vehicleRoot.position.y = 0;
-      } else if (time <= dropTime) {
-        // 第一阶段：伞降，80 m → 14.5 m
-        const ratio = Math.max(0, time) / Math.max(0.1, dropTime);
-        objects.vehicleRoot.position.y = spawnHeight - (spawnHeight - fallingHeight) * ratio;
+      } else if (time <= timing.chuteTime) {
+        // 第一阶段：伞降，spawnHeight → vehicleFallingHeight
+        const ratio = Math.max(0, time) / Math.max(0.1, timing.chuteTime);
+        objects.vehicleRoot.position.y = spawnHeight - (spawnHeight - timing.fallHeight) * ratio;
       } else {
-        // 第二阶段：14.5 m 处脱离伞具，自由落体
-        const dt = time - dropTime;
-        objects.vehicleRoot.position.y = Math.max(0, fallingHeight - 0.5 * FALL_GRAVITY * dt * dt);
+        // 第二阶段：vehicleFallingHeight 处脱离伞具，自由落体
+        const dt = time - timing.chuteTime;
+        objects.vehicleRoot.position.y = Math.max(0, timing.fallHeight - 0.5 * FALL_GRAVITY * dt * dt);
       }
     }
   }
@@ -824,12 +859,13 @@ export function createFieldSupport(options) {
     };
     if (skill.kind === 'airdrop') {
       const air = skill.airdrop || {};
-      const fallTime = vehicleFallTime(air);
+      const timing = airDropTiming(air);
       const dropRows = [
-        addRow('空投高度', fmt(air.spawnHeight, ' m')),
-        addRow('伞降时间', fmt(air.dropTime, ' s')),
-        addRow('自由落体高度', fmt(air.vehicleFallingHeight, ' m')),
-        addRow('自由落体时间', fmt(fallTime, ' s', 1)),
+        addRow('空投高度', `${fmt(air.spawnHeight, ' m')}${air.configSpawnHeight ? `（游戏配置 ${fmt(air.configSpawnHeight, ' m')}）` : ''}`),
+        addRow('空投总时间', fmt(timing.total, ' s')),
+        addRow('伞降时间', fmt(timing.chuteTime, ' s', 1)),
+        addRow('自由落体高度', fmt(timing.fallHeight, ' m')),
+        addRow('自由落体时间', fmt(timing.fallTime, ' s', 1)),
       ].filter(Boolean);
       pushGroup('空投', dropRows);
       const vehicleRows = [
@@ -1113,6 +1149,7 @@ export function createFieldSupport(options) {
 
   return {
     isPlacing: () => state.placing,
+    currentSkillId: () => state.skill,
     beginPlacement,
     cancelPlacement,
     preview,

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "editions": {
+    "full": {
+      "latest": "2026.11.05.1",
+      "patches": []
+    },
+    "szu": {
+      "latest": "2026.11.05.1",
+      "patches": []
+    }
+  }
+}

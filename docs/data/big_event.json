@@ -1,0 +1,353 @@
+{
+ "schema": 1,
+ "generated": "2026-11-01",
+ "gameBuild": "正式服 1.101.37117.36",
+ "coordNote": "center=米，web [x,y,z]=[UE X, UE Z, UE Y]/100；half=判定区半尺寸(m)，轴序同 web；yawDeg=UE Yaw，three.js 用 rotation.y=-yaw。",
+ "maps": {
+  "Iceland": {
+   "name": "攀升",
+   "target": "D 区尖塔（F 点）",
+   "targetShort": "尖塔",
+   "anchor": "Objective_PointF_0",
+   "volume": {
+    "center": [
+     2337.67,
+     137.52,
+     -2416.22
+    ],
+    "half": [
+     30.0,
+     90.0,
+     40.0
+    ],
+    "yawDeg": -29.9377
+   },
+   "modes": {
+    "commander": {
+     "mapId": 601,
+     "tableRow": "Iceland_BigEvent_commander",
+     "hp": 1200,
+     "missileWeight": 300,
+     "artilleryWeight": 4,
+     "missileShots": 4,
+     "artilleryRounds": 12,
+     "missiles": [
+      300,
+      1200
+     ],
+     "source": "DamageEventTable:Iceland_BigEvent_commander",
+     "broadcasts": [
+      {
+       "atPct": 50,
+       "text": "尖塔地基受损",
+       "detail": "尖塔血量低于百分之50"
+      },
+      {
+       "atPct": 30,
+       "text": "尖塔结构严重受损",
+       "detail": "尖塔血量低于百分之30"
+      },
+      {
+       "atPct": 0,
+       "text": "尖塔受到致命打击"
+      }
+     ]
+    },
+    "assault": {
+     "mapId": 54,
+     "tableRow": "Iceland_BigEvent",
+     "hp": 1500,
+     "missileWeight": 300,
+     "artilleryWeight": 4,
+     "missileShots": 5,
+     "artilleryRounds": 15,
+     "missiles": [
+      300,
+      1500
+     ],
+     "source": "DamageEventTable:Iceland_BigEvent",
+     "broadcasts": [
+      {
+       "atPct": 50,
+       "text": "尖塔地基受损",
+       "detail": "尖塔血量低于百分之50"
+      },
+      {
+       "atPct": 30,
+       "text": "尖塔结构严重受损",
+       "detail": "尖塔血量低于百分之30"
+      },
+      {
+       "atPct": 0,
+       "text": "尖塔受到致命打击"
+      }
+     ]
+    }
+   },
+   "artilleryAllowed": true,
+   "artilleryShellsPerRound": 25,
+   "broadcasts": [
+    {
+     "atPct": 50,
+     "text": "尖塔地基受损",
+     "detail": "尖塔血量低于百分之50"
+    },
+    {
+     "atPct": 30,
+     "text": "尖塔结构严重受损",
+     "detail": "尖塔血量低于百分之30"
+    },
+    {
+     "atPct": 0,
+     "text": "尖塔受到致命打击"
+    }
+   ],
+   "notes": [
+    "只有进攻方能呼叫阵地支援（守方 ScoreCost=-1）。",
+    "前 2 个据点阶段不开放制导导弹（UnOpenSectors=[2]）。",
+    "炮兵齐射每发炮弹计 4 点，一轮 25 发≈100 点；其余三图炮兵齐射不计入大事件。",
+    "触发后：尖塔倒塌、D2 开启、背水一战，F 点移除。"
+   ]
+  },
+  "Cracked": {
+   "name": "烬区",
+   "target": "C1 军需仓库",
+   "targetShort": "C1 仓库",
+   "anchor": "Objective_PointC1",
+   "volume": {
+    "center": [
+     1054.12,
+     -4.9,
+     -1027.06
+    ],
+    "half": [
+     11.34,
+     7.4062,
+     20.5938
+    ],
+    "yawDeg": 0.0
+   },
+   "modes": {
+    "commander": {
+     "mapId": 602,
+     "tableRow": "Cracked_BigEvent_Commander",
+     "hp": 1200,
+     "missileWeight": 600,
+     "artilleryWeight": 0,
+     "missileShots": 2,
+     "artilleryRounds": null,
+     "missiles": [
+      600,
+      1200
+     ],
+     "source": "DamageEventTable:Cracked_BigEvent_Commander",
+     "broadcasts": [
+      {
+       "atPct": 0,
+       "text": "C1受到致命打击"
+      }
+     ]
+    },
+    "assault": {
+     "mapId": 33,
+     "tableRow": null,
+     "hp": 2,
+     "missileWeight": 1,
+     "artilleryWeight": 0,
+     "missileShots": 2,
+     "artilleryRounds": null,
+     "missiles": [
+      1,
+      2
+     ],
+     "source": "关卡实例（DamageEventTable 无 MapID 33 行）",
+     "broadcasts": [
+      {
+       "atPct": 0,
+       "text": "C1受到致命打击"
+      }
+     ]
+    }
+   },
+   "artilleryAllowed": false,
+   "artilleryShellsPerRound": 25,
+   "broadcasts": [
+    {
+     "atPct": 0,
+     "text": "C1受到致命打击"
+    }
+   ],
+   "notes": [
+    "只有进攻方能呼叫制导导弹（守方 ScoreCost=-1）。",
+    "判定区仅 23×41×15 m，基本要命中 C1 仓库本体；炮兵齐射不计数。",
+    "攻防模式（MapID 33）无表行，按关卡实例 2/1 计（同样是 2 发）。",
+    "触发后：C1 仓库变废墟、C1 据点消失，仅剩 C2。"
+   ]
+  },
+  "Gibraltar": {
+   "name": "临界点",
+   "target": "C1 监控区（S3A2）",
+   "targetShort": "C1 监控区",
+   "anchor": "Objective_S3A2",
+   "volume": {
+    "center": [
+     2463.89,
+     -68.16,
+     -1750.53
+    ],
+    "half": [
+     22.6245,
+     13.9147,
+     25.7761
+    ],
+    "yawDeg": -19.7232
+   },
+   "modes": {
+    "commander": {
+     "mapId": 603,
+     "tableRow": null,
+     "hp": 1800,
+     "missileWeight": 900,
+     "artilleryWeight": 0,
+     "missileShots": 2,
+     "artilleryRounds": null,
+     "missiles": [
+      900,
+      1800
+     ],
+     "source": "关卡实例（DamageEventTable 无 MapID 603 行）",
+     "broadcasts": [
+      {
+       "atPct": 0,
+       "text": "C1受到致命打击"
+      }
+     ]
+    },
+    "assault": {
+     "mapId": 75,
+     "tableRow": "Gibraltar_BigEvent",
+     "hp": 1800,
+     "missileWeight": 900,
+     "artilleryWeight": 0,
+     "missileShots": 2,
+     "artilleryRounds": null,
+     "missiles": [
+      900,
+      1800
+     ],
+     "source": "DamageEventTable:Gibraltar_BigEvent",
+     "broadcasts": [
+      {
+       "atPct": 0,
+       "text": "C1受到致命打击"
+      }
+     ]
+    }
+   },
+   "artilleryAllowed": false,
+   "artilleryShellsPerRound": 25,
+   "broadcasts": [
+    {
+     "atPct": 0,
+     "text": "C1受到致命打击"
+    }
+   ],
+   "notes": [
+    "只有进攻方能呼叫制导导弹（守方 ScoreCost=-1）。",
+    "炮兵齐射不计数；判定区约 45×52×28 m，要落在 S3A2 仓库建筑群。",
+    "指挥官模式（MapID 603）无表行，按关卡实例 1800/900 计（2 发）。",
+    "触发后：C1 变废墟，占领状态重置（仍可争夺）。"
+   ]
+  },
+  "Suez": {
+   "name": "乌姆斯运河",
+   "target": "D1 大仓",
+   "targetShort": "D1 大仓",
+   "anchor": "Objective_PointD1",
+   "volume": {
+    "center": [
+     652.84,
+     13.7,
+     -860.54
+    ],
+    "half": [
+     28.75,
+     20.0,
+     33.75
+    ],
+    "yawDeg": -90.0001
+   },
+   "modes": {
+    "commander": {
+     "mapId": 612,
+     "tableRow": "Suez_BigEvent_Commander",
+     "hp": 1200,
+     "missileWeight": 600,
+     "artilleryWeight": 0,
+     "missileShots": 2,
+     "artilleryRounds": null,
+     "missiles": [
+      600,
+      1200
+     ],
+     "source": "DamageEventTable:Suez_BigEvent_Commander",
+     "broadcasts": [
+      {
+       "atPct": 50,
+       "text": "仓库结构严重受损"
+      },
+      {
+       "atPct": 0,
+       "text": "仓库受到致命打击",
+       "detail": "地下设施已暴露"
+      }
+     ]
+    },
+    "assault": {
+     "mapId": 311,
+     "tableRow": "Suez_BigEvent",
+     "hp": 1200,
+     "missileWeight": 600,
+     "artilleryWeight": 0,
+     "missileShots": 2,
+     "artilleryRounds": null,
+     "missiles": [
+      600,
+      1200
+     ],
+     "source": "DamageEventTable:Suez_BigEvent",
+     "broadcasts": [
+      {
+       "atPct": 50,
+       "text": "仓库结构严重受损"
+      },
+      {
+       "atPct": 0,
+       "text": "仓库受到致命打击",
+       "detail": "地下设施已暴露"
+      }
+     ]
+    }
+   },
+   "artilleryAllowed": false,
+   "artilleryShellsPerRound": 25,
+   "broadcasts": [
+    {
+     "atPct": 50,
+     "text": "仓库结构严重受损"
+    },
+    {
+     "atPct": 0,
+     "text": "仓库受到致命打击",
+     "detail": "地下设施已暴露"
+    }
+   ],
+   "notes": [
+    "只有进攻方能呼叫制导导弹（守方 ScoreCost=-1）。",
+    "炮兵齐射不计数；判定区约 58×68×40 m，要落在 D1 大仓区域。",
+    "触发后：D1 变巨坑、D3 地下通道开启、5 扇大事件门打开。",
+    "另有一个「小事件」（打塔，DamageEventVolumeBox_5）：阈值 4，1 发制导导弹或炮弹即可触发，与本大事件无关。"
+   ]
+  }
+ }
+}

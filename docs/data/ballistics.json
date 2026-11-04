@@ -25,6 +25,11 @@
         0.8
       ],
       "radius": 0.1,
+      "blastRadius": 6.0,
+      "fullBlastRadius": 4.0,
+      "explosionDamage": 60.0,
+      "explosionMinDamage": 20.0,
+      "hitRadius": 4.0,
       "mountHeight": 2.5,
       "pitch": [
         -15,
@@ -49,6 +54,9 @@
         0.8
       ],
       "radius": 0.1,
+      "blastRadius": 0.0,
+      "fullBlastRadius": 0.0,
+      "hitRadius": 0.5,
       "mountHeight": 2.5,
       "pitch": [
         0,
@@ -73,6 +81,11 @@
         0.8
       ],
       "radius": 0.1,
+      "blastRadius": 3.0,
+      "fullBlastRadius": 1.0,
+      "explosionDamage": 10.0,
+      "explosionMinDamage": 10.0,
+      "hitRadius": 1.0,
       "mountHeight": 2.5,
       "pitch": [
         -5,
@@ -99,6 +112,11 @@
         0.5
       ],
       "radius": 0.1,
+      "blastRadius": 6.0,
+      "fullBlastRadius": 6.0,
+      "explosionDamage": 100.0,
+      "explosionMinDamage": 50.0,
+      "hitRadius": 6.0,
       "mountHeight": 2.8,
       "pitch": [
         -30,
@@ -125,6 +143,11 @@
         0.5
       ],
       "radius": 0.1,
+      "blastRadius": 10.0,
+      "fullBlastRadius": 4.0,
+      "explosionDamage": 100.0,
+      "explosionMinDamage": 30.0,
+      "hitRadius": 4.0,
       "mountHeight": 2.2,
       "pitch": [
         45,
@@ -163,5 +186,5 @@
       "mountHeight": 1.7
     }
   ],
-  "note": "speed m/s, gravity m/s^2, distance m; drag is per-second velocity decay; validDistance = full-damage range, attenuateDistances = falloff range, maxDistance = hard cap"
+  "note": "speed m/s, gravity m/s^2, distance m; drag is per-second velocity decay; validDistance = full-damage range, attenuateDistances = falloff range, maxDistance = hard cap; hitRadius = 满伤/直射命中半径(m); blastRadius = 有伤害爆炸半径(m, 0=直射武器); fullBlastRadius = 满伤爆炸半径(m)"
 }
