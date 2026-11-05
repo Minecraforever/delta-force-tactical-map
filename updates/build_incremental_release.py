@@ -1,7 +1,7 @@
-"""在 VS Code 运行：编辑下方常量，生成两个分支的增量包和待发布索引。
+"""在 VS Code 运行：编辑下方常量，生成双分支前端补丁和待发布索引。
 
-先上传所有 ZIP 至指定 GitHub Release 并核对下载，再将 stable.next.json
-发布为仓库 updates/stable.json。发布顺序不能颠倒。
+先把所有小型 ZIP 提交到仓库 updates/assets 并核对 raw 下载，再将
+stable.next.json 发布为 updates/stable.json。发布顺序不能颠倒。
 """
 
 from hashlib import sha256
@@ -17,10 +17,9 @@ PREVIOUS = ROOT / "发布版_2026-11-05_自动更新"
 CURRENT = ROOT / "发布版_下一版"  # 改成已验收的新发布目录
 FROM_VERSION = "2026.11.05.1"
 TO_VERSION = "2026.11.06.1"  # 改成新版本
-RELEASE_TAG = "v2026.11.06.1"  # 先创建草稿 Release，上传附件后再公布索引
 OUTPUT = ROOT / "更新附件_下一版"
 INDEX = ROOT / ".cloud_repo/updates/stable.json"
-MAX_RAW_PER_ASSET = 1200 << 20
+MAX_RAW_PER_ASSET = 40 << 20
 MAX_FRONTEND_FILE = 16 << 20
 EDITIONS = {"full": "三维战术板", "szu": "指挥官三维战术板·深大校队专用版"}
 
@@ -91,13 +90,13 @@ def make_assets(edition: str, changed: list[tuple[str, Path]]) -> list[dict]:
             archive.writestr("manifest.json", json.dumps(manifest, ensure_ascii=False, separators=(",", ":")))
             for name, path in group:
                 archive.write(path, "payload/" + name)
-        if archive_path.stat().st_size >= 2 << 30:
-            raise ValueError(f"GitHub Release 附件超过 2 GiB：{filename}")
+        if archive_path.stat().st_size >= 50 << 20:
+            raise ValueError(f"仓库前端附件超过 50 MiB：{filename}")
         with ZipFile(archive_path) as archive:
             if archive.testzip() is not None:
                 raise ValueError(f"附件 CRC 错误：{filename}")
         assets.append({"name": filename,
-                       "url": f"https://github.com/Minecraforever/delta-force-tactical-map/releases/download/{RELEASE_TAG}/{filename}",
+                       "url": f"https://raw.githubusercontent.com/Minecraforever/delta-force-tactical-map/main/updates/assets/{filename}",
                        "size": archive_path.stat().st_size, "sha256": digest(archive_path)})
     return assets
 
@@ -127,7 +126,7 @@ def main() -> None:
         channel["latest"] = TO_VERSION
         print(edition, "changed", len(changed), "deleted", len(deleted), "assets", len(assets))
     (OUTPUT / "stable.next.json").write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print("先上传全部 ZIP，最后发布 stable.next.json 的内容。")
+    print("先把全部 ZIP 提交到 updates/assets 并核对 raw 下载，最后发布 stable.next.json 的内容。")
 
 
 if __name__ == "__main__":

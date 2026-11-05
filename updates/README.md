@@ -2,6 +2,6 @@
 
 `stable.json` 分别记录完整版 `full` 和深大版 `szu` 的正式版本与连续增量。日常增量仅覆盖前端代码、`web/data/` 的小型配置/图标、README 和服务程序；`web/map/`、逐地图 TDM 数据和载具模型目录不进入更新附件。更新器只接受当前安装分支对应的附件，并在 SHA-256 校验、文件路径检查和完整解压后安装；中断时恢复旧文件。地图资产、更新器、服务身份探针、启动脚本及 Python 引导环境升级时重新分发完整 ZIP。
 
-发布新版本时，在 `build_incremental_release.py` 里填写已验收的新旧发布目录和版本号，直接在 VS Code 运行；将生成的 ZIP 上传到对应 GitHub Release，确认下载与哈希后，最后把 `stable.next.json` 写入本目录的 `stable.json` 并推送。切勿先更新索引。
+发布新版本时，在 `build_incremental_release.py` 里填写已验收的新旧发布目录和版本号，直接在 VS Code 运行；先把生成的小型 ZIP 提交到 `updates/assets/`，确认 GitHub raw 下载与哈希后，最后把 `stable.next.json` 写入本目录的 `stable.json` 并推送。切勿先更新索引；此通道不使用 GitHub Release。
 
-旧包没有更新器，须先手动安装一次带更新器的完整包。深大版附件会作为公开 Release 资源供客户端匿名下载，请按此公开范围发布。
+11 月 3 日正式发布的完整版 1.5 与深大版 1.6 可通过单独的前端引导包补齐更新器与启动依赖，保留原有地图数据。更早版本从作者网盘取得最近发布包。地图包不上传 GitHub。

@@ -14,6 +14,6 @@ macOS 双击 `start-mac.command`；Windows 双击 `start-windows.cmd`。本地�
 
 ## 本地版自动更新
 
-完整版与深大校队专用版的完整安装包见 [Releases](https://github.com/Minecraforever/delta-force-tactical-map/releases)。两个安装包包含同一套启动环境检查和自动更新器，使用 `updates/stable.json` 中相互隔离的 `full`、`szu` 更新通道。首次安装须完整解压；2026-11-05 之前的旧安装包没有更新器，需要先手动换用新版完整包。后续应用文件通过校验后的增量附件更新。Windows 会修复缺失的独立 Python 运行时；Mac 会自动建立独立 Python 环境。离线时继续运行已安装版本。
+完整版与深大校队专用版的完整安装包由作者通过网盘分发。两个安装包包含启动环境检查和自动更新器，使用 `updates/stable.json` 中相互隔离的 `full`、`szu` 更新通道。首次安装须完整解压；2026-11-03 发布的完整版 1.5／深大版 1.6 可使用作者提供的前端桥接升级包补齐更新器。后续应用文件通过校验后的增量附件更新。Windows 会修复缺失的独立 Python 运行时；Mac 会自动建立独立 Python 环境。离线时继续运行已安装版本。
 
-`updates/build_incremental_release.py` 是在 VS Code 运行的增量制作脚本。日常增量只更新前端代码及小型配置，不传送地图包或逐地图数据；地图资产变化要发布新的完整包。先上传并核对所有 Release 附件，最后更新 `updates/stable.json`；启动器与运行时升级也需重新发布 ZIP。网页 Pages 版仍只提供低精度地图。
+`updates/build_incremental_release.py` 是在 VS Code 运行的增量制作脚本。日常增量只更新前端代码及小型配置，不传送地图包或逐地图数据；地图资产变化由作者通过网盘分发完整包。先提交并核对仓库 `updates/assets/` 中的小型附件，最后更新 `updates/stable.json`；启动器与运行时升级也需重新分发完整 ZIP。网页 Pages 版仍只提供低精度地图。
