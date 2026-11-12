@@ -1100,7 +1100,7 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
     <h2>地图精度</h2>
     <div class="buttons" id="tierButtons">
       <button id="tierLow" class="on">低精度</button>
-      <button id="tierHigh" hidden aria-hidden="true" tabindex="-1">高精度</button>
+      <button id="tierHigh" title="选择当前地图的本地高精度 MFPK；文件不会上传">高精度 · 导入包</button>
     </div>
     <h2>天空</h2>
     <div class="row">
@@ -2496,6 +2496,9 @@ async function loadFlightData() {
  * 二进制文件，浏览器每档只发 1 次请求，减少数百/上千次 HTTP 往返。 */
 const SPLIT_MFPK = {"map/Crest/Crest_low.mfpk":{"parts":["Crest_low.mfpk.part01","Crest_low.mfpk.part02","Crest_low.mfpk.part03","Crest_low.mfpk.part04"],"size":14875440},"map/Retrowar/Retrowar_low.mfpk":{"parts":["Retrowar_low.mfpk.part01","Retrowar_low.mfpk.part02"],"size":66310276},"map/Mogadishu/Mogadishu_low.mfpk":{"parts":["Mogadishu_low.mfpk.part01","Mogadishu_low.mfpk.part02","Mogadishu_low.mfpk.part03"],"size":100469668},"map/Skyline/Skyline_low.mfpk":{"parts":["Skyline_low.mfpk.part01","Skyline_low.mfpk.part02","Skyline_low.mfpk.part03","Skyline_low.mfpk.part04","Skyline_low.mfpk.part05","Skyline_low.mfpk.part06","Skyline_low.mfpk.part07","Skyline_low.mfpk.part08","Skyline_low.mfpk.part09","Skyline_low.mfpk.part10","Skyline_low.mfpk.part11","Skyline_low.mfpk.part12","Skyline_low.mfpk.part13"],"size":53915284},"map/Skyline/Skyline_lowextra.mfpk":{"parts":["Skyline_lowextra.mfpk.part01","Skyline_lowextra.mfpk.part02","Skyline_lowextra.mfpk.part03","Skyline_lowextra.mfpk.part04","Skyline_lowextra.mfpk.part05","Skyline_lowextra.mfpk.part06","Skyline_lowextra.mfpk.part07","Skyline_lowextra.mfpk.part08","Skyline_lowextra.mfpk.part09","Skyline_lowextra.mfpk.part10","Skyline_lowextra.mfpk.part11","Skyline_lowextra.mfpk.part12"],"size":46245164}};
 async function fetchMfpkBytes(url) {
+  if (url.endsWith('/' + MAP + '_high.mfpk') && onlineHighFiles.has(MAP)) {
+    return onlineHighFiles.get(MAP).arrayBuffer();
+  }
   const key = url.replace(/^\.\//, '');
   const split = SPLIT_MFPK[key];
   if (!split) {
@@ -2518,6 +2521,29 @@ async function fetchMfpkBytes(url) {
   return result.buffer;
 }
 const mfpkCache = {};
+const onlineHighFiles = new Map();
+const onlineHighInput = document.createElement('input');
+onlineHighInput.type = 'file';
+onlineHighInput.accept = '.mfpk';
+onlineHighInput.style.display = 'none';
+document.body.appendChild(onlineHighInput);
+onlineHighInput.addEventListener('change', async () => {
+  const file = onlineHighInput.files && onlineHighInput.files[0];
+  onlineHighInput.value = '';
+  if (!file) return;
+  if (file.name !== MAP + '_high.mfpk') {
+    document.getElementById('hud').textContent = '请选取当前地图的 ' + MAP + '_high.mfpk';
+    return;
+  }
+  const magic = new TextDecoder().decode(new Uint8Array(await file.slice(0, 4).arrayBuffer()));
+  if (magic !== 'MFPK') {
+    document.getElementById('hud').textContent = '不是有效的 MFPK 地图包';
+    return;
+  }
+  onlineHighFiles.set(MAP, file);
+  mfpkCache.high = null;
+  await selectTier('high');
+});
 
 async function parseMfpk(url) {
   let buf = await fetchMfpkBytes(url);
@@ -2778,7 +2804,8 @@ let cbdGroup = null;
 let gasGroup = null;
 
 async function selectTier(name) {
-  if (name !== 'low') return;
+  if (!['low', 'high'].includes(name)) return;
+  if (name === 'high' && !onlineHighFiles.has(MAP)) { onlineHighInput.click(); return; }
   const requestId = ++tierRequestId;
   const button = document.getElementById({ low: 'tierLow', high: 'tierHigh' }[name]);
   if (name !== 'low' && !tierGroups[name]) {
