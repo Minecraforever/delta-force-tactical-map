@@ -60,6 +60,9 @@ export function createFieldSupport(options) {
     smokes: [],     // { mesh, time, lifetime }
     missiles: [],   // { mesh, curve, impactTime } 或 { mesh, startY, impactTime }（齐射）
     vehicleRoot: null,
+    vehicleChute: null,
+    vehicleHarness: null,
+    vehicleDust: null,
   };
   let duration = 20;
   let raf = 0;
@@ -70,6 +73,11 @@ export function createFieldSupport(options) {
   const vehicleModelCache = new Map();
   const gltfCache = new Map();
   const textureCache = new Map();
+  let chuteManifest = null;
+  let chuteManifestPromise = null;
+  let chuteModelPromise = null;
+  const chuteGltfCache = new Map();
+  const chuteTextureCache = new Map();
 
   const tone = (hex) => new THREE.Color(hex || '#ff6b52');
 
@@ -226,6 +234,9 @@ export function createFieldSupport(options) {
     objects.smokes.length = 0;
     objects.missiles.length = 0;
     objects.vehicleRoot = null;
+    objects.vehicleChute = null;
+    objects.vehicleHarness = null;
+    objects.vehicleDust = null;
   }
 
   function rng(seed) {
@@ -354,6 +365,143 @@ export function createFieldSupport(options) {
     return vehicleModelCache.get(id).then((root) => (root ? root.clone(true) : null));
   }
 
+  /* ---------------- 空投伞具（BP_Vehicle_AirDrop_New 提取） ---------------- */
+  const CHUTE_DIR = './data/parachute_models/';
+
+  function loadChuteManifest() {
+    if (chuteManifest) return Promise.resolve(chuteManifest);
+    if (!chuteManifestPromise) {
+      chuteManifestPromise = fetch(CHUTE_DIR + 'manifest.json')
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null)
+        .then((doc) => { chuteManifest = doc; return doc; });
+    }
+    return chuteManifestPromise;
+  }
+
+  function loadChuteGltf(url) {
+    if (!chuteGltfCache.has(url)) {
+      chuteGltfCache.set(url, new GLTFLoader().loadAsync(CHUTE_DIR + url).catch(() => null));
+    }
+    return chuteGltfCache.get(url);
+  }
+
+  function loadChuteTexture(url) {
+    if (!chuteTextureCache.has(url)) {
+      chuteTextureCache.set(url, new THREE.TextureLoader().loadAsync(CHUTE_DIR + url)
+        .then((texture) => {
+          texture.colorSpace = THREE.SRGBColorSpace;
+          texture.flipY = false;
+          texture.anisotropy = 4;
+          return texture;
+        })
+        .catch(() => null));
+    }
+    return chuteTextureCache.get(url);
+  }
+
+  async function applyChuteMaterials(object, materials, partName) {
+    const mapping = materials || {};
+    const jobs = [];
+    object.traverse((child) => {
+      if (!child.isMesh) return;
+      const materialName = child.material?.name || '';
+      const textureUrl = mapping[materialName];
+      jobs.push((textureUrl ? loadChuteTexture(textureUrl) : Promise.resolve(null)).then((texture) => {
+        const isRope = /rope/i.test(partName) || /rope/i.test(materialName);
+        child.material = new THREE.MeshStandardMaterial({
+          map: texture || null,
+          color: texture ? 0xffffff : (isRope ? 0x6f7168 : 0xd9d5c6),
+          side: THREE.DoubleSide,
+          metalness: 0.02,
+          roughness: isRope ? 0.95 : 0.82,
+          transparent: true,
+          opacity: 1,
+          alphaTest: isRope ? 0.4 : 0,
+        });
+        child.material.name = materialName;
+        child.material.userData.baseOpacity = 1;
+        child.renderOrder = 65;
+      }));
+    });
+    await Promise.all(jobs);
+  }
+
+  function staticizeSkinnedMeshes(object) {
+    const swaps = [];
+    object.traverse((node) => {
+      if (!node.isSkinnedMesh) return;
+      const mesh = new THREE.Mesh(node.geometry, node.material);
+      mesh.name = node.name;
+      mesh.position.copy(node.position);
+      mesh.quaternion.copy(node.quaternion);
+      mesh.scale.copy(node.scale);
+      mesh.renderOrder = node.renderOrder;
+      mesh.frustumCulled = false;
+      swaps.push([node, mesh]);
+    });
+    for (const [oldNode, mesh] of swaps) {
+      if (oldNode.parent) {
+        oldNode.parent.add(mesh);
+        oldNode.parent.remove(oldNode);
+      }
+    }
+  }
+
+  async function buildChuteModel() {
+    const doc = await loadChuteManifest();
+    if (!doc?.parts?.length) return null;
+    const root = new THREE.Group();
+    root.userData.sharedModel = true;
+    for (const part of doc.parts) {
+      const gltf = await loadChuteGltf(part.url);
+      if (!gltf) continue;
+      const object = gltf.scene.clone(true);
+      staticizeSkinnedMeshes(object);
+      await applyChuteMaterials(object, part.materials, part.name);
+      object.userData.part = part.name;
+      root.add(object);
+    }
+    if (!root.children.length) return null;
+    return root;
+  }
+
+  function getParachuteModel() {
+    if (!chuteModelPromise) chuteModelPromise = buildChuteModel().catch(() => null);
+    return chuteModelPromise.then((root) => (root ? root.clone(true) : null));
+  }
+
+  function setChuteFade(chute, fade) {
+    if (!chute) return;
+    chute.traverse((node) => {
+      if (!node.isMesh || !node.material) return;
+      const material = node.material;
+      material.transparent = true;
+      material.opacity = (material.userData.baseOpacity ?? 1) * fade;
+      material.depthWrite = fade > 0.95;
+    });
+  }
+
+  function buildLandingDust() {
+    const root = new THREE.Group();
+    root.name = 'vehicleLandingDust';
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(1.2, 2.2, 64),
+      new THREE.MeshBasicMaterial({ color: 0xe6d8b8, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }),
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.3;
+    const puff = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 14, 10),
+      new THREE.MeshBasicMaterial({ color: 0xcfc2a8, transparent: true, opacity: 0, depthWrite: false }),
+    );
+    puff.scale.set(3.2, 1.1, 3.2);
+    puff.position.y = 1.0;
+    root.add(ring, puff);
+    group.add(root);
+    return { root, ring, puff };
+  }
+
   function addTrajectory(delivery, impactTime, accent, withShell = true) {
     const distance = delivery.fireDistance || 1000;
     const height = delivery.fireHeight || 1500;
@@ -463,10 +611,42 @@ export function createFieldSupport(options) {
         addHeightRuler(blast.radius, 0xffb347, impactAt);
       } else if (skill.kind === 'thermobaric') {
         const killRadius = radiusForDamage(blast, 100);
-        addDisc(blast.radius, 0xff4d2e, 0.08, 0.26, impactAt);
-        addRing(blast.radius, 0.8, 0xff5a45, 0.9, 0.32, impactAt);
-        if (zones.a && blast.fullRadius) addRing(blast.fullRadius, 0.55, 0xffb347, 0.95, 0.36, impactAt);
-        if (zones.b && killRadius) addRing(killRadius, 0.5, 0xffd166, 0.95, 0.38, impactAt);
+        // 温压弹：制导导弹式 3D 伤害球，但球心在钻地目标（地面/屋顶之下），
+        // 并画出从地表到目标的钻地通道；制导导弹仍以可见表面为球心。
+        const surfaceY = typeof surfaceHeightAt === 'function'
+          ? surfaceHeightAt(cx, cz) : heightAt(cx, cz);
+        const drillDepth = Number.isFinite(surfaceY) ? Math.max(0, surfaceY - cy) : 0;
+        if (drillDepth > 0.2) {
+          const shaft = new THREE.Mesh(
+            new THREE.CylinderGeometry(1.15, 0.7, drillDepth, 18, 1, true),
+            makeBasicMaterial(0xff4d2e, 0.52),
+          );
+          shaft.position.y = drillDepth / 2;
+          shaft.renderOrder = 54;
+          group.add(shaft);
+          objects.rings.push({ mesh: shaft, visibleAt: impactAt });
+          addRing(2.6, 0.5, 0xffb347, 0.95, drillDepth, impactAt);
+          addRing(1.25, 0.35, 0xff6b45, 1.0, drillDepth + 0.12, impactAt);
+        }
+        addSphereVolume(blast.radius, 0xff4d2e, 0.10, 0.95, impactAt);
+        addRing(blast.radius, 0.8, 0xff5a45, 0.95, 0.32, impactAt);
+        if (zones.a && blast.fullRadius) {
+          addSphereVolume(blast.fullRadius, 0xffb347, 0.14, 1.0, impactAt);
+          addRing(blast.fullRadius, 0.55, 0xffb347, 1.0, 0.36, impactAt);
+        }
+        if (zones.b && killRadius) {
+          addSphereVolume(killRadius, 0xffd166, 0.12, 0.95, impactAt);
+          addRing(killRadius, 0.5, 0xffd166, 0.98, 0.38, impactAt);
+        }
+        // 钻地目标核心点，保证在全图缩放下也能看见
+        const core = new THREE.Mesh(
+          new THREE.SphereGeometry(1.15, 16, 12),
+          makeBasicMaterial(0xffe08a, 0.95),
+        );
+        core.renderOrder = 62;
+        group.add(core);
+        objects.rings.push({ mesh: core, visibleAt: impactAt });
+        addHeightRuler(blast.radius, 0xffb347, impactAt);
       }
       // 炮兵齐射不在中心画单发爆炸，改为每个落点单独画（见下面的 impact 标记）
     }
@@ -474,8 +654,9 @@ export function createFieldSupport(options) {
       const dot = skill.special?.dotRadius || 0;
       const delay = skill.special?.dotDelay || 0;
       if (dot) {
-        addDisc(dot, 0xff7a2f, 0.1, 0.22, impactTimes[0] + delay);
-        addRing(dot, 0.7, 0xffa040, 0.8, 0.3, impactTimes[0] + delay);
+        // 持续燃烧区也画成 3D 体积球，而不是平面圆
+        addSphereVolume(dot, 0xff7a2f, 0.018, 0.32, impactTimes[0] + delay);
+        addRing(dot, 0.7, 0xffa040, 0.65, 0.3, impactTimes[0] + delay);
       }
     }
     if (skill.kind === 'airdrop') {
@@ -597,6 +778,42 @@ export function createFieldSupport(options) {
         }
         updateSkillHint();
       });
+
+      // 伞具：BP_Vehicle_AirDrop_New 的伞衣/伞绳/根环/绳缆，锚在载具上方 vehicleFallingHeight 处。
+      const timing = airDropTiming(skill.airdrop || {});
+      const chuteAnchor = new THREE.Group();
+      chuteAnchor.name = 'vehicleParachute';
+      chuteAnchor.position.y = timing.vehicleOffset;
+      chuteAnchor.rotation.y = Math.PI * 0.75;
+      root.add(chuteAnchor);
+      objects.vehicleChute = chuteAnchor;
+      getParachuteModel().then((chuteModel) => {
+        if (token !== buildToken || !state.center || objects.vehicleRoot !== root) return;
+        if (!chuteModel) return;
+        chuteAnchor.add(chuteModel);
+        applyTime(state.staticView ? Infinity : state.t);
+      });
+
+      // 载具-伞具之间的吊索（4 根，从载具四角收敛到伞具锚点）。
+      const harness = new THREE.Group();
+      harness.name = 'vehicleHarness';
+      const harnessMaterial = new THREE.LineBasicMaterial({
+        color: 0x4a4d3f, transparent: true, opacity: 0.92, depthTest: true,
+      });
+      const harnessPoints = [[-1.7, 2.1, -2.6], [1.7, 2.1, -2.6], [-1.7, 2.1, 2.6], [1.7, 2.1, 2.6]];
+      for (const point of harnessPoints) {
+        const geometry = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(point[0], point[1], point[2]),
+          new THREE.Vector3(0, timing.vehicleOffset, 0),
+        ]);
+        harness.add(new THREE.Line(geometry, harnessMaterial));
+      }
+      root.add(harness);
+      objects.vehicleHarness = harness;
+
+      // 落地扬尘（伞具淡出时同时出现，做成完整落地反馈）。
+      objects.vehicleDust = buildLandingDust();
+      objects.vehicleDust.time = timing.total;
     }
 
     duration = computeDuration(skill, impactTimes);
@@ -648,20 +865,44 @@ export function createFieldSupport(options) {
     return impactSurfaceCache;
   }
 
-  // 空投载具时序：游戏 AirDropTime 视为「总空投时间」；最后 vehicleFallingHeight
-  // 段为自由落体（g=9.8），其余时间为伞降段。旧数据只有 dropTime（伞降时长）时
-  // 兼容按「dropTime + 自由落体」计算总时长。
-  const FALL_GRAVITY = 9.8;
+  // 空投载具下落（2026-11-12 修正）：
+  // - SpawnAirDropHeight(80 m) 是空投 actor（伞具）生成高度；
+  // - 载具本体起始 65.5 m（80 − VehicleFallingHeight 14.5）；
+  // - 伞具下降段到载具 14.5 m 时脱离（约 10.3 s），之后载具自由落体 14.5 m（约 1.7 s），
+  //   总空投时间 AirDropTime = 12 s；伞衣/吊索在脱离瞬间消失。
+  const AIRDROP_GRAVITY = 9.8;
   function airDropTiming(airdrop) {
-    const fallHeight = Math.max(0, Number(airdrop?.vehicleFallingHeight) || 14.5);
-    const fallTime = Math.sqrt(fallHeight * 2 / FALL_GRAVITY);
-    const explicitTotal = Number(airdrop?.totalDropTime);
-    const legacyChute = Number(airdrop?.dropTime) || 12;
-    const total = Number.isFinite(explicitTotal) && explicitTotal > 0
-      ? explicitTotal
-      : legacyChute + fallTime;
-    const chuteTime = Math.max(0.1, total - fallTime);
-    return { total, chuteTime, fallHeight, fallTime };
+    const spawnHeight = Math.max(0, Number(airdrop?.spawnHeight) || 80);
+    const vehicleOffset = Math.max(0, Number(airdrop?.vehicleFallingHeight) || 14.5);
+    const vehicleStart = Math.max(0.1, spawnHeight - vehicleOffset);
+    const freeFallHeight = Math.min(vehicleStart, Math.max(0.1, vehicleOffset));
+    const freeFallTime = Math.sqrt(freeFallHeight * 2 / AIRDROP_GRAVITY);
+    const total = Math.max(0.1, Number(airdrop?.totalDropTime) || 12);
+    const chuteTime = Math.max(0.1, total - freeFallTime);
+    const descentDistance = Math.max(0.1, vehicleStart - freeFallHeight);
+    const decelFraction = Math.min(0.9, Math.max(0.01, Number(airdrop?.decelerateHeightPercentage) || 0.1));
+    const t1 = chuteTime * (1 - decelFraction) / (1 + decelFraction);
+    const t2 = Math.max(0.05, chuteTime - t1);
+    const speed = (1 + decelFraction) * descentDistance / chuteTime;
+    const decel = speed / t2;
+    const decelHeight = descentDistance - speed * t1;
+    return {
+      spawnHeight, vehicleOffset, vehicleStart, freeFallHeight, freeFallTime,
+      total, chuteTime, descentDistance, decelFraction, t1, t2, speed, decel, decelHeight,
+    };
+  }
+
+  function airDropHeightAt(t, timing) {
+    if (!(t > 0)) return timing.vehicleStart;
+    if (t >= timing.total) return 0;
+    if (t < timing.chuteTime) {
+      if (t <= timing.t1) return timing.vehicleStart - timing.speed * t;
+      const tau = t - timing.t1;
+      const travelled = timing.speed * timing.t1 + (timing.speed * tau - 0.5 * timing.decel * tau * tau);
+      return Math.max(timing.freeFallHeight, timing.vehicleStart - travelled);
+    }
+    const dt = t - timing.chuteTime;
+    return Math.max(0, timing.freeFallHeight - 0.5 * AIRDROP_GRAVITY * dt * dt);
   }
 
   function applyTime(t) {
@@ -717,20 +958,51 @@ export function createFieldSupport(options) {
     if (objects.vehicleRoot) {
       const skill = skills[state.skill] || {};
       const drop = skill.airdrop || {};
-      const spawnHeight = Number(drop.spawnHeight) || 45;
       const timing = airDropTiming(drop);
+      const landed = staticView || time >= timing.total;
       objects.vehicleRoot.visible = true;
-      if (staticView || time >= timing.total) {
-        // 全时段定格或已落地
-        objects.vehicleRoot.position.y = 0;
-      } else if (time <= timing.chuteTime) {
-        // 第一阶段：伞降，spawnHeight → vehicleFallingHeight
-        const ratio = Math.max(0, time) / Math.max(0.1, timing.chuteTime);
-        objects.vehicleRoot.position.y = spawnHeight - (spawnHeight - timing.fallHeight) * ratio;
-      } else {
-        // 第二阶段：vehicleFallingHeight 处脱离伞具，自由落体
-        const dt = time - timing.chuteTime;
-        objects.vehicleRoot.position.y = Math.max(0, timing.fallHeight - 0.5 * FALL_GRAVITY * dt * dt);
+      objects.vehicleRoot.position.y = landed ? 0 : airDropHeightAt(time, timing);
+      // 伞具：随载具下降；到达脱伞高度后（自由落体开始前 0.2 s 内）消失，不再落地淡出。
+      const chute = objects.vehicleChute;
+      const releaseFade = clamp01((timing.chuteTime - time) / 0.2);
+      if (chute) {
+        chute.visible = !staticView && time >= 0 && time < timing.chuteTime && releaseFade > 0.01;
+        if (chute.visible) {
+          const age = Math.max(0, time);
+          chute.position.y = timing.vehicleOffset;
+          chute.rotation.z = Math.sin(age * 1.05) * 0.022 + Math.sin(age * 0.43 + 0.7) * 0.012;
+          chute.rotation.x = Math.sin(age * 0.82 + 1.2) * 0.018;
+          chute.rotation.y = Math.PI * 0.75 + Math.sin(age * 0.31) * 0.05;
+          const canopy = chute.children.find((child) => child.userData?.part === 'canopy');
+          if (canopy) {
+            const billow = 1 + Math.sin(age * 1.6) * 0.008;
+            canopy.scale.set(billow, billow, billow);
+          }
+          setChuteFade(chute, releaseFade);
+        }
+      }
+      const harness = objects.vehicleHarness;
+      if (harness) {
+        harness.visible = chute ? chute.visible : false;
+        if (harness.visible) {
+          harness.traverse((node) => {
+            if (node.isLine && node.material) node.material.opacity = 0.92 * releaseFade;
+          });
+        }
+      }
+      // 落地扬尘：落地瞬间展开，1.6 s 内消散。
+      const dust = objects.vehicleDust;
+      if (dust) {
+        const dt = time - dust.time;
+        const active = !staticView && dt >= 0 && dt <= 1.6;
+        dust.root.visible = active;
+        if (active) {
+          const k = clamp01(dt / 1.6);
+          dust.ring.scale.setScalar(1.4 + 7.5 * k);
+          dust.ring.material.opacity = 0.65 * (1 - k);
+          dust.puff.scale.set(3.2 + 3.2 * k, 1.0 + 1.8 * k, 3.2 + 3.2 * k);
+          dust.puff.material.opacity = 0.32 * (1 - k);
+        }
       }
     }
   }
@@ -861,11 +1133,10 @@ export function createFieldSupport(options) {
       const air = skill.airdrop || {};
       const timing = airDropTiming(air);
       const dropRows = [
-        addRow('空投高度', `${fmt(air.spawnHeight, ' m')}${air.configSpawnHeight ? `（游戏配置 ${fmt(air.configSpawnHeight, ' m')}）` : ''}`),
+        addRow('空投高度', `${fmt(air.spawnHeight, ' m')}（伞具生成高度）`),
         addRow('空投总时间', fmt(timing.total, ' s')),
-        addRow('伞降时间', fmt(timing.chuteTime, ' s', 1)),
-        addRow('自由落体高度', fmt(timing.fallHeight, ' m')),
-        addRow('自由落体时间', fmt(timing.fallTime, ' s', 1)),
+        addRow('脱伞时间', `${fmt(timing.chuteTime, ' s', 1)}（载具高度 ${fmt(timing.freeFallHeight, ' m')}）`),
+        addRow('自由落体', `${fmt(timing.freeFallHeight, ' m')}（约 ${fmt(timing.freeFallTime, '', 1)} s）`),
       ].filter(Boolean);
       pushGroup('空投', dropRows);
       const vehicleRows = [
@@ -1022,7 +1293,13 @@ export function createFieldSupport(options) {
 
   function placeAt(point) {
     if (!point) return false;
-    const y = Number.isFinite(point.y) ? point.y + 0.25 : (heightAt(point.x, point.z) + 0.25);
+    const skill = skills[state.skill];
+    // 制导导弹/空投载具以可见表面为命中面；温压弹钻地，目标取地面高度（可位于屋顶之下）。
+    const drill = skill?.kind === 'thermobaric';
+    const baseY = drill
+      ? heightAt(point.x, point.z)
+      : (Number.isFinite(point.y) ? point.y : heightAt(point.x, point.z));
+    const y = baseY + 0.25;
     state.center = new THREE.Vector3(point.x, y, point.z);
     state.placing = false;
     state.staticView = true;

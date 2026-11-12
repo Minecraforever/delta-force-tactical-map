@@ -1,0 +1,34 @@
+{
+  "source": "正式服 1.101.37119.18 · BP_Vehicle_AirDrop_New（CUE4Parse MeshExport）",
+  "note": "载具空投伞具：伞衣/伞绳/根环/绳缆，坐标系为 UE 厘米→米（glTF Y-up）",
+  "parts": [
+    {
+      "name": "canopy",
+      "url": "canopy.glb",
+      "materials": {
+        "MI_tactical_Vehicleparachute": "tex/chute_basecolor.jpg"
+      }
+    },
+    {
+      "name": "lines",
+      "url": "lines.glb",
+      "materials": {
+        "MI_tactical_Vehicleparachute": "tex/chute_basecolor.jpg"
+      }
+    },
+    {
+      "name": "rootloop",
+      "url": "rootloop.glb",
+      "materials": {
+        "MI_tactical_Vehicleparachute": "tex/chute_basecolor.jpg"
+      }
+    },
+    {
+      "name": "rope",
+      "url": "rope.glb",
+      "materials": {
+        "props_tactical_Vehicleparachute_936": "tex/rope_basecolor.png"
+      }
+    }
+  ]
+}

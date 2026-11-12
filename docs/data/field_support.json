@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-04 08:57",
+ "generated": "2026-11-12 11:13",
  "source": "CUE4Parse 导出的 BP/DataTable；温压弹取自体验服 2.101.11302.2",
  "units": "米 / 秒 / 伤害值",
  "skills": {
@@ -139,6 +139,7 @@
     "dotDelay": 1.0
    },
    "notes": [
+    "钻地弹：命中后先钻入地面/掩体再起爆；三维预览球心取地面高度，选在屋顶时会显示钻地通道。",
     "体验服 2.101 数据：1 发，约 1960 m 高、飞行 20 s；直接爆炸 5 m / 满伤 2.5 m，110 → 50。",
     "穿掩体；对载具 900 → 400；20 m 击倒、50 m 屏幕火焰效果。",
     "爆炸后 30 m 半径持续燃烧，延迟 1 s。"
@@ -151,18 +152,17 @@
    "kind": "airdrop",
    "tone": "#ffd166",
    "airdrop": {
-    "spawnHeight": 45.0,
-    "configSpawnHeight": 80.0,
+    "spawnHeight": 80.0,
+    "vehicleFallingHeight": 14.5,
     "totalDropTime": 12.0,
     "decelerateHeightPercentage": 0.1,
-    "vehicleFallingHeight": 14.5,
     "minDistance": 20.0,
     "emptyDecreaseAfter": 30.0,
     "emptyDecreasePercent": 20.0
    },
    "notes": [
-    "游戏配置：SpawnAirDropHeight=80 m、AirDropTime=12 s、VehicleFallingHeight=14.5 m（正式服/体验服一致）。",
-    "用户实机反馈：12 s 已完整落地、目测初始高度约 40–50 m；预览按 45 m + 总时长 12 s（伞降约 10.3 s + 自由落体 1.7 s，待目检）。",
+    "游戏配置：SpawnAirDropHeight=80 m（伞具生成高度）、AirDropTime=12 s（总时长）、VehicleFallingHeight=14.5 m（脱伞/自由落体起点）、AirDropDecelerateHeightPercentage=0.1（下降段末段减速比例）。",
+    "载具本体起始 65.5 m（80 − 14.5）；伞具下降至载具 14.5 m 时脱伞（约 10.3 s），随后载具自由落体 14.5 m（约 1.7 s），合计 12 s；伞具在脱伞瞬间消失。",
     "每图每阵营最多 2 辆；允许 M1A4、LAV-AA、LAV-G1、FSV、GTQ-35、冲锋艇、AAV。"
    ]
   }

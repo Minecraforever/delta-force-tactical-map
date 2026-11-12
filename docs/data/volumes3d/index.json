@@ -1,0 +1,690 @@
+{
+  "schemaVersion": 1,
+  "layer": "volumes3d",
+  "sourceVersion": "1.101.37119.18",
+  "generatedAt": "2026-11-12T00:16:52+08:00",
+  "axis": {
+    "source": "UE5 left-handed, cm, X forward / Y right / Z up",
+    "web": "three.js x=UE X/100, y=UE Z/100, z=UE Y/100; metres"
+  },
+  "maps": {
+    "Collapse": {
+      "mapName": "余震",
+      "file": "Collapse.json",
+      "sourceLevel": "Collapse_Breakthrough",
+      "status": "static_verified",
+      "counts": {
+        "areas": 25,
+        "sector": 6,
+        "base": 12,
+        "objective": 7,
+        "areasVerified": 25,
+        "areasWarning": 0,
+        "volumes": 2,
+        "valid_area": 1,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 1,
+        "volumeWarnings": 0,
+        "gaps": 0,
+        "unmatchedAreaComponents": 0
+      },
+      "zRange": [
+        21.1731,
+        43.9094
+      ],
+      "gaps": [],
+      "manifestConsistency": {
+        "areas": 25,
+        "matched": 25,
+        "mismatched": 0
+      }
+    },
+    "Colosseum": {
+      "mapName": "克劳狄斗兽场",
+      "file": "Colosseum.json",
+      "sourceLevel": "Colosseum_BreakThrough",
+      "status": "static_verified",
+      "counts": {
+        "areas": 22,
+        "sector": 4,
+        "base": 8,
+        "objective": 10,
+        "areasVerified": 22,
+        "areasWarning": 0,
+        "volumes": 0,
+        "valid_area": 0,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 0,
+        "gaps": 0,
+        "unmatchedAreaComponents": 0
+      },
+      "zRange": [
+        10.1139,
+        45.2452
+      ],
+      "gaps": [],
+      "manifestConsistency": {
+        "areas": 22,
+        "matched": 22,
+        "mismatched": 0
+      }
+    },
+    "Cracked": {
+      "mapName": "烬区",
+      "file": "Cracked.json",
+      "sourceLevel": "Cracked_Breakthrough",
+      "status": "static_verified",
+      "counts": {
+        "areas": 14,
+        "sector": 3,
+        "base": 6,
+        "objective": 5,
+        "areasVerified": 14,
+        "areasWarning": 0,
+        "volumes": 2,
+        "valid_area": 2,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 0,
+        "gaps": 0,
+        "unmatchedAreaComponents": 0
+      },
+      "zRange": [
+        -15.614,
+        3.1972
+      ],
+      "gaps": [],
+      "manifestConsistency": {
+        "areas": 14,
+        "matched": 14,
+        "mismatched": 0
+      }
+    },
+    "Crest": {
+      "mapName": "刀锋",
+      "file": "Crest.json",
+      "sourceLevel": "Crest_Breakthrough",
+      "status": "partial",
+      "counts": {
+        "areas": 9,
+        "sector": 3,
+        "base": 6,
+        "objective": 0,
+        "areasVerified": 9,
+        "areasWarning": 0,
+        "volumes": 0,
+        "valid_area": 0,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 0,
+        "gaps": 5,
+        "unmatchedAreaComponents": 5
+      },
+      "zRange": [
+        -66.6727,
+        -10.7194
+      ],
+      "gaps": [
+        {
+          "kind": "area_no_source_component",
+          "area": "Crest_Breakthrough_Objective_A1_Area",
+          "label": "A1",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Crest_Breakthrough_Objective_B1_Area",
+          "label": "B1",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Crest_Breakthrough_Objective_B2_Area",
+          "label": "B2",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Crest_Breakthrough_Objective_C1_Area",
+          "label": "C1",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Crest_Breakthrough_Objective_C2_Area",
+          "label": "C2",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        }
+      ],
+      "manifestConsistency": {
+        "areas": 14,
+        "matched": 9,
+        "mismatched": 0
+      }
+    },
+    "derail": {
+      "mapName": "断轨",
+      "file": "derail.json",
+      "sourceLevel": "Derail_Breakthrough",
+      "status": "partial",
+      "counts": {
+        "areas": 18,
+        "sector": 4,
+        "base": 8,
+        "objective": 6,
+        "areasVerified": 18,
+        "areasWarning": 0,
+        "volumes": 2,
+        "valid_area": 2,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 1,
+        "gaps": 0,
+        "unmatchedAreaComponents": 2
+      },
+      "zRange": [
+        -3.5785,
+        56.793
+      ],
+      "gaps": [],
+      "manifestConsistency": {
+        "areas": 18,
+        "matched": 18,
+        "mismatched": 0
+      }
+    },
+    "Fault": {
+      "mapName": "断层",
+      "file": "Fault.json",
+      "sourceLevel": "Fault_Breakthrough",
+      "status": "partial",
+      "counts": {
+        "areas": 14,
+        "sector": 3,
+        "base": 6,
+        "objective": 5,
+        "areasVerified": 14,
+        "areasWarning": 0,
+        "volumes": 2,
+        "valid_area": 1,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 1,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 1,
+        "gaps": 0,
+        "unmatchedAreaComponents": 0
+      },
+      "zRange": [
+        57.1852,
+        143.6328
+      ],
+      "gaps": [],
+      "manifestConsistency": {
+        "areas": 14,
+        "matched": 14,
+        "mismatched": 0
+      }
+    },
+    "Gibraltar": {
+      "mapName": "临界点",
+      "file": "Gibraltar.json",
+      "sourceLevel": "Gibraltar_Breakthrough",
+      "status": "static_verified",
+      "counts": {
+        "areas": 14,
+        "sector": 3,
+        "base": 6,
+        "objective": 5,
+        "areasVerified": 14,
+        "areasWarning": 0,
+        "volumes": 1,
+        "valid_area": 1,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 0,
+        "gaps": 0,
+        "unmatchedAreaComponents": 3
+      },
+      "zRange": [
+        -95.9416,
+        -76.4829
+      ],
+      "gaps": [],
+      "manifestConsistency": {
+        "areas": 14,
+        "matched": 14,
+        "mismatched": 0
+      }
+    },
+    "Iceland": {
+      "mapName": "攀升",
+      "file": "Iceland.json",
+      "sourceLevel": "Iceland_Breakthrough",
+      "status": "partial",
+      "counts": {
+        "areas": 22,
+        "sector": 5,
+        "base": 10,
+        "objective": 7,
+        "areasVerified": 22,
+        "areasWarning": 0,
+        "volumes": 1,
+        "valid_area": 1,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 1,
+        "gaps": 0,
+        "unmatchedAreaComponents": 6
+      },
+      "zRange": [
+        -223.564,
+        194.2416
+      ],
+      "gaps": [],
+      "manifestConsistency": {
+        "areas": 22,
+        "matched": 22,
+        "mismatched": 0
+      }
+    },
+    "Mogadishu": {
+      "mapName": "摩格旧城区",
+      "file": "Mogadishu.json",
+      "sourceLevel": "Mogadishu_Breakthrough",
+      "status": "partial",
+      "counts": {
+        "areas": 22,
+        "sector": 5,
+        "base": 10,
+        "objective": 7,
+        "areasVerified": 22,
+        "areasWarning": 0,
+        "volumes": 1,
+        "valid_area": 1,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 0,
+        "gaps": 2,
+        "unmatchedAreaComponents": 0
+      },
+      "zRange": [
+        17.5477,
+        31.5456
+      ],
+      "gaps": [
+        {
+          "kind": "area_no_source_component",
+          "area": "Mogadishu_Breakthrough_Objective_PointD_Hidden",
+          "label": "D1",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Mogadishu_Breakthrough_Objective_PointE_Hidden",
+          "label": "E1",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        }
+      ],
+      "manifestConsistency": {
+        "areas": 24,
+        "matched": 22,
+        "mismatched": 0
+      }
+    },
+    "Monument": {
+      "mapName": "金字塔",
+      "file": "Monument.json",
+      "sourceLevel": "Monument_Breakthrough",
+      "status": "partial",
+      "counts": {
+        "areas": 19,
+        "sector": 4,
+        "base": 8,
+        "objective": 7,
+        "areasVerified": 19,
+        "areasWarning": 0,
+        "volumes": 1,
+        "valid_area": 1,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 1,
+        "gaps": 0,
+        "unmatchedAreaComponents": 0
+      },
+      "zRange": [
+        30.6452,
+        110.5404
+      ],
+      "gaps": [],
+      "manifestConsistency": {
+        "areas": 19,
+        "matched": 19,
+        "mismatched": 0
+      }
+    },
+    "NavalBattle": {
+      "mapName": "风暴眼",
+      "file": "NavalBattle.json",
+      "sourceLevel": "NavalBattle_Breakthrough",
+      "status": "static_verified",
+      "counts": {
+        "areas": 22,
+        "sector": 5,
+        "base": 10,
+        "objective": 7,
+        "areasVerified": 22,
+        "areasWarning": 0,
+        "volumes": 0,
+        "valid_area": 0,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 0,
+        "gaps": 0,
+        "unmatchedAreaComponents": 0
+      },
+      "zRange": [
+        -98.9483,
+        -58.8833
+      ],
+      "gaps": [],
+      "manifestConsistency": {
+        "areas": 22,
+        "matched": 22,
+        "mismatched": 0
+      }
+    },
+    "Retrowar": {
+      "mapName": "堑壕战",
+      "file": "Retrowar.json",
+      "sourceLevel": "Retrowar_Breakthrough",
+      "status": "static_verified",
+      "counts": {
+        "areas": 22,
+        "sector": 5,
+        "base": 10,
+        "objective": 7,
+        "areasVerified": 22,
+        "areasWarning": 0,
+        "volumes": 1,
+        "valid_area": 1,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 0,
+        "gaps": 0,
+        "unmatchedAreaComponents": 0
+      },
+      "zRange": [
+        -10.6094,
+        50.8749
+      ],
+      "gaps": [],
+      "manifestConsistency": {
+        "areas": 22,
+        "matched": 22,
+        "mismatched": 0
+      }
+    },
+    "Shafted": {
+      "mapName": "贯穿",
+      "file": "Shafted.json",
+      "sourceLevel": "Shafted_Breakthrough",
+      "status": "static_verified",
+      "counts": {
+        "areas": 13,
+        "sector": 3,
+        "base": 6,
+        "objective": 4,
+        "areasVerified": 13,
+        "areasWarning": 0,
+        "volumes": 0,
+        "valid_area": 0,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 0,
+        "volumeWarnings": 0,
+        "gaps": 0,
+        "unmatchedAreaComponents": 0
+      },
+      "zRange": [
+        -53.5052,
+        1.878
+      ],
+      "gaps": [],
+      "manifestConsistency": {
+        "areas": 13,
+        "matched": 13,
+        "mismatched": 0
+      }
+    },
+    "Skyline": {
+      "mapName": "天际港",
+      "file": "Skyline.json",
+      "sourceLevel": "Dday_Breakthrough",
+      "status": "partial",
+      "counts": {
+        "areas": 19,
+        "sector": 3,
+        "base": 9,
+        "objective": 7,
+        "areasVerified": 11,
+        "areasWarning": 8,
+        "volumes": 3,
+        "valid_area": 2,
+        "forbidden_box": 0,
+        "force_forbidden_box": 0,
+        "forbidden_area": 0,
+        "redeploy_forbidden": 1,
+        "volumeWarnings": 0,
+        "gaps": 17,
+        "unmatchedAreaComponents": 1
+      },
+      "zRange": [
+        -8.0497,
+        212.1921
+      ],
+      "gaps": [
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Objective_PointC1_2_Area",
+          "label": "未发布 C3",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Objective_PointD1_3_Area",
+          "label": "未发布 C2",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Objective_PointD1_Area",
+          "label": "未发布 C1",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Objective_PointE1_Area",
+          "label": "未发布 D1",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Objective_PointE2_Area",
+          "label": "未发布 D2",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Dday_Breakthrough_Sector_S3_Event_Area",
+          "label": "S3",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Base_S3_Attack_Area",
+          "label": "未发布 S3_Attack",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Base_S3_Defend_Area",
+          "label": "未发布 S3_Defend",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Base_S4_Attack_2_Area",
+          "label": "未发布 S4_Attack_2",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Base_S4_Defend_Area",
+          "label": "未发布 S4_Defend",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Base_S5_Attack_Area",
+          "label": "未发布 S5_Attack",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Base_S5_Defend_Area",
+          "label": "未发布 S5_Defend",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Sector_S3_Area",
+          "label": "未发布 S3",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Sector_S4_Area",
+          "label": "未发布 S4",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Skyline_Breakthrough_Sector_S5_Area",
+          "label": "未发布 S5",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Dday_Breakthrough_Base_S3_Attack_Event_Area",
+          "label": "S3_Attack",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        },
+        {
+          "kind": "area_no_source_component",
+          "area": "Dday_Breakthrough_Base_S3_Defend_Event_Area",
+          "label": "S3_Defend",
+          "detail": "manifest 有该区域，但关卡里没有同名 AreaTexturePath + >=3 个 WorldSplinePoint 的组件；多为事件解锁据点的圆形推断，或源关卡缺失。"
+        }
+      ],
+      "manifestConsistency": {
+        "areas": 36,
+        "matched": 11,
+        "mismatched": 8
+      }
+    }
+  },
+  "archivedMaps": {
+    "Suez": {
+      "mapName": "乌姆斯运河",
+      "reason": "赛季轮换，已不在当前游戏内；2026-11-09 归档，官方重新放出后恢复。",
+      "archive": "_backup\\suez_archived_20261109"
+    }
+  },
+  "totals": {
+    "areas": 255,
+    "sector": 56,
+    "base": 115,
+    "objective": 84,
+    "areasVerified": 247,
+    "areasWarning": 8,
+    "volumes": 16,
+    "valid_area": 13,
+    "forbidden_box": 0,
+    "force_forbidden_box": 0,
+    "forbidden_area": 1,
+    "redeploy_forbidden": 2,
+    "volumeWarnings": 4,
+    "gaps": 24,
+    "unmatchedAreaComponents": 17
+  },
+  "globalGaps": [
+    {
+      "kind": "rooftop_black_zone_not_located",
+      "detail": "14 张攻防 persistent 关卡里 BP_ForbiddenBox_C / BP_ForceForbiddenBox_C 的静态实例数为 0；楼顶黑区可能是运行时/子关卡生成，未定位到可靠几何，列为缺口。"
+    },
+    {
+      "kind": "no_sublevel_dumps",
+      "detail": "本版每张攻防图 pak 里只有 1 个 .umap；persistent 的 StreamingLevels 为空，没有可用的子关卡/流送关卡 dump。"
+    },
+    {
+      "kind": "skyline_partial",
+      "detail": "Skyline（天际港）manifest 使用 Dday 世界数据，但 36 个区域里只有 11 个能在 Dday_Breakthrough 找到逐点一致的同名组件；其余为缺口/未发布/事件变体，未用近似几何补齐。"
+    },
+    {
+      "kind": "manifest_event_circle_height_outliers",
+      "detail": "旧 manifest 的事件解锁据点圆圈高度异常：Crest A1/B1/B2/C1/C2 为 -37.5…-60.6m、Mogadishu D1/E1 为 399.6m；关卡里没有对应 AreaTexturePath 组件，本图层列为缺口，不导出。"
+    }
+  ],
+  "sourceAudit": {
+    "sourceVersion": "1.101.37119.18",
+    "levelDumpRoot": "D:\\DF\\dfpak\\out\\builds\\1.101.37119.18\\levels\\json",
+    "manifestPointSemantics": "manifest.points 已是 [x,y,z] 米，来自 WorldSplinePoint；y=UE Z，z=UE Y。",
+    "axisMapping": "web x=UE X/100, y=UE Z/100, z=UE Y/100",
+    "worldSplinePoint": "WorldSplinePoint 是世界坐标；用 SplineCurves.local + actor/component transform 交叉验证。",
+    "boxExtentDefault": "GamePlayValidAreaActor 缺少 BoxExtent 时，按 native BoxComponent 默认 100cm 处理，并用包含所有区域点做 containment 校验；结果写入 extentSource。",
+    "sublevels": "none available (1 umap per breakthrough map, StreamingLevels empty)"
+  },
+  "blackZoneCoverage": {
+    "status": "removed_from_ui",
+    "reason": "反编译追踪到倒计时触发源是 ADFMQuestGamingArea 的 spline 安全区之外；旧的交战区包络/可玩盒/据点体积全部推翻。",
+    "staticData": "persistent level 没有 ADFMQuestGamingArea/BP_GamingAreaSpline_C 实例；静态包无 GamingArea spline，需运行时数据。",
+    "runtimeChain": [
+      "ADFMQuestGamingArea::CheckWorldLocationInsideSpline2D",
+      "ADFMQuestGamingArea::GetPlayersOutsideSpline2D",
+      "UDFMQuestGamingAreaPlayerComponent::StartCountdown",
+      "UDFMQuestGamingAreaPlayerComponent::CountdownEnd"
+    ]
+  },
+  "validationSummary": {
+    "maxWorldPointTransformErrorCm": 0.0251,
+    "maxBox3DZErrorCm": 0.0,
+    "triangleOutsideBox3DTotal": 0,
+    "maxManifestPointsErrorM": 36.7413,
+    "areasChecked": 255
+  }
+}

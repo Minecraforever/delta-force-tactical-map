@@ -259,95 +259,166 @@
     "触发后：C1 变废墟，占领状态重置（仍可争夺）。"
    ]
   },
-  "Suez": {
-   "name": "乌姆斯运河",
-   "target": "D1 大仓",
-   "targetShort": "D1 大仓",
-   "anchor": "Objective_PointD1",
-   "volume": {
-    "center": [
-     652.84,
-     13.7,
-     -860.54
-    ],
-    "half": [
-     28.75,
-     20.0,
-     33.75
-    ],
-    "yawDeg": -90.0001
+  "Skyline": {
+   "name": "天际港",
+   "target": "C 区 · 巨浪",
+   "targetShort": "巨浪",
+   "anchor": "Objective_PointC3",
+   "eventType": "tsunami",
+   "area": {
+    "name": "Dday_Breakthrough_Sector_S3_Event_Area",
+    "label": "S3",
+    "stage": 4,
+    "points": [
+     [
+      654.0,
+      7.1,
+      -974.9
+     ],
+     [
+      627.5,
+      7.1,
+      -996.7
+     ],
+     [
+      751.7,
+      15.8,
+      -1148.4
+     ],
+     [
+      815.3,
+      16.7,
+      -1093.8
+     ],
+     [
+      832.7,
+      17.0,
+      -1116.1
+     ],
+     [
+      909.4,
+      16.4,
+      -1055.9
+     ],
+     [
+      925.2,
+      16.2,
+      -1043.5
+     ],
+     [
+      959.0,
+      15.9,
+      -1020.7
+     ],
+     [
+      996.1,
+      16.0,
+      -1002.7
+     ],
+     [
+      986.4,
+      15.1,
+      -976.5
+     ],
+     [
+      1013.1,
+      17.1,
+      -964.6
+     ],
+     [
+      1013.2,
+      8.1,
+      -833.1
+     ],
+     [
+      816.9,
+      7.8,
+      -833.3
+     ],
+     [
+      816.7,
+      7.8,
+      -843.9
+     ],
+     [
+      762.5,
+      7.2,
+      -844.0
+     ],
+     [
+      742.4,
+      4.1,
+      -858.7
+     ],
+     [
+      690.1,
+      7.8,
+      -800.5
+     ],
+     [
+      581.9,
+      7.3,
+      -888.8
+     ]
+    ]
    },
    "modes": {
     "commander": {
-     "mapId": 612,
-     "tableRow": "Suez_BigEvent_Commander",
-     "hp": 1200,
-     "missileWeight": 600,
+     "mapId": 616,
+     "hp": 2,
+     "missileWeight": 1,
      "artilleryWeight": 0,
      "missileShots": 2,
      "artilleryRounds": null,
      "missiles": [
-      600,
-      1200
+      1,
+      2
      ],
-     "source": "DamageEventTable:Suez_BigEvent_Commander",
+     "source": "C 区制导导弹成功命中 2 发；温压弹暂不计入，待实机",
      "broadcasts": [
       {
-       "atPct": 50,
-       "text": "仓库结构严重受损"
-      },
-      {
        "atPct": 0,
-       "text": "仓库受到致命打击",
-       "detail": "地下设施已暴露"
+       "text": "巨浪大事件触发，海啸淹没城市"
       }
      ]
     },
     "assault": {
-     "mapId": 311,
-     "tableRow": "Suez_BigEvent",
-     "hp": 1200,
-     "missileWeight": 600,
+     "mapId": 165,
+     "hp": 2,
+     "missileWeight": 1,
      "artilleryWeight": 0,
      "missileShots": 2,
      "artilleryRounds": null,
      "missiles": [
-      600,
-      1200
+      1,
+      2
      ],
-     "source": "DamageEventTable:Suez_BigEvent",
+     "source": "C 区制导导弹成功命中 2 发；温压弹暂不计入，待实机",
      "broadcasts": [
       {
-       "atPct": 50,
-       "text": "仓库结构严重受损"
-      },
-      {
        "atPct": 0,
-       "text": "仓库受到致命打击",
-       "detail": "地下设施已暴露"
+       "text": "巨浪大事件触发，海啸淹没城市"
       }
      ]
     }
    },
    "artilleryAllowed": false,
    "artilleryShellsPerRound": 25,
-   "broadcasts": [
-    {
-     "atPct": 50,
-     "text": "仓库结构严重受损"
-    },
-    {
-     "atPct": 0,
-     "text": "仓库受到致命打击",
-     "detail": "地下设施已暴露"
-    }
-   ],
+   "broadcasts": [],
    "notes": [
-    "只有进攻方能呼叫制导导弹（守方 ScoreCost=-1）。",
-    "炮兵齐射不计数；判定区约 58×68×40 m，要落在 D1 大仓区域。",
-    "触发后：D1 变巨坑、D3 地下通道开启、5 扇大事件门打开。",
-    "另有一个「小事件」（打塔，DamageEventVolumeBox_5）：阈值 4，1 发制导导弹或炮弹即可触发，与本大事件无关。"
-   ]
+    "当前只计入制导导弹：C 区成功命中 2 发触发巨浪。",
+    "温压弹暂不计入：代码路径虽同为 ArtilleryShelling，但按用户口径等实机测试确认后再接入。",
+    "DamageEventTable 没有 MapID 165/616 行；BigEventTriggerProbabilitySeq=[0,2,0,0,0]，第 1 发 0 不触发、第 2 发 2.0 必触发。",
+    "触发后系统播报，海啸淹没城市；C1/C2 消失，C3 天台点出现，攻方获得约 10 分钟。",
+    "2026-11-12 热修：BigEventAnchorChange.EventDuration 50→130 秒"
+   ],
+   "sources": [
+    "Dday_Breakthrough:TsunamiWaveBigEventTrigger",
+    "Dday_Breakthrough:BigEventAnchorChange",
+    "LOC_MAPS_Dday:Dday_BigEventName=巨浪"
+   ],
+   "eventDurationSec": 130,
+   "eventDurationPrevSec": 50
   }
  }
 }

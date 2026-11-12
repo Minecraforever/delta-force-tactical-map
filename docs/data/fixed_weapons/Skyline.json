@@ -1,0 +1,57 @@
+[
+  {
+    "name": "BP_SceneAAGun_LD3000_C_0",
+    "type": "vulcan",
+    "weaponId": "fixed_18990000023",
+    "position": [
+      779.91,
+      221.66,
+      -990.58
+    ],
+    "yaw": 40.0
+  },
+  {
+    "name": "BP_SceneMachineGun_C_2",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      1145.81,
+      11.39,
+      -698.25
+    ],
+    "yaw": 0
+  },
+  {
+    "name": "BP_SceneMachineGun_C_3",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      1145.57,
+      11.39,
+      -703.39
+    ],
+    "yaw": 0
+  },
+  {
+    "name": "BP_SceneMachineGun_C_4",
+    "type": "mg",
+    "weaponId": null,
+    "position": [
+      826.22,
+      12.4,
+      -949.22
+    ],
+    "yaw": 40.0
+  },
+  {
+    "name": "BP_SceneShoreGun_C_0",
+    "type": "coastal",
+    "weaponId": "fixed_18990000008",
+    "position": [
+      1099.63,
+      13.7,
+      -626.24
+    ],
+    "yaw": -6.1
+  }
+]

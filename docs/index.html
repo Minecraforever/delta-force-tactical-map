@@ -212,6 +212,16 @@
   .vehRowName { color: #eaf4ff; font-size: 12px; }
   .vehRowCount { color: #8fb4d8; font-size: 11px; white-space: nowrap; }
   .vehRowSub { color: #6f8eae; font-size: 10.5px; margin: 3px 2px 0; line-height: 1.45; }
+  .vehStage { margin: 10px 0 2px; padding: 4px 6px; background: #0e2133; border-left: 3px solid #3f9bff; border-radius: 4px; color: #cfe6ff; font-size: 12px; font-weight: 600; }
+  .vehStageCond { border-left-color: #e0a34a; color: #ffd79a; }
+  .vehForce { margin: 7px 0 0; color: #8fb4d8; font-size: 11px; letter-spacing: .5px; }
+  .vehForce-attack { color: #ff9b8a; }
+  .vehForce-defend { color: #84c9ff; }
+  .vehForce-neutral { color: #9fb4c8; }
+  .vehRowCond { background: #1a2230; border: 1px dashed #5a4a2a; }
+  .vehRowCond .vehRowCount b { color: #ffcf7a; font-weight: 600; }
+  .vehCondRole { margin-right: 6px; padding: 1px 5px; border-radius: 3px; background: #2a3444; color: #c7d6e6; font-size: 10px; }
+
   .vehRule { color: #ffd78a; font-size: 11px; margin-top: 8px; padding: 5px 7px;
     border-left: 3px solid #ffcf5a; background: #1b2b3f; border-radius: 4px; line-height: 1.5; }
   #gpu { font-family: Consolas, monospace; font-size: 12px; }
@@ -224,6 +234,19 @@
   #hud { position: absolute; left: 12px; bottom: 12px; font-size: 12px; color: #8b9bb3;
     background: rgba(11,14,19,.75); padding: 6px 10px; border-radius: 4px; line-height: 1.7;
     font-family: Consolas, monospace; }
+  /* 实验性三维体积图层：默认关闭，独立图例；不改原地图默认外观 */
+  #vol3dLegend { position: absolute; left: 12px; bottom: 54px; z-index: 80;
+    max-width: 300px; padding: 7px 9px 8px; border-radius: 6px;
+    background: rgba(8,12,18,.88); border: 1px solid #31506e;
+    color: #cfe6ff; font-size: 11px; line-height: 1.55; pointer-events: none; }
+  #vol3dLegend[hidden] { display: none !important; }
+  #vol3dLegend .v3title { color: #fff; font-weight: 700; font-size: 11.5px; margin-bottom: 3px; }
+  #vol3dLegend .v3title span { color: #8fb4d8; font-weight: 400; }
+  #vol3dLegend .v3row { white-space: nowrap; }
+  #vol3dLegend .v3sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px;
+    margin-right: 5px; vertical-align: -1px; }
+  #vol3dLegend .v3note { color: #ffcf5a; margin-top: 3px; white-space: normal; }
+  body.mode-conquest #vol3dStatus { display: none !important; }
   #loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     font-size: 14px; color: #9ad7ff; background: rgba(11,14,19,.88); }
   #labels { position: absolute; inset: 0; pointer-events: none; }
@@ -296,7 +319,6 @@
   #mmFullTools button.on { color: #fff; border-color: #ffb347; background: #3a2a14; }
   #mmFullStage { position: absolute; inset: 0; min-height: 0; overflow: hidden; background: #060b12; }
   #mmFullCanvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; z-index: 1; }
-
   #mmFullInk { position: absolute; inset: 0; display: block; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
   #mmInkBar { position: absolute; left: 14px; top: 64px; z-index: 5; display: flex; flex-direction: column;
     align-items: center; gap: 4px; padding: 6px 5px; border: 1px solid #2b3a51; border-radius: 8px;
@@ -307,6 +329,12 @@
   #mmInkBar button.inkColor.on { box-shadow: 0 0 0 1px #fff inset; background: #182536; }
   #mmInkBar #mmInkClear { width: 30px; font-size: 9px; }
   #mmInkBar .inkSep { width: 20px; height: 1px; background: #2c4058; margin: 2px 0; }
+  #mmLayerBar { position: absolute; right: 16px; top: 64px; z-index: 5; display: flex; flex-direction: column;
+    align-items: stretch; gap: 4px; padding: 7px; border: 1px solid #2b3a51; border-radius: 8px;
+    background: rgba(10,17,27,.92); box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+  #mmLayerBar .mmLayerTitle { padding: 0 5px 3px; font-size: 10px; letter-spacing: .12em; color: #8fa3bf; }
+  #mmLayerBar button { min-width: 136px; padding: 5px 8px; text-align: left; font-size: 11px; }
+  #mmLayerBar button.on { color: #fff; border-color: #ffb347; background: #3a2a14; }
   #mmFullHint { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
     padding: 7px 18px 10px; color: #b8cde4; font-size: 12px; white-space: nowrap;
     background: linear-gradient(0deg, rgba(6,11,18,.92), rgba(6,11,18,0)); pointer-events: none; }
@@ -342,6 +370,57 @@
     padding: 5px 10px; font-size: 12px;
     transition: top .2s ease, right .2s ease; }
   #fpToggle.on { color: #ffd27f; border-color: #7a6a2f; }
+
+  /* 场景切面：视口左侧竖向高度条，条以上全部隐藏（看室内 / 地下结构）。
+     UI 只改裁剪面的高度，材质在页面启动时就已经带 1 个裁剪面，切换不重编译。 */
+  #cutDock { position: absolute; left: 44px; top: 96px; z-index: 24; }
+  #cutToggle { width: 30px; height: 104px; padding: 0; display: flex; align-items: center;
+    justify-content: center; writing-mode: vertical-rl; letter-spacing: .18em; font-size: 12px;
+    background: rgba(24,36,52,.96); color: #9db1ca; border: 1px solid var(--line);
+    border-radius: 8px; backdrop-filter: blur(10px); }
+  #cutToggle[hidden] { display: none !important; }
+  #cutToggle:hover { background: #22344c; color: #d7ebff; }
+  #cutToggle.on { color: #8fdcff; border-color: #3d8fc8; background: #17314a; }
+  #cutPanel { width: 138px; padding: 9px 10px 8px; border: 1px solid #2e4a68; border-radius: 10px;
+    background: rgba(12,20,31,.95); box-shadow: 0 12px 30px rgba(0,0,0,.4);
+    backdrop-filter: blur(12px); }
+  #cutPanel[hidden] { display: none !important; }
+  #cutPanel .cutHead { display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    color: #cfe6ff; font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+  #cutPanel .cutHead button { width: 20px; height: 20px; padding: 0; line-height: 1;
+    font-size: 11px; border-radius: 5px; }
+  #cutPanel .cutValueRow { display: flex; align-items: baseline; justify-content: center; gap: 3px;
+    margin: 5px 0 7px; }
+  #cutPanel #cutValue { width: 78px; padding: 0; border: none; background: transparent; color: #eaf6ff;
+    font: 700 22px/1.2 Consolas, "Microsoft YaHei", monospace; text-align: right; }
+  #cutPanel #cutValue::-webkit-inner-spin-button,
+  #cutPanel #cutValue::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  #cutPanel #cutValue:focus { outline: none; color: #fff; }
+  #cutPanel .cutUnit { color: #7f95ad; font-size: 11px; }
+  #cutScale { position: relative; height: clamp(220px, calc(100vh - 290px), 620px); margin: 2px 0 5px; }
+  #cutTrack { position: absolute; left: 0; top: 0; bottom: 0; width: 26px; border-radius: 13px;
+    border: 1px solid #2a3d55; background: rgba(255,255,255,.05); overflow: hidden; touch-action: none; }
+  #cutTrack:focus-visible { outline: 1px solid #3f9bff; outline-offset: 2px; }
+  #cutFill { position: absolute; left: 0; right: 0; bottom: 0; height: 50%;
+    background: linear-gradient(to top, rgba(71,168,255,.62), rgba(71,168,255,.14)); }
+  #cutHandle { position: absolute; left: -3px; width: 32px; bottom: 50%; height: 8px;
+    transform: translateY(50%); border-radius: 3px; background: #eaf6ff; pointer-events: none;
+    box-shadow: 0 0 0 1px #2f7fd1, 0 0 10px rgba(71,168,255,.85); }
+  #cutTicks { position: absolute; left: 34px; top: 0; bottom: 0; right: 0; pointer-events: none;
+    color: #7f95ad; font: 10px/1 Consolas, monospace; }
+  #cutPanel .cutTick { position: absolute; left: 0; right: 0; height: 0;
+    border-top: 1px dashed rgba(140,170,200,.22); }
+  #cutPanel .cutTick b { position: absolute; left: 8px; top: -5px; font-weight: 400; color: #93a8c0; }
+  #cutPanel .cutTick.zero b { color: #ffd27f; }
+  #cutPanel .cutTick.datum { border-top-color: rgba(71,168,255,.6); }
+  #cutPanel .cutTick.datum b { color: #7fd4ff; font-weight: 700; }
+  #cutPanel .cutHeadTools { display: flex; align-items: center; gap: 3px; }
+  #cutPanel #cutScaleMode { width: auto; padding: 0 4px; font-size: 10px; font-weight: 400;
+    color: #8fdcff; border-color: #2f5e82; letter-spacing: 0; }
+  #cutPanel #cutScaleMode.linear { color: #9db1ca; border-color: var(--line); }
+  #cutPanel .cutNote { color: #8ea3bd; font-size: 10.5px; text-align: center; line-height: 1.5; }
+  #cutPanel .cutDatumNote { color: #7fd4ff; font-size: 10px; text-align: center; line-height: 1.4; }
+  #cutPanel .cutDatumNote[hidden] { display: none !important; }
   /* 右栏展开后视口变窄，顶部阶段栏会压住它；此时贴到小地图正下方。
      右侧再留 30px 给「收起」把手，避免把手压住小地图和按钮。 */
   body.rail-open #minimap { right: 42px; }
@@ -350,7 +429,6 @@
     font: 12px/1.5 Consolas, monospace; color: #ffe08a; background: rgba(8,11,16,.92);
     border: 1px solid #7a6a2f; border-radius: 5px; padding: 6px 8px; white-space: pre-wrap; }
   #stageList td:first-child { color: #cfe0f5; }
-
   .capRow.selected td { background: #1b3a5c; color: #5fd0ff; }
   #stageFloat { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 85;
     display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 5px 8px;
@@ -500,9 +578,13 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
     <button id="tObj" class="on">据点</button>
     <button id="tSector" class="on">阶段区域</button>
     <button id="tBase" class="on">基地</button>
+  </div>
+  <div class="buttons commander-only">
     <button id="tFlight">飞行限制</button>
     <button id="tProject" title="把区域边界投射到地形；默认关闭，保留源数据 Z">边界投射</button>
+    <button id="tVolumes3d" title="显示据点真高边界与 DetectHeight 高度带；默认关闭">据点体积</button>
   </div>
+  <div class="note commander-only" id="vol3dStatus">默认关闭。开启后显示据点真高边界与高度带；不改原地图。</div>
   <table id="stageList" class="commander-only"></table>
   <div class="note commander-only" id="phaseNotes" hidden></div>
   <div class="note commander-only" id="flightInfo">当前地图未检测到飞行载具区。</div>
@@ -645,7 +727,8 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
       <button data-vehcamp="attack">攻方</button>
       <button data-vehcamp="defend">守方</button>
     </div>
-    <div class="note" id="vehList">当前图暂无固定载具部署数据。</div>
+    <div class="note" id="vehSectorInfo"></div>
+          <div class="note" id="vehList">当前图暂无固定载具部署数据。</div>
   </section>
   <section id="paneLabels" hidden>
   <h2>文字标签</h2>
@@ -754,8 +837,17 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
     <div class="buttons">
       <button id="balOriginLabelToggle" class="on">点位标签</button>
     </div>
-    <h2>场景固定武器</h2>
-    <section id="paneFixedWeapon">
+    <h2>弹道项目</h2>
+    <div class="row">
+      <label>项目</label>
+      <select id="balProject" style="flex:1">
+        <option value="fixed">场景固定武器</option>
+        <option value="build">建造固定武器</option>
+        <option value="vehicle">载具武器</option>
+        <option value="drone">巡飞弹</option>
+      </select>
+    </div>
+    <section id="paneFixedWeapon" data-bal-project="fixed">
       <div class="row">
         <label>武器</label>
         <select id="scnWeapon" style="flex:1"></select>
@@ -780,8 +872,7 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
       <div class="note result" id="scnResult">未计算</div>
     </section>
 
-    <h2>建造固定武器</h2>
-    <section id="paneBuildWeapon">
+    <section id="paneBuildWeapon" data-bal-project="build" hidden>
       <div class="row">
         <label>武器</label>
         <select id="bldWeapon" style="flex:1"></select>
@@ -806,8 +897,7 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
       <div class="note result" id="bldResult">未计算</div>
     </section>
 
-    <h2>载具武器</h2>
-    <section id="paneVehicleWeapon">
+    <section id="paneVehicleWeapon" data-bal-project="vehicle" hidden>
       <div class="row">
         <label>武器</label>
         <select id="vehWeapon" style="flex:1"></select>
@@ -832,8 +922,7 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
       <div class="note result" id="vehResult">未计算</div>
     </section>
 
-    <h2>巡飞弹</h2>
-    <section id="paneDrone">
+    <section id="paneDrone" data-bal-project="drone" hidden>
       <div class="buttons">
         <button id="drnSetOrigin">设发射点</button>
         <button id="drnSetTarget">设目标点</button>
@@ -905,6 +994,14 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
   </div>
   <div id="labels"></div>
   <div id="hud">左键旋转 · Shift+左键平移 · 滚轮缩放</div>
+  <div id="vol3dLegend" hidden>
+    <div class="v3title">据点体积 <span id="vol3dLegendCount"></span></div>
+    <div class="v3row"><i class="v3sw" style="background:#ff2bd6"></i>据点边界（真高）</div>
+    <div class="v3row"><i class="v3sw" style="background:#ff2bd6;opacity:.6"></i>据点高度带（DetectHeight）</div>
+    <div class="v3row"><i class="v3sw" style="background:#ffffff;border:1px solid #6f8299"></i>每个点上定点</div>
+    <div class="v3row"><i class="v3sw" style="background:#ff2bd6;border:1px solid #6f8299"></i>每个点下定点</div>
+    <div class="v3note" id="vol3dLegendNote"></div>
+  </div>
   <div id="debugPick" hidden></div>
   <div id="minimap" hidden title="点击打开全屏战术地图">
     <div class="cap" id="minimapCap">战术地图 · M键 / 点击预览</div>
@@ -914,6 +1011,31 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
     </div>
   </div>
   <button id="fpToggle">观察视角</button>
+  <div id="cutDock">
+    <button id="cutToggle" title="场景切面：隐藏高度条以上的全部内容">场景切面</button>
+    <div id="cutPanel" hidden>
+      <div class="cutHead">
+        <span>场景切面</span>
+        <div class="cutHeadTools">
+          <button id="cutScaleMode" title="切换高度坐标：对数 / 线性">对数</button>
+          <button id="cutClose" title="关闭场景切面">✕</button>
+        </div>
+      </div>
+      <div class="cutValueRow">
+        <input id="cutValue" type="number" step="0.5" inputmode="decimal" aria-label="切面高度（米）" />
+        <span class="cutUnit">m</span>
+      </div>
+      <div id="cutScale">
+        <div id="cutTrack" tabindex="0" role="slider" aria-label="切面高度" aria-orientation="vertical">
+          <div id="cutFill"></div>
+        </div>
+        <div id="cutHandle"></div>
+        <div id="cutTicks"></div>
+      </div>
+      <div class="cutNote">条以上隐藏 · 往下拖</div>
+      <div class="cutDatumNote" id="cutDatumNote" hidden title="对数坐标的基准：当前目标点中位高度"></div>
+    </div>
+  </div>
   <div id="loading">正在加载地图…</div>
 </div>
 
@@ -927,6 +1049,12 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
       <button id="mmFullSupport">阵地支援选点</button>
       <button id="mmFullClose" title="关闭">✕</button>
     </div>
+  </div>
+  <div id="mmLayerBar" aria-label="战术地图图层">
+    <div class="mmLayerTitle">图层</div>
+    <button id="mmLayerDeploy">当前阶段部署点</button>
+    <button id="mmLayerBigEvent">大事件判定区</button>
+    <button id="mmLayer3D" class="on">三维地图标记</button>
   </div>
   <div id="mmFullStage">
     <canvas id="mmFullCanvas"></canvas>
@@ -1052,11 +1180,71 @@ let modeStateToken = 0;
 let baseMinimapCfg = null;
 let baseMinimapRange = 150;
 let tdmReturnView = null;
-const availableMaps = new Set(["Iceland", "Cracked", "Gibraltar", "Shafted", "Crest", "Retrowar", "Derail", "NavalBattle", "Fault", "Mogadishu", "Skyline"]);
+const mapCodes = ["Iceland", "Cracked", "Gibraltar", "Shafted", "Crest", "Retrowar", "Derail", "NavalBattle", "Fault", "Mogadishu", "Skyline"];
 const requestedMap = PAGE_PARAMS.get('map') || 'Skyline';
-const normalizedMap = requestedMap.toLowerCase() === 'derail' ? 'Derail' : requestedMap.toLowerCase() === 'skyline' ? 'Skyline' : requestedMap;
-const MAP = availableMaps.has(normalizedMap) ? normalizedMap : 'Skyline';
-const MAP_ROOT = './map/' + (MAP === 'Derail' ? 'derail' : MAP) + '/';
+const MAP = mapCodes.find(code => code.toLowerCase() === requestedMap.toLowerCase()) || 'Skyline';
+let MAP_ROOT = './map/' + MAP + '/';
+
+async function mapFileExists(url) {
+  try {
+    const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+    return res.ok;
+  } catch (error) { return false; }
+}
+
+async function ensureMapPackage() { return true; }
+
+function showMapImportGate(missing) {
+  const loading = document.getElementById('loading');
+  if (loading) loading.style.display = 'none';
+  if (document.getElementById('mapImportGate')) return;
+  const box = document.createElement('div');
+  box.id = 'mapImportGate';
+  box.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(4,10,18,.86);font-family:system-ui,"Microsoft YaHei",sans-serif;color:#dbe9f8;';
+  const card = document.createElement('div');
+  card.style.cssText = 'width:min(560px,92vw);background:#0e1a28;border:1px solid #274058;border-radius:12px;padding:22px 24px;box-shadow:0 18px 60px rgba(0,0,0,.5);';
+  card.innerHTML = '<div style="font-size:18px;font-weight:700;margin-bottom:6px;">缺少地图包：' + MAP + '</div>' +
+    '<div style="font-size:12.5px;color:#93a9c0;line-height:1.7;">缺少文件：<b style="color:#ffcf7a;">' + missing.join(' / ') + '</b><br>' +
+    '可直接导入该图的包（.mfpk 单文件，或包含 manifest.json 的 .zip）。<br>导入会写回默认目录 <code>web/map/' + MAP + '/</code>，<b>已存在的文件不会覆盖</b>。</div>';
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:10px;align-items:center;margin-top:16px;';
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.mfpk,.zip,.dfpack';
+  input.style.cssText = 'flex:1;font-size:12px;color:#b9cde0;';
+  const btn = document.createElement('button');
+  btn.textContent = '导入并刷新';
+  btn.style.cssText = 'padding:8px 14px;border-radius:8px;border:1px solid #2f6fa8;background:#123a5a;color:#e6f2ff;cursor:pointer;font-size:13px;';
+  const status = document.createElement('div');
+  status.style.cssText = 'margin-top:10px;font-size:12px;color:#ffcf7a;min-height:18px;';
+  btn.onclick = async () => {
+    const file = input.files && input.files[0];
+    if (!file) { status.textContent = '请先选择文件'; return; }
+    status.textContent = '正在导入 ' + file.name + ' …';
+    btn.disabled = true;
+    try {
+      const url = '/api/maps/import?map=' + encodeURIComponent(MAP) + '&name=' + encodeURIComponent(file.name);
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: file });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) throw new Error(data.error || ('HTTP ' + res.status));
+      const rest = data.missing || [];
+      if (!rest.length) {
+        status.textContent = '导入完成（新增 ' + (data.addedCount || 0) + '，跳过 ' + (data.skippedCount || 0) + '），刷新中…';
+        setTimeout(() => location.reload(), 600);
+      } else {
+        status.textContent = '已导入 ' + (data.addedCount || 0) + ' 个文件，仍缺少：' + rest.join(' / ');
+        btn.disabled = false;
+      }
+    } catch (error) {
+      status.textContent = '导入失败：' + (error && error.message ? error.message : error);
+      btn.disabled = false;
+    }
+  };
+  row.appendChild(input); row.appendChild(btn);
+  card.appendChild(row); card.appendChild(status);
+  box.appendChild(card);
+  document.body.appendChild(box);
+}
+
 /* 本地设置读写：地图切换会整页重载，需要跨页面保留两侧栏的状态。 */
 function loadStored(key, fallback = '') {
   try {
@@ -1517,7 +1705,7 @@ gpuName = String(gpuName).replace(/^ANGLE \((.*)\)$/, '$1');
 const DISCRETE = /(nvidia|geforce|rtx|gtx|quadro|tesla|radeon\s+(rx|pro|vii)|arc\s?a\d|intel\(r\)\s*arc)/i;
 const SOFTWARE = /(swiftshader|llvmpipe|basic render|software rasterizer|microsoft basic)/i;
 // AMD 的 APU 核显命名形如 "AMD Radeon(TM) 610M / 680M / 780M"，独显才叫 RX xxxx
-const INTEGRATED = /(intel|uhd graphics|iris|hd graphics|vega|radeon graphics|radeon\(tm\)\s*\d{3}m|radeon\s+\d{3}m|adreno|mali|apple\s*(?:gpu|m\d+)|610m|660m|680m|740m|760m|780m|880m|890m)/i;
+const INTEGRATED = /(intel|uhd graphics|iris|hd graphics|vega|radeon graphics|radeon\(tm\)\s*\d{3}m|radeon\s+\d{3}m|adreno|mali|apple m\d|610m|660m|680m|740m|760m|780m|880m|890m)/i;
 
 let gpuTier = 'unknown';
 if (SOFTWARE.test(gpuName)) gpuTier = 'software';
@@ -1562,6 +1750,14 @@ const renderer = new THREE.WebGLRenderer({
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
+/* 场景切面：水平裁剪面，隐藏高度条以上的全部内容（看室内 / 地下结构）。
+   裁剪面常驻（关闭时放在 +1000 m，什么也裁不到），这样所有材质启动时就编译好
+   1 个裁剪面的 shader，开关只改高度，运行中不重编译、不卡顿。
+   法线 (0,-1,0) + constant=h：worldY > h 的片元被丢弃。天空穹顶是自定义 shader，不受裁剪。 */
+const CUT_OFF_HEIGHT = 1e6;
+const cutPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), CUT_OFF_HEIGHT);
+const cutState = { on: false, height: 0, min: -100, max: 200, saved: null, log: true, datum: 0 };
+renderer.clippingPlanes = [cutPlane];
 // 用真正在用的那个 WebGL 上下文再读一次显卡名（比探测用的临时上下文更准）
 try {
   const real = renderer.getContext();
@@ -3056,11 +3252,26 @@ let mmInkDrawing = false;
 let mmLaserPoints = [];
 let mmLaserRaf = 0;
 let mmLaserStrokeId = 0;
+// 全屏战术地图图层：三维标记默认开，其余默认关
+const mmLayerState = { deploy: false, bigEvent: false, markers: true };
 const areaGroups = {};
 const labelNodes = [];
 const areaNodes = [];
 // 区域边界投射：默认关闭，首次加载始终显示源数据真实 Z；仅在当前会话内由用户切换。
 let areaProjection = false;
+// 实验性三维体积图层（独立开关，默认关闭；不改原地图默认外观）
+let volumes3dEnabled = false;
+let volumes3dData = null;
+let volumes3dMap = null;
+let volumes3dGroup = null;
+let vol3dParamApplied = false;
+let blackZoneEnabled = false;
+let blackZoneGroup = null;
+const VOL3D_COLORS = {
+  sector: 0x39d0ff, base: 0x5ee08a, objective: 0xff2bd6,
+  valid_area: 0x9b8cff, redeploy_forbidden: 0xffa94f,
+  forbidden_area: 0xff4fd8, forbidden_box: 0xff4f4f, force_forbidden_box: 0xff2a2a,
+};
 const deviceGroup = new THREE.Group();
 deviceGroup.name = 'eventDevices';
 scene.add(deviceGroup);
@@ -3221,8 +3432,9 @@ function currentBigEvent() {
   const entry = bigEventData.maps[MAP];
   if (!entry) return null;
   const mode = entry.modes?.[modeKey];
-  if (!mode || !(mode.hp > 0) || !(mode.missileWeight > 0)) return null;
-  return { entry, mode, modeKey };
+  const scripted = mode?.scripted === true;
+  if (!mode || (!scripted && (!(mode.hp > 0) || !(mode.missileWeight > 0)))) return null;
+  return { entry, mode, modeKey, scripted };
 }
 
 /* 提示性质的大事件机制条目（风暴眼/断层天气、余震地震）；没有数值模拟 */
@@ -3252,6 +3464,45 @@ function buildBigEventNode(view) {
   }
   disposeBigEventNode();
   if (!view) return;
+  const polygon = view.entry.area?.points || view.entry.volume?.points;
+  if (polygon?.length >= 3) {
+    const shape = new THREE.Shape();
+    polygon.forEach((p, index) => (index ? shape.lineTo(p[0], -p[2]) : shape.moveTo(p[0], -p[2])));
+    const geometry = new THREE.ShapeGeometry(shape);
+    geometry.rotateX(-Math.PI / 2);
+    const yByKey = new Map(polygon.map((p) => [
+      `${Math.round(p[0] * 100)},${Math.round(p[2] * 100)}`, Number(p[1]) || 0,
+    ]));
+    const pos = geometry.attributes.position;
+    for (let k = 0; k < pos.count; k++) {
+      const y = yByKey.get(`${Math.round(pos.getX(k) * 100)},${Math.round(pos.getZ(k) * 100)}`);
+      pos.setY(k, (y ?? 0) + 0.8);
+    }
+    pos.needsUpdate = true;
+    const fill = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
+      color: BIG_EVENT_COLOR, transparent: true, opacity: 0.13,
+      depthWrite: false, side: THREE.DoubleSide,
+      polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+    }));
+    fill.renderOrder = 8;
+    const loop = polygon.concat([polygon[0]]).map((p) => new THREE.Vector3(
+      p[0], (Number(p[1]) || 0) + 1.2, p[2]));
+    const lineGeo = new THREE.BufferGeometry().setFromPoints(loop);
+    const outline = new THREE.Line(lineGeo, new THREE.LineDashedMaterial({
+      color: 0xff8a5c, dashSize: 5, gapSize: 3, transparent: true, opacity: 1,
+      depthTest: false, blending: THREE.AdditiveBlending,
+    }));
+    outline.computeLineDistances();
+    outline.renderOrder = 21;
+    const group = new THREE.Group();
+    group.name = 'bigEventVolume';
+    group.add(fill, outline);
+    scene.add(group);
+    bigEventNode = group;
+    bigEventNodeKey = key;
+    applyBigEventVisibility();
+    return;
+  }
   const volume = view.entry.volume;
   if (!volume?.center || !volume?.half) return;
   const width = volume.half[0] * 2;
@@ -3294,7 +3545,7 @@ function redrawBigEventMaps() {
 
 function bigEventSimInfo() {
   const view = currentBigEvent();
-  if (!view) return null;
+  if (!view || view.scripted) return null;
   const { entry, mode } = view;
   const artilleryAllowed = mode.artilleryWeight > 0;
   const roundsPerBarrage = 25;
@@ -3402,8 +3653,20 @@ function updateBigEventPanel() {
     return;
   }
   const { entry, mode } = view;
+  if (view.scripted) {
+    if (missilePanel) missilePanel.hidden = true;
+    const mech = currentBigEventMechanic();
+    if (mechPanel) mechPanel.hidden = !mech;
+    if (mechTag) mechTag.hidden = !mech;
+    if (volumeBtn) volumeBtn.hidden = false;
+    if (mech) renderBigEventMechanics(mech);
+    return;
+  }
   const half = entry.volume?.half || [0, 0, 0];
-  const sizeText = `${Math.round(half[0] * 2)} × ${Math.round(half[2] * 2)} × ${Math.round(half[1] * 2)} m`;
+  const areaPoints = entry.area?.points;
+  const sizeText = areaPoints?.length
+    ? `${Math.round(Math.max(...areaPoints.map((p) => p[0])) - Math.min(...areaPoints.map((p) => p[0])))} × ${Math.round(Math.max(...areaPoints.map((p) => p[2])) - Math.min(...areaPoints.map((p) => p[2])))} m`
+    : `${Math.round(half[0] * 2)} × ${Math.round(half[2] * 2)} × ${Math.round(half[1] * 2)} m`;
   const artilleryAllowed = mode.artilleryWeight > 0;
   const artilleryText = artilleryAllowed
     ? `${mode.artilleryWeight} 点/发炮弹 · ${mode.artilleryWeight * 25} 点/轮 · 共 ${mode.artilleryRounds} 轮`
@@ -3457,6 +3720,14 @@ function updateBigEventPanel() {
       return `<div class="beOff">· ${text}${item.atPct > 0 ? `（血量 ≤ ${item.atPct}% 时）` : ''}</div>`;
     }).join('');
   }
+  if (entry.eventType) {
+    const viewMech = currentBigEventMechanic();
+    if (viewMech) {
+      if (mechPanel) mechPanel.hidden = false;
+      if (mechTag) mechTag.hidden = false;
+      renderBigEventMechanics(viewMech);
+    }
+  }
 }
 
 function refreshBigEvent({ reset = false } = {}) {
@@ -3471,10 +3742,13 @@ function refreshBigEvent({ reset = false } = {}) {
 }
 
 /* 判定区在地面上的投影（4 角，世界 x/z）；无数据或隐藏时返回 null */
-function bigEventFootprint() {
+function bigEventFootprint(force = false) {
   const view = currentBigEvent();
-  if (!view || !bigEventVolumeOn || !view.entry.volume) return null;
+  if (!view || (!force && !bigEventVolumeOn)) return null;
   const volume = view.entry.volume;
+  const polygon = view.entry.area?.points || volume?.points;
+  if (polygon?.length >= 3) return polygon.map((p) => [p[0], p[2]]);
+  if (!volume) return null;
   const phi = -(Number(volume.yawDeg) || 0) * Math.PI / 180;
   const cos = Math.cos(phi);
   const sin = Math.sin(phi);
@@ -3487,7 +3761,7 @@ function bigEventFootprint() {
 }
 
 function drawBigEventOnCanvas(ctx, toX, toY, widthScale = 1, options = {}) {
-  const corners = bigEventFootprint();
+  const corners = bigEventFootprint(!!options.force);
   if (!corners) return false;
   ctx.save();
   ctx.beginPath();
@@ -3587,8 +3861,7 @@ window.__bigEvent = {
   toggle.addEventListener('click', () => {
     bigEventVolumeOn = !bigEventVolumeOn;
     saveStored(BIG_EVENT_VOLUME_KEY, bigEventVolumeOn ? '1' : '0');
-    applyBigEventVisibility();
-    updateBigEventPanel();
+    refreshBigEvent();
     redrawBigEventMaps();
   });
   document.getElementById('bePrev')?.addEventListener('click', () => {
@@ -3696,7 +3969,10 @@ function scenePickTargets({ includeTerrain = true } = {}) {
 }
 
 function visibleHits(hits) {
-  return hits.filter((hit) => isRenderVisible(hit.object));
+  // 场景切面开启时，条以上不可见的面也不参与拾取（否则标点会落到看不见的屋顶上）。
+  const limit = cutState.on ? cutState.height : null;
+  return hits.filter((hit) => isRenderVisible(hit.object)
+    && (limit === null || hit.point.y <= limit + 0.001));
 }
 
 /* 屏幕点击 → 当前可见表面点（建筑/大事件/地形），无命中返回 null */
@@ -3885,6 +4161,601 @@ function setAreaProjection(enabled) {
   scheduleSystemInfo();
 }
 
+/* ===== 实验性三维体积图层（独立数据 web/data/volumes3d，默认关闭） ===== */
+function vol3dLineMaterial(color, opacity = 0.95) {
+  return new THREE.LineBasicMaterial({
+    color, transparent: true, opacity, depthTest: false, depthWrite: false,
+  });
+}
+
+function vol3dPointsMaterial(color) {
+  return new THREE.PointsMaterial({
+    color, size: 2.2, sizeAttenuation: false, transparent: true, opacity: 0.9,
+    depthTest: false, depthWrite: false,
+  });
+}
+
+function addVol3dLoop(points, color, closed = true) {
+  if (!points || points.length < 2) return null;
+  const vecs = points.map((p) => new THREE.Vector3(p[0], p[1] + 0.15, p[2]));
+  if (closed) vecs.push(vecs[0].clone());
+  const geo = new THREE.BufferGeometry().setFromPoints(vecs);
+  const line = new THREE.Line(geo, vol3dLineMaterial(color));
+  line.renderOrder = 30;
+  line.frustumCulled = false;
+  const pts = new THREE.Points(geo, vol3dPointsMaterial(color));
+  pts.renderOrder = 31;
+  pts.frustumCulled = false;
+  const group = new THREE.Group();
+  group.add(line, pts);
+  return group;
+}
+
+function addVol3dBox(corners, color, faceOpacity = 0.025) {
+  if (!corners || corners.length !== 8) return null;
+  const group = new THREE.Group();
+  const v = corners.map((p) => new THREE.Vector3(p[0], p[1], p[2]));
+  const edgeIdx = [
+    [0, 1], [1, 2], [2, 3], [3, 0],
+    [4, 5], [5, 6], [6, 7], [7, 4],
+    [0, 4], [1, 5], [2, 6], [3, 7],
+  ];
+  const edgePts = [];
+  for (const [a, b] of edgeIdx) edgePts.push(v[a], v[b]);
+  const edgeGeo = new THREE.BufferGeometry().setFromPoints(edgePts);
+  const edges = new THREE.LineSegments(edgeGeo, vol3dLineMaterial(color, 0.7));
+  edges.renderOrder = 30;
+  edges.frustumCulled = false;
+  group.add(edges);
+  if (faceOpacity > 0) {
+    const faceIdx = [
+      [0, 1, 2], [0, 2, 3], [4, 6, 5], [4, 7, 6],
+      [0, 4, 5], [0, 5, 1], [1, 5, 6], [1, 6, 2],
+      [2, 6, 7], [2, 7, 3], [3, 7, 4], [3, 4, 0],
+    ];
+    const pos = [];
+    for (const tri of faceIdx) for (const i of tri) pos.push(v[i].x, v[i].y, v[i].z);
+    const fgeo = new THREE.BufferGeometry();
+    fgeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    const faces = new THREE.Mesh(fgeo, new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: faceOpacity, side: THREE.DoubleSide,
+      depthWrite: false, depthTest: true,
+    }));
+    faces.renderOrder = 29;
+    faces.frustumCulled = false;
+    group.add(faces);
+  }
+  return group;
+}
+
+function vol3dPointSegDist2(p, a, b) {
+  const dx = b[0] - a[0], dz = b[1] - a[1];
+  const len2 = dx * dx + dz * dz;
+  if (len2 <= 1e-9) return (p[0] - a[0]) ** 2 + (p[1] - a[1]) ** 2;
+  let t = ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / len2;
+  t = Math.max(0, Math.min(1, t));
+  const qx = a[0] + t * dx, qz = a[1] + t * dz;
+  return (p[0] - qx) ** 2 + (p[1] - qz) ** 2;
+}
+
+function simplifyRing2D(points, tolerance = 1.0) {
+  const ring = [];
+  for (const p of points || []) {
+    const x = Number(p[0]), z = Number(p[2]);
+    if (!Number.isFinite(x) || !Number.isFinite(z)) continue;
+    const last = ring[ring.length - 1];
+    if (last && Math.hypot(last[0] - x, last[1] - z) < 0.35) continue;
+    ring.push([x, z]);
+  }
+  if (ring.length > 1 && Math.hypot(ring[0][0] - ring[ring.length - 1][0], ring[0][1] - ring[ring.length - 1][1]) < 0.35) {
+    ring.pop();
+  }
+  if (ring.length <= 4) return ring;
+  let far = 1, best = -1;
+  for (let i = 1; i < ring.length; i++) {
+    const d = (ring[i][0] - ring[0][0]) ** 2 + (ring[i][1] - ring[0][1]) ** 2;
+    if (d > best) { best = d; far = i; }
+  }
+  const rdp = (arr) => {
+    if (arr.length <= 2) return arr;
+    const keep = new Array(arr.length).fill(false);
+    keep[0] = keep[arr.length - 1] = true;
+    const stack = [[0, arr.length - 1]];
+    while (stack.length) {
+      const [i, j] = stack.pop();
+      let maxD = -1, at = -1;
+      for (let k = i + 1; k < j; k++) {
+        const d = vol3dPointSegDist2(arr[k], arr[i], arr[j]);
+        if (d > maxD) { maxD = d; at = k; }
+      }
+      if (maxD > tolerance * tolerance && at > 0) {
+        keep[at] = true;
+        stack.push([i, at], [at, j]);
+      }
+    }
+    return arr.filter((_, i) => keep[i]);
+  };
+  const a = rdp(ring.slice(0, far + 1));
+  const b = rdp(ring.slice(far).concat([ring[0]]));
+  const out = a.concat(b.slice(1, -1));
+  return out.length >= 3 ? out : ring;
+}
+
+function addVol3dTube(group, a, b, color, radius, opacity, order) {
+  const dir = new THREE.Vector3().subVectors(b, a);
+  const len = dir.length();
+  if (!(len > 0.05)) return;
+  const geo = new THREE.CylinderGeometry(radius, radius, len, 6, 1, false);
+  const mat = new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity, depthTest: false, depthWrite: false, side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(a).add(b).multiplyScalar(0.5);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
+  mesh.renderOrder = order;
+  mesh.frustumCulled = false;
+  group.add(mesh);
+}
+
+function addVol3dRingTube(group, ring, y, color, radius) {
+  if (!ring || ring.length < 3) return;
+  const path = new THREE.CurvePath();
+  for (let i = 0; i < ring.length; i++) {
+    const a = ring[i], b = ring[(i + 1) % ring.length];
+    path.add(new THREE.LineCurve3(
+      new THREE.Vector3(a[0], y, a[1]),
+      new THREE.Vector3(b[0], y, b[1]),
+    ));
+  }
+  const geo = new THREE.TubeGeometry(path, Math.max(12, ring.length * 3), radius, 5, false);
+  const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity: 0.95, depthTest: false, depthWrite: false, side: THREE.DoubleSide,
+  }));
+  mesh.renderOrder = 31;
+  mesh.frustumCulled = false;
+  group.add(mesh);
+}
+
+function addVol3dRingRibbon(group, ring, y, color, width) {
+  if (!ring || ring.length < 3) return;
+  const n = ring.length;
+  const cx = ring.reduce((s, p) => s + p[0], 0) / n;
+  const cz = ring.reduce((s, p) => s + p[1], 0) / n;
+  const edgeNormal = (a, b) => {
+    const dx = b[0] - a[0], dz = b[1] - a[1];
+    const l = Math.hypot(dx, dz) || 1;
+    let nx = -dz / l, nz = dx / l;
+    const mx = (a[0] + b[0]) * 0.5, mz = (a[1] + b[1]) * 0.5;
+    if (nx * (cx - mx) + nz * (cz - mz) < 0) { nx = -nx; nz = -nz; }
+    return [nx, nz];
+  };
+  const outer = [], inner = [];
+  for (let i = 0; i < n; i++) {
+    const cur = ring[i];
+    const n1 = edgeNormal(ring[(i - 1 + n) % n], cur);
+    const n2 = edgeNormal(cur, ring[(i + 1) % n]);
+    let mx = n1[0] + n2[0], mz = n1[1] + n2[1];
+    const ml = Math.hypot(mx, mz) || 1;
+    mx /= ml; mz /= ml;
+    const denom = Math.max(0.35, n1[0] * mx + n1[1] * mz);
+    const off = Math.min(width * 1.4, (width * 0.5) / denom);
+    outer.push([cur[0] + mx * off, cur[1] + mz * off]);
+    inner.push([cur[0] - mx * off, cur[1] - mz * off]);
+  }
+  const pos = [];
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    pos.push(outer[i][0], y, outer[i][1], outer[j][0], y, outer[j][1], inner[j][0], y, inner[j][1]);
+    pos.push(outer[i][0], y, outer[i][1], inner[j][0], y, inner[j][1], inner[i][0], y, inner[i][1]);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity: 0.92, depthTest: false, depthWrite: false, side: THREE.DoubleSide,
+  }));
+  mesh.renderOrder = 31;
+  mesh.frustumCulled = false;
+  group.add(mesh);
+}
+
+function addVol3dPrism(points, bottomY, topY, color) {
+  if (!points || points.length < 3 || !(topY > bottomY)) return null;
+  const ring = simplifyRing2D(points, 0.05);
+  if (ring.length < 3) return null;
+  const group = new THREE.Group();
+
+  // 只画线框（环 + 竖边 + 点），不画半透明面，避免缩小时摩尔纹和透明面重叠。
+
+
+  // 每个原始点都画上/下端点和竖边；只用线段，避免圆柱面在缩小时产生摩尔纹。
+  const topPts = ring.map((p) => new THREE.Vector3(p[0], topY, p[1]));
+  const bottomPts = ring.map((p) => new THREE.Vector3(p[0], bottomY, p[1]));
+  const vtx = [];
+  for (let i = 0; i < ring.length; i++) {
+    vtx.push(new THREE.Vector3(ring[i][0], bottomY, ring[i][1]));
+    vtx.push(new THREE.Vector3(ring[i][0], topY, ring[i][1]));
+  }
+  const vlines = new THREE.LineSegments(
+    new THREE.BufferGeometry().setFromPoints(vtx),
+    new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.95, depthTest: false, depthWrite: false }),
+  );
+  vlines.renderOrder = 31;
+  vlines.frustumCulled = false;
+  group.add(vlines);
+  const ringLine = (y, colour) => {
+    const pts = ring.map((p) => new THREE.Vector3(p[0], y, p[1]));
+    const line = new THREE.LineLoop(
+      new THREE.BufferGeometry().setFromPoints(pts),
+      new THREE.LineBasicMaterial({ color: colour, transparent: true, opacity: 1, depthTest: false, depthWrite: false }),
+    );
+    line.renderOrder = 32;
+    line.frustumCulled = false;
+    group.add(line);
+  };
+  ringLine(bottomY, 0xff2bd6);
+  ringLine(topY, 0xffb3f0);
+
+  // 每个原始点都画上/下定点；点按世界尺度缩放，缩小地图时不会变成密集像素点。
+  const marker = (arr, colour, size, order) => {
+    if (!arr.length) return;
+    const geo = new THREE.BufferGeometry().setFromPoints(arr);
+    const pts = new THREE.Points(geo, new THREE.PointsMaterial({
+      color: colour, size, sizeAttenuation: false, transparent: true, opacity: 1,
+      depthTest: false, depthWrite: false,
+    }));
+    pts.renderOrder = order;
+    pts.frustumCulled = false;
+    group.add(pts);
+  };
+  marker(topPts, 0xffffff, 2.8, 33);
+  marker(topPts, color, 1.6, 34);
+  marker(bottomPts, color, 2.4, 33);
+  marker(bottomPts, 0xffffff, 1.5, 34);
+  return group;
+}
+
+function convexHull2D(points) {
+  const pts = [];
+  const seen = new Set();
+  for (const p of points || []) {
+    const x = Number(p[0]), z = Number(p[2]);
+    if (!Number.isFinite(x) || !Number.isFinite(z)) continue;
+    const k = `${Math.round(x * 100)},${Math.round(z * 100)}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    pts.push([x, z]);
+  }
+  if (pts.length < 3) return [];
+  pts.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lower = [];
+  for (const p of pts) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop();
+    lower.push(p);
+  }
+  const upper = [];
+  for (let i = pts.length - 1; i >= 0; i--) {
+    const p = pts[i];
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop();
+    upper.push(p);
+  }
+  lower.pop();
+  upper.pop();
+  return lower.concat(upper);
+}
+
+function pointInPoly2D(x, z, poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i][0], zi = poly[i][1];
+    const xj = poly[j][0], zj = poly[j][1];
+    if (((zi > z) !== (zj > z)) && (x < ((xj - xi) * (z - zi)) / (zj - zi) + xi)) inside = !inside;
+  }
+  return inside;
+}
+
+function clearBlackZone() {
+  if (blackZoneGroup) {
+    scene.remove(blackZoneGroup);
+    disposeObject3D(blackZoneGroup);
+    blackZoneGroup = null;
+  }
+  const row = document.getElementById('v3rowBlack');
+  if (row) row.hidden = true;
+  const count = document.getElementById('blackZoneCount');
+  if (count) count.textContent = '';
+  const status = document.getElementById('blackZoneStatus');
+  if (status) status.textContent = '';
+}
+
+function buildBlackZone(data) {
+  clearBlackZone();
+  const status = document.getElementById('blackZoneStatus');
+  const btn = document.getElementById('tBlackZone');
+  const stageNum = String(stageFilter) === 'all' ? null : Number(stageFilter);
+  const safeAreas = (data?.features || []).filter(
+    (f) => f.type === 'area' && f.status === 'static_verified'
+      && (f.subtype === 'sector' || f.subtype === 'base' || f.subtype === 'objective')
+      && (stageNum == null || Number(f.stage) === stageNum),
+  );
+  if (!safeAreas.length) {
+    if (status) status.textContent = '该图没有已验证的交战区/基地多边形，无法生成黑区。';
+    blackZoneEnabled = false;
+    if (btn) btn.classList.remove('on');
+    return;
+  }
+  if (!terrainData || typeof heightAt !== 'function') {
+    if (status) status.textContent = '地形尚未就绪，稍后重试。';
+    return;
+  }
+  const safePts = [];
+  for (const f of safeAreas) for (const p of f.web?.points || []) safePts.push(p);
+  const hull = convexHull2D(safePts);
+  if (hull.length < 3) {
+    if (status) status.textContent = '交战区/基地点不足以生成外边界包络，无法生成黑区。';
+    blackZoneEnabled = false;
+    if (btn) btn.classList.remove('on');
+    return;
+  }
+  const insideAny = (x, z) => pointInPoly2D(x, z, hull);
+  const t = terrainData;
+  const x0 = Number(t.originX) || 0;
+  const z0 = Number(t.originY) || 0;
+  const x1 = x0 + (Number(t.nx) - 1) * Number(t.stepX);
+  const z1 = z0 + (Number(t.ny) - 1) * Number(t.stepY);
+  const N = 96;
+  const sx = (x1 - x0) / N;
+  const sz = (z1 - z0) / N;
+  const positions = [];
+  let cells = 0;
+  for (let i = 0; i < N; i++) {
+    for (let j = 0; j < N; j++) {
+      const xa = x0 + i * sx, xb = xa + sx;
+      const za = z0 + j * sz, zb = za + sz;
+      if (insideAny(xa, za) || insideAny(xb, za) || insideAny(xa, zb) || insideAny(xb, zb)) continue;
+      const ya = heightAt(xa, za) + 0.35;
+      const yb = heightAt(xb, za) + 0.35;
+      const yc = heightAt(xb, zb) + 0.35;
+      const yd = heightAt(xa, zb) + 0.35;
+      positions.push(xa, ya, za, xb, yb, za, xb, yc, zb);
+      positions.push(xa, ya, za, xb, yc, zb, xa, yd, zb);
+      cells++;
+    }
+  }
+  if (!positions.length) {
+    if (status) status.textContent = '交战区外边界包络覆盖全图，没有产生黑区格；未添加空图层。';
+    blackZoneEnabled = false;
+    if (btn) btn.classList.remove('on');
+    return;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+    color: 0x05070a, transparent: true, opacity: 0.6, side: THREE.DoubleSide,
+    depthWrite: false, depthTest: true, polygonOffset: true, polygonOffsetFactor: -2,
+  }));
+  mesh.renderOrder = 28;
+  mesh.frustumCulled = false;
+  const group = new THREE.Group();
+  group.name = 'blackZone';
+  group.userData = { cells, areas: safeAreas.length, hullPoints: hull.length, method: 'battle_area_convex_hull_outline' };
+  group.add(mesh);
+  if (hull.length >= 3) {
+    const ring = hull.map(([x, z]) => new THREE.Vector3(x, heightAt(x, z) + 0.8, z));
+    const border = new THREE.LineLoop(
+      new THREE.BufferGeometry().setFromPoints(ring),
+      new THREE.LineBasicMaterial({ color: 0xaab4c0, transparent: true, opacity: 0.7, depthTest: false }),
+    );
+    border.renderOrder = 32;
+    border.frustumCulled = false;
+    group.add(border);
+  }
+  scene.add(group);
+  blackZoneGroup = group;
+  blackZoneEnabled = true;
+  if (btn) btn.classList.add('on');
+  const row = document.getElementById('v3rowBlack');
+  if (row) row.hidden = false;
+  const count = document.getElementById('blackZoneCount');
+  if (count) count.textContent = ` · ${cells} 格`;
+  if (status) {
+    status.textContent = `黑区：${cells} 个格（当前阶段 ${stageNum == null ? '全部' : stageNum} 交战区/基地包络之外）；${safeAreas.length} 个区域，包络 ${hull.length} 点；` +
+      '这是包络近似，不是已证实的“玩家可存在区域”；进入黑区后倒计时，未回交战区会被击杀。';
+  }
+  const legend = document.getElementById('vol3dLegend');
+  if (legend) legend.hidden = false;
+}
+
+async function setBlackZone(enabled) {
+  const next = !!enabled;
+  const btn = document.getElementById('tBlackZone');
+  const status = document.getElementById('blackZoneStatus');
+  if (next && (IS_TDM || IS_CONQUEST)) {
+    if (status) status.textContent = '黑区预览仅用于胜者为王/攻防。';
+    return false;
+  }
+  if (!next) {
+    blackZoneEnabled = false;
+    if (btn) btn.classList.remove('on');
+    clearBlackZone();
+    if (status) status.textContent = '黑区预览已关闭。';
+    return false;
+  }
+  if (!volumes3dEnabled) {
+    const ok = await setVolumes3d(true);
+    if (!ok) return false;
+  }
+  blackZoneEnabled = true;
+  if (btn) btn.classList.add('on');
+  if (status) status.textContent = '生成交战区外黑区…';
+  try {
+    const data = await loadVolumes3d();
+    if (!blackZoneEnabled) return false;
+    buildBlackZone(data);
+    return blackZoneEnabled;
+  } catch (error) {
+    blackZoneEnabled = false;
+    if (btn) btn.classList.remove('on');
+    clearBlackZone();
+    if (status) status.textContent = `黑区生成失败：${error.message}`;
+    return false;
+  }
+}
+
+function clearVolumes3d() {
+  if (volumes3dGroup) {
+    scene.remove(volumes3dGroup);
+    disposeObject3D(volumes3dGroup);
+    volumes3dGroup = null;
+  }
+  clearBlackZone();
+  const legend = document.getElementById('vol3dLegend');
+  if (legend) legend.hidden = true;
+  if (window.__mapReady) {
+    Object.assign(window.__mapReady, { volumes3d: false, volumes3dLoaded: false, volumes3dCounts: null });
+  }
+  applyAreaVisibility();
+}
+
+async function loadVolumes3d() {
+  if (volumes3dData && volumes3dMap === MAP) return volumes3dData;
+  const resp = await fetch(`./data/volumes3d/${encodeURIComponent(MAP)}.json`, { cache: 'no-store' });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const data = await resp.json();
+  volumes3dData = data;
+  volumes3dMap = MAP;
+  return data;
+}
+
+function vol3dCountsText(data, shownAreas, shownHeights, skipped) {
+  const c = data?.counts || {};
+  return `${MAP} · ${shownAreas} 据点` +
+    (shownHeights ? ` · ${shownHeights} 高度带` : '') +
+    (skipped ? ` · 跳过 ${skipped} 个警告` : '') +
+    (c.gaps ? ` · 缺口 ${c.gaps}` : '');
+}
+
+function updateVol3dLegend(data, shownAreas, shownHeights, skipped) {
+  const legend = document.getElementById('vol3dLegend');
+  const count = document.getElementById('vol3dLegendCount');
+  const note = document.getElementById('vol3dLegendNote');
+  if (!legend) return;
+  if (!data) { legend.hidden = true; return; }
+  if (count) count.textContent = vol3dCountsText(data, shownAreas, shownHeights, skipped);
+  if (note) {
+    const c = data.counts || {};
+    note.textContent = '只显示据点边界、据点高度带和每个点的上/下定点；线框模式，不做半透明面。' +
+      ' 交战区/基地/静态体积不在此层。黑区层已下掉。' +
+      (c.gaps ? ` ${c.gaps} 个源数据缺口，未用猜测几何补齐。` : '');
+  }
+  legend.hidden = false;
+}
+
+function buildVolumes3d(data) {
+  clearVolumes3d();
+  const group = new THREE.Group();
+  group.name = 'volumes3d';
+  group.userData.experimental = true;
+  const stageNum = String(stageFilter) === 'all' ? null : Number(stageFilter);
+  let shownAreas = 0;
+  let shownHeights = 0;
+  let skipped = 0;
+  for (const f of data.features || []) {
+    if (f.type === 'area') {
+      if (f.status !== 'static_verified') { skipped++; continue; }
+      // 三维实验层只保留据点：交战区/基地边界在原地图已有，静态体积意义不大。
+      if (f.subtype !== 'objective') continue;
+      if (stageNum != null && Number(f.stage) !== stageNum) continue;
+      const color = VOL3D_COLORS[f.subtype] || 0xcccccc;
+      if (f.web?.zRange) {
+        const bottomY = f.web.zRange[0];
+        const h = Number(f.web.heightM) || 0;
+        const prism = addVol3dPrism(f.web.points || [], bottomY, bottomY + Math.max(h, 0.25), color);
+        if (prism) {
+          group.add(prism);
+          shownAreas++;
+          if (h > 0) shownHeights++;
+        }
+      }
+      continue;
+    }
+    // 其余 volume 不再进入三维实验层。
+  }
+  scene.add(group);
+  volumes3dGroup = group;
+  group.userData.counts = { shownAreas, shownHeights, skipped };
+  if (window.__mapReady) {
+    Object.assign(window.__mapReady, {
+      volumes3d: true,
+      volumes3dLoaded: true,
+      volumes3dCounts: group.userData.counts,
+    });
+  }
+  updateVol3dLegend(data, shownAreas, shownHeights, skipped);
+  applyAreaVisibility();
+  if (blackZoneEnabled) buildBlackZone(data);
+  const status = document.getElementById('vol3dStatus');
+  if (status) {
+    status.textContent = `已开启：${shownAreas} 据点` +
+      (shownHeights ? ` / ${shownHeights} 个高度带` : '') +
+      (skipped ? `；跳过 ${skipped} 个警告（Skyline 点位不一致）` : '') +
+      (data.counts?.gaps ? `；${data.counts.gaps} 个缺口见 README` : '');
+  }
+}
+
+async function setVolumes3d(enabled) {
+  const next = !!enabled;
+  const btn = document.getElementById('tVolumes3d');
+  const status = document.getElementById('vol3dStatus');
+  if (next && (IS_TDM || IS_CONQUEST)) {
+    if (status) status.textContent = '据点体积仅用于胜者为王/攻防。';
+    return false;
+  }
+  volumes3dEnabled = next;
+  if (btn) btn.classList.toggle('on', next);
+  if (!next) {
+    blackZoneEnabled = false;
+    const blackBtn = document.getElementById('tBlackZone');
+    if (blackBtn) blackBtn.classList.remove('on');
+    clearVolumes3d();
+    if (status) status.textContent = '默认关闭。开启后显示据点真高边界与高度带；不改原地图。';
+    return false;
+  }
+  if (status) status.textContent = '加载据点体积…';
+  try {
+    const data = await loadVolumes3d();
+    if (!volumes3dEnabled) return false;
+    buildVolumes3d(data);
+    return true;
+  } catch (error) {
+    volumes3dEnabled = false;
+    if (btn) btn.classList.remove('on');
+    clearVolumes3d();
+    if (status) status.textContent = `据点体积加载失败：${error.message}`;
+    console.warn('[volumes3d]', error);
+    return false;
+  }
+}
+
+async function refreshVolumes3d() {
+  volumes3dData = null;
+  volumes3dMap = null;
+  if (volumes3dEnabled) await setVolumes3d(true);
+}
+
+window.__volumes3d = {
+  enabled: () => volumes3dEnabled,
+  set: setVolumes3d,
+  data: () => volumes3dData,
+  map: () => volumes3dMap,
+  counts: () => volumes3dGroup?.userData?.counts || null,
+  group: () => volumes3dGroup,
+  blackEnabled: () => blackZoneEnabled,
+  blackSet: setBlackZone,
+  blackCounts: () => blackZoneGroup?.userData || null,
+  blackGroup: () => blackZoneGroup,
+};
+
 function clearSpawnOverlays() {
   if (spawnGroup) {
     scene.remove(spawnGroup);
@@ -3937,7 +4808,8 @@ function clearStageUi() {
 
 function applyAreaVisibility() {
   for (const item of areaNodes) {
-    item.node.visible = areaVisible(item);
+    const hideForVolume = volumes3dEnabled && item.kind === 'objective';
+    item.node.visible = areaVisible(item) && !hideForVolume;
   }
   for (const item of labelNodes) {
     item.div.dataset.hidden = areaVisible(item) ? '' : '1';
@@ -4296,6 +5168,21 @@ function mmFullMinZoom() {
   return Math.min(1, Math.min(W, H) / Math.max(W, H));
 }
 
+function syncMmLayerButtons() {
+  const map = [['deploy', 'mmLayerDeploy'], ['bigEvent', 'mmLayerBigEvent'], ['markers', 'mmLayer3D']];
+  for (const [key, id] of map) {
+    const button = document.getElementById(id);
+    if (button) button.classList.toggle('on', !!mmLayerState[key]);
+  }
+}
+
+function setMmLayer(key, enabled) {
+  if (!(key in mmLayerState)) return;
+  mmLayerState[key] = !!enabled;
+  syncMmLayerButtons();
+  drawMinimapFull();
+}
+
 function updateMinimapFullChrome() {
   const scale = document.getElementById('mmFullScale');
   if (scale) {
@@ -4360,6 +5247,95 @@ function drawSupportOnCanvas(ctx, toX, toY, metersToPx, u) {
   ctx.restore();
 }
 
+function drawFullDeploymentPoints(ctx, toX, toY, u) {
+  const link = (from, to, color) => {
+    if (!from || !to) return;
+    const x1 = toX(from[0], from[2]), y1 = toY(from[0], from[2]);
+    const x2 = toX(to[0], to[2]), y2 = toY(to[0], to[2]);
+    if (!Number.isFinite(x1) || !Number.isFinite(y1) || !Number.isFinite(x2) || !Number.isFinite(y2)) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.setLineDash([5 * u, 4 * u]);
+    ctx.lineWidth = 1.1 * u;
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = .72;
+    ctx.stroke();
+    ctx.restore();
+  };
+  const dot = (p, color, radius) => {
+    const x = toX(p[0], p[2]), y = toY(p[0], p[2]);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.lineWidth = 1.1 * u;
+    ctx.strokeStyle = 'rgba(8,13,20,.9)';
+    ctx.stroke();
+  };
+  if (IS_TDM && tdmData) {
+    const hubBySpawn = new Map();
+    for (const hub of tdmData.hubs || []) {
+      for (const spawnName of hub.spawnAreas || []) hubBySpawn.set(spawnName, hub);
+    }
+    for (const point of tdmData.deploymentPoints || []) {
+      if (!campVisible(point.camp)) continue;
+      const color = point.camp === 'attack' ? '#2ecc71'
+        : point.camp === 'defend' ? '#e74c3c' : '#f1c40f';
+      if ((point.points || []).length >= 3) {
+        ctx.beginPath();
+        point.points.forEach((p, index) => {
+          const x = toX(p[0], p[2]), y = toY(p[0], p[2]);
+          if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.globalAlpha = .10; ctx.fillStyle = color; ctx.fill();
+        ctx.globalAlpha = 1; ctx.strokeStyle = color; ctx.lineWidth = 1.5 * u; ctx.stroke();
+      }
+      const hub = hubBySpawn.get(point.id);
+      if (hub?.pos && point.pos) link(hub.pos, point.pos, color);
+      if (point.pos) dot(point.pos, color, (point.kind === 'base' ? 3.2 : 2.2) * u);
+    }
+    return;
+  }
+  const ATK = '#2ecc71', DEF = '#e74c3c';
+  for (const ob of spawnData?.objectives || []) {
+    if (!spawnStageVisible(ob.label, objectiveStage(ob.label))) continue;
+    const groups = [
+      ['Camp0InnerSpawnAreas', ATK, true, 'attack'],
+      ['Camp0OuterSpawnAreas', ATK, false, 'attack'],
+      ['Camp1InnerSpawnAreas', DEF, true, 'defend'],
+      ['Camp1OuterSpawnAreas', DEF, false, 'defend'],
+    ];
+    for (const [key, color, inner, camp] of groups) {
+      if (!campVisible(camp)) continue;
+      for (const p of ob.spawns?.[key] || []) {
+        link(ob.pos, p, color);
+        dot(p, color, (inner ? 2.6 : 1.8) * u);
+      }
+    }
+  }
+  for (const hub of deployData?.hubs || []) {
+    if (!spawnStageVisible(null, hub.stage) || !campVisible(hub.camp)) continue;
+    const color = hub.camp === 'attack' ? ATK : DEF;
+    for (const p of hub.spawnAreas || []) {
+      if (hub.pos) link(hub.pos, p, color);
+      dot(p, color, 2.2 * u);
+    }
+    if (!hub.pos) continue;
+    const x = toX(hub.pos[0], hub.pos[2]), y = toY(hub.pos[0], hub.pos[2]);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    const r = 5 * u;
+    ctx.beginPath();
+    ctx.moveTo(x, y - r); ctx.lineTo(x + r, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r, y);
+    ctx.closePath();
+    ctx.fillStyle = color; ctx.fill();
+    ctx.lineWidth = 1.2 * u; ctx.strokeStyle = 'rgba(8,13,20,.95)'; ctx.stroke();
+  }
+}
+
 function drawFullMinimapFeatures(ctx, layer, u) {
   const { toX, toY } = layer;
   if (IS_TDM && tdmData) {
@@ -4372,24 +5348,6 @@ function drawFullMinimapFeatures(ctx, layer, u) {
       ctx.closePath();
       ctx.globalAlpha = .10; ctx.fillStyle = '#ffffff'; ctx.fill();
       ctx.globalAlpha = 1; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2 * u; ctx.stroke();
-    }
-    for (const point of tdmData.deploymentPoints || []) {
-      if (!campVisible(point.camp)) continue;
-      const colour = point.camp === 'attack' ? '#2ecc71'
-        : point.camp === 'defend' ? '#e74c3c' : '#f1c40f';
-      if ((point.points || []).length >= 3) {
-        ctx.beginPath();
-        point.points.forEach((p, index) => {
-          const x = toX(p[0], p[2]), y = toY(p[0], p[2]);
-          if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        });
-        ctx.closePath();
-        ctx.globalAlpha = .08; ctx.fillStyle = colour; ctx.fill();
-        ctx.globalAlpha = 1; ctx.strokeStyle = colour; ctx.lineWidth = 1.5 * u; ctx.stroke();
-      }
-      const x = toX(point.pos[0], point.pos[2]), y = toY(point.pos[0], point.pos[2]);
-      ctx.fillStyle = colour;
-      ctx.beginPath(); ctx.arc(x, y, (point.kind === 'base' ? 3.2 : 2.2) * u, 0, Math.PI * 2); ctx.fill();
     }
   } else {
     for (const area of areasData) {
@@ -4418,7 +5376,11 @@ function drawFullMinimapFeatures(ctx, layer, u) {
       }
     }
   }
-  drawBigEventOnCanvas(ctx, toX, toY, u, { label: '大事件判定区', fontSize: 12 * u });
+  if (mmLayerState.deploy) drawFullDeploymentPoints(ctx, toX, toY, u);
+  if (mmLayerState.bigEvent) {
+    drawBigEventOnCanvas(ctx, toX, toY, u, { label: '大事件判定区', fontSize: 12 * u, force: true });
+  }
+  if (mmLayerState.markers) {
   for (const [letter, pts] of Object.entries(markPoints)) {
     if (!pts.length) continue;
     const colour = MARK_COLORS[letter];
@@ -4469,6 +5431,19 @@ function drawFullMinimapFeatures(ctx, layer, u) {
         ctx.fillStyle = '#d7f5ff'; ctx.fillText(text, x, y - 6 * u);
       }
     }
+  }
+  if (typeof vehicleMarkPoints !== 'undefined') {
+    for (const mark of vehicleMarkPoints) {
+      if (!mark?.p) continue;
+      const x = toX(mark.p.x, mark.p.z), y = toY(mark.p.x, mark.p.z);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+      const colour = MARK_COLORS[mark.team] ?? 0x9ad7ff;
+      const css = '#' + colour.toString(16).padStart(6, '0');
+      ctx.beginPath(); ctx.arc(x, y, 3.6 * u, 0, Math.PI * 2);
+      ctx.fillStyle = css; ctx.fill();
+      ctx.lineWidth = 1.4 * u; ctx.strokeStyle = 'rgba(10,14,20,.92)'; ctx.stroke();
+    }
+  }
   }
   // 当前 3D 视角中心
   const vx = toX(controls.target.x, controls.target.z);
@@ -4885,6 +5860,7 @@ function openMinimapFull(opts = {}) {
   mmFullPanZ = 0;
   mmInkTool = 'none';
   mmInkUpdateUi();
+  syncMmLayerButtons();
   mmFullSupportMode = !!opts.support || !!fieldSupport?.isPlacing();
   if (mmFullSupportMode && fieldSupport) fieldSupport.beginPlacement();
   updateMinimapFullChrome();
@@ -5095,6 +6071,19 @@ function updateLabels() {
     div.style.left = ((p.x * 0.5 + 0.5) * w) + 'px';
     div.style.top = ((-p.y * 0.5 + 0.5) * h) + 'px';
   }
+  /* 场景切面：条以上的文字标签一起隐藏（DOM 标签不经过 WebGL 裁剪面）。 */
+  if (cutState.on) {
+    const limit = cutState.height;
+    const cull = (div, y) => { if (y > limit) div.style.display = 'none'; };
+    for (const item of labelNodes) {
+      const anchorPoint = item.node && item.node.userData ? item.node.userData.centre : null;
+      if (anchorPoint) cull(item.div, anchorPoint.y);
+    }
+    for (const list of [markLabels, vehicleMarkLabels, textLabelNodes, rosterLabels,
+      deployLabelNodes, weaponLabels, balOriginLabels, predLabels, predTeamLabels, deviceLabels]) {
+      for (const item of list) if (item.pos) cull(item.div, item.pos.y);
+    }
+  }
 }
 
 let centre = new THREE.Vector3();
@@ -5164,6 +6153,8 @@ function resize() {
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
   layoutMarkFloat();
+  // 高度条高度随视口变化：刻度密度按新的像素高度重排。
+  if (cutState.on) cutRenderTicks();
 }
 if (window.ResizeObserver) {
   new ResizeObserver(() => resize()).observe(document.getElementById('viewport'));
@@ -5353,6 +6344,23 @@ function rebuildVehiclePanel() {
   updateVehiclePanel();
 }
 
+function vehicleConditionText(c) {
+  const v = Number(c.value);
+  const num = Number.isFinite(v) ? Math.round(v * 10) / 10 : c.value;
+  if (c.type === 'ELeftVoteLessthanX') return `剩余票数 < ${num}`;
+  if (c.type === 'ELeftVoteLessthanXPercent') {
+    const pct = Number.isFinite(v) && v <= 1 ? Math.round(v * 1000) / 10 : num;
+    return `剩余票数 < ${pct}%`;
+  }
+  if (c.type === 'ESectorActiveSomeTime') return `扇区激活 ${num} 秒`;
+  return String(c.type || '条件').replace(/([a-z])([A-Z])/g, '$1 $2');
+}
+
+function vehicleConditionLine(c) {
+  const sec = c.sector ? `S${c.sector} ` : '';
+  return `${sec}${vehicleConditionText(c)}`;
+}
+
 function updateVehiclePanel() {
   const info = document.getElementById('vehSectorInfo');
   const list = document.getElementById('vehList');
@@ -5362,45 +6370,119 @@ function updateVehiclePanel() {
   const stageLabel = stage
     ? (mapMeta?.stageLabels?.[String(stage)] || `阶段 ${stage}`)
     : '全部阶段';
-  const spawners = mapData.spawners.filter((s) => {
+  const inStage = (s) => {
     if (!stage) return true;
+    if (IS_CONQUEST) return true;
     const spawnerStage = vehicleSpawnerStage(s);
     return spawnerStage == null || Number(spawnerStage) === stage;
-  });
-  // 一个 SpawnerID 可以在关卡中有多个阶段/版本对象；它只代表一项刷新配置。
+  };
+  const spawners = mapData.spawners.filter(inStage);
   const uniqueSpawnerCount = new Set(spawners.map((s) => (s.id || s.name).toLowerCase())).size;
-
   const stageSectors = mapData.sectors.filter((s) => {
     if (!stage) return true;
     const sectorStage = vehicleStageOfSector(s);
     return sectorStage == null || Number(sectorStage) === stage;
   });
   const anchors = [...new Set(stageSectors.flatMap((s) => (s.anchors || []).map(prettyAnchorLabel)))];
-  if (info) info.innerHTML = `<b>${stageLabel}</b>${anchors.length ? ` · 据点 ${anchors.join(' / ')}` : ''} · 载具部署点` +
-    `<br>刷新配置 ${uniqueSpawnerCount} 项 · 地图候选位置 ${spawners.length} 处`;
-
-  const byVeh = new Map();
+  const normal = [];
+  const conditional = [];
   for (const s of spawners) {
-    const key = s.vehicleId || 'any';
-    if (!byVeh.has(key)) byVeh.set(key, []);
-    byVeh.get(key).push(s);
+    if ((s.conditions || []).length) conditional.push(s);
+    else normal.push(s);
   }
+  if (info) info.innerHTML = `<b>${stageLabel}</b>${anchors.length ? ` · 据点 ${anchors.join(' / ')}` : ''} · 载具部署点` +
+    `<br>刷新配置 ${uniqueSpawnerCount} 项 · 地图候选位置 ${spawners.length} 处` +
+    (conditional.length ? ` · 条件刷新 ${conditional.length} 处` : '');
+
+  const stageLabelOf = (st) => {
+    if (st == null) return IS_CONQUEST ? '全场' : '全程/未分阶段';
+    const fixed = mapMeta?.stageLabels?.[String(st)];
+    if (fixed) return fixed;
+    const phase = (phasePlan?.phases || []).find((p) => Number(p.stage) === Number(st) && p.kind !== 'event');
+    if (phase && phase.id) return `阶段 ${phase.id}`;
+    const area = areasData.find((a) => a.kind === 'objective' && Number(a.stage) === Number(st));
+    const label = area ? (area.srcLabel || simpleLabel(area.label)) : '';
+    return label ? `阶段 ${label}` : `阶段 ${st}`;
+  };
+  const stageOf = (s) => (IS_CONQUEST ? null : vehicleSpawnerStage(s));
+  const roleOf = (s) => {
+    const role = vehicleRole(s);
+    if (role === 'attack') return 'attack';
+    if (role === 'defend') return 'defend';
+    return 'neutral';
+  };
+  const roleLabel = { attack: '攻方', defend: '守方', neutral: '通用/基地' };
+
+  // 阶段 -> 阵营 -> 载具 -> 点位
+  const buckets = new Map();
+  for (const s of normal) {
+    const st = stageOf(s);
+    const stKey = st == null ? 'none' : String(st);
+    if (!buckets.has(stKey)) buckets.set(stKey, { stage: st, roles: new Map() });
+    const roles = buckets.get(stKey).roles;
+    const rk = roleOf(s);
+    if (!roles.has(rk)) roles.set(rk, new Map());
+    const vehMap = roles.get(rk);
+    const vk = s.vehicleId || 'any';
+    if (!vehMap.has(vk)) vehMap.set(vk, []);
+    vehMap.get(vk).push(s);
+  }
+
   const html = [];
-  const order = [...byVeh.keys()].sort((a, b) => {
-    if (a === 'any') return 1;
-    if (b === 'any') return -1;
-    return byVeh.get(b).length - byVeh.get(a).length;
+  const stageKeys = [...buckets.keys()].sort((a, b) => {
+    if (a === 'none') return 1;
+    if (b === 'none') return -1;
+    return Number(a) - Number(b);
   });
-  for (const key of order) {
-    const arr = byVeh.get(key);
-    const camps = arr.filter((s) => s.kind === 'camp').length;
-    const fields = arr.length - camps;
-    const forces = [...new Set(arr.map(vehicleForceLabel))].join('/');
-    const title = key === 'any' ? '任意载具（可替换）' : vehicleName(key);
-    const configured = new Set(arr.map((s) => (s.id || s.name).toLowerCase())).size;
-    html.push(`<div class="vehRow"><span class="vehRowName">${title}</span>` +
-      `<span class="vehRowCount">${configured} 项刷新配置${arr.length !== configured ? ` · ${arr.length} 处候选位置` : ''}${camps ? ` · 基地 ${camps} / 战场 ${fields}` : ''} · ${forces}</span></div>`);
+  for (const stKey of stageKeys) {
+    const bucket = buckets.get(stKey);
+    html.push(`<div class="vehStage">${stageLabelOf(bucket.stage)}</div>`);
+    const roles = bucket.roles;
+    for (const rk of ['attack', 'defend', 'neutral']) {
+      const vehMap = roles.get(rk);
+      if (!vehMap || !vehMap.size) continue;
+      html.push(`<div class="vehForce vehForce-${rk}">${roleLabel[rk]}</div>`);
+      const vehs = [...vehMap.entries()].sort((a, b) => (b[1].length - a[1].length) || vehicleName(a[0]).localeCompare(vehicleName(b[0])));
+      for (const [vid, arr] of vehs) {
+        const camps = arr.filter((s) => s.kind === 'camp').length;
+        const fields = arr.length - camps;
+        const parts = [];
+        if (camps) parts.push(`基地 ${camps}`);
+        if (fields) parts.push(`战场 ${fields}`);
+        const title = vid === 'any' ? '任意载具' : vehicleName(vid);
+        html.push(`<div class="vehRow"><span class="vehRowName">${title}</span>` +
+          `<span class="vehRowCount">×${arr.length}${parts.length ? ` · ${parts.join(' / ')}` : ''}</span></div>`);
+      }
+    }
   }
+
+  if (conditional.length) {
+    html.push(`<div class="vehStage vehStageCond">条件刷新（达到条件才出现）</div>`);
+    const groups = new Map();
+    for (const s of conditional) {
+      const conds = (s.conditions || [])
+        .filter((c) => !stage || c.sector == null || Number(c.sector) === stage)
+        .map((c) => `S${c.sector ? c.sector : '?'} ${vehicleConditionText(c)}`);
+      if (stage && !conds.length) continue;
+      const condText = conds.join(' 或 ') || '条件触发';
+      const rk = roleOf(s);
+      const key = `${rk}|${s.vehicleId || 'any'}|${condText}|${s.kind}`;
+      if (!groups.has(key)) groups.set(key, { role: rk, vid: s.vehicleId, cond: condText, kind: s.kind, n: 0 });
+      groups.get(key).n += 1;
+    }
+    const ordered = [...groups.values()].sort((a, b) =>
+      (['attack', 'defend', 'neutral'].indexOf(a.role) - ['attack', 'defend', 'neutral'].indexOf(b.role)) ||
+      (b.n - a.n));
+    for (const g of ordered) {
+      const parts = [`×${g.n}`];
+      if (g.kind === 'camp') parts.push('基地');
+      const title = g.vid ? vehicleName(g.vid) : '任意载具';
+      html.push(`<div class="vehRow vehRowCond"><span class="vehRowName">` +
+        `<span class="vehCondRole">${roleLabel[g.role]}</span>${title}</span>` +
+        `<span class="vehRowCount">${parts.join(' · ')} · <b>${g.cond}</b></span></div>`);
+    }
+  }
+
   if (!html.length) html.push('<div class="vehRowSub">当前阶段没有固定载具部署数据。</div>');
   list.innerHTML = html.join('');
   drawVehicleOverlays();
@@ -5475,7 +6557,7 @@ function drawVehicleOverlays() {
 async function loadVehicleSystem() {
   if (IS_TDM) return;
   const vehiclePath = IS_CONQUEST ? './data/vehicles_conquest.json'
-    : (IS_ASSAULT || MAP.toLowerCase() === 'skyline')
+    : IS_ASSAULT
       ? './data/vehicles_assault.json' : './data/vehicles.json';
   try {
     if (vehicleModeCache.has(vehiclePath)) {
@@ -5500,6 +6582,9 @@ async function loadVehicleSystem() {
 }
 
 async function run() {
+  if (MAP === 'Derail' && !(await mapFileExists(MAP_ROOT + 'manifest.json'))
+      && await mapFileExists('./map/derail/manifest.json')) MAP_ROOT = './map/derail/';
+  if (!(await ensureMapPackage())) throw new Error('缺少地图包：' + MAP);
   const manifest = await (await fetch(MAP_ROOT + 'manifest.json')).json();
   mapManifest = manifest;
   mapMeta = manifest;
@@ -5524,8 +6609,7 @@ async function run() {
   document.getElementById('s-z').textContent = `${zmin.toFixed(0)} … ${zmax.toFixed(0)} m`;
 
   document.getElementById('g-renderer').textContent = gpuName;
-  const safariHidesGpu = gpuTier === 'unknown' && glProbe && /Macintosh/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/(Chrome|Chromium|Edg|CriOS)/.test(navigator.userAgent);
-  const tier = { discrete: ['独显', 'dgpu'], integrated: ['集成 GPU', 'igpu'], software: ['软件渲染', 'sw'], unknown: [safariHidesGpu ? 'Safari 未公开 GPU 型号' : '未识别', 'igpu'] }[gpuTier];
+  const tier = { discrete: ['独显', 'dgpu'], integrated: ['核显', 'igpu'], software: ['软件渲染', 'sw'], unknown: ['未识别', 'igpu'] }[gpuTier];
   document.getElementById('g-tier').innerHTML = `<span class="tag ${tier[1]}">${tier[0]}</span>`;
   applyProfile();
 
@@ -5762,6 +6846,14 @@ async function applyModeState({ initial = false, previousMode = null } = {}) {
   }
 
   clearAreas();
+  const vol3dWasEnabled = volumes3dEnabled && !IS_TDM && !IS_CONQUEST;
+  volumes3dEnabled = vol3dWasEnabled;
+  const black3dWasEnabled = blackZoneEnabled && !IS_TDM && !IS_CONQUEST;
+  blackZoneEnabled = black3dWasEnabled;
+  if (!black3dWasEnabled) document.getElementById('tBlackZone')?.classList.remove('on');
+  clearVolumes3d();
+  volumes3dData = null;
+  volumes3dMap = null;
   clearSpawnOverlays();
   clearPredictionOverlay();
   clearEscortOverlay();
@@ -5783,6 +6875,11 @@ async function applyModeState({ initial = false, previousMode = null } = {}) {
     ? (captureData?.areas || [])
     : prepareAreas(mapManifest?.breakthrough || []);
   buildAreas(breakthrough);
+  const vol3dParam = new URLSearchParams(location.search).get('vol3d') === '1';
+  if (vol3dWasEnabled || (!vol3dParamApplied && vol3dParam)) {
+    vol3dParamApplied = true;
+    await setVolumes3d(true);
+  }
   applyTdmWorldContext();
 
   spawnVisible = IS_TDM ? true : keepSpawn;
@@ -5830,6 +6927,9 @@ async function applyModeState({ initial = false, previousMode = null } = {}) {
     bigEventMechanic: !!currentBigEventMechanic(),
     textLabels: textLabelPoints.length,
     textLabelVisible: textLabelLayerVisible,
+    volumes3d: volumes3dEnabled,
+    volumes3dLoaded: !!volumes3dGroup,
+    volumes3dCounts: volumes3dGroup?.userData?.counts || null,
   };
   markButtons();
   layoutMarkFloat();
@@ -7313,6 +8413,16 @@ document.getElementById('mmFullReset')?.addEventListener('click', () => {
   mmFullPanZ = 0;
   setMinimapFullZoom(mmFullMinZoom());
 });
+document.getElementById('mmLayerDeploy')?.addEventListener('click', () => {
+  setMmLayer('deploy', !mmLayerState.deploy);
+});
+document.getElementById('mmLayerBigEvent')?.addEventListener('click', () => {
+  setMmLayer('bigEvent', !mmLayerState.bigEvent);
+});
+document.getElementById('mmLayer3D')?.addEventListener('click', () => {
+  setMmLayer('markers', !mmLayerState.markers);
+});
+syncMmLayerButtons();
 document.querySelectorAll('#mmInkBar [data-ink]').forEach((button) => {
   button.addEventListener('click', () => {
     const tool = button.dataset.ink;
@@ -7572,6 +8682,8 @@ function scenePickEpoch() {
   for (const group of [root, ...Object.values(tierGroups), ...Object.values(eventGroups), cbdGroup, gasGroup]) {
     flags.push(group && group.visible ? 1 : 0);
   }
+  // 切面高度变化后，阵地支援按高度缓存的最上层表面要重算。
+  flags.push(cutState.on ? 'cut' + cutState.height.toFixed(2) : 'cut0');
   return flags.join('');
 }
 
@@ -7750,6 +8862,8 @@ function onStageButtonClick(event) {
     other.classList.toggle('on', other === button);
   }
   applyAreaVisibility();
+  if (volumes3dEnabled && volumes3dData) buildVolumes3d(volumes3dData);
+  if (blackZoneEnabled && volumes3dData) buildBlackZone(volumes3dData);
   updateSeaLevelForStage();
   applyOverlays();
   applyDeviceVisibility();
@@ -7814,6 +8928,12 @@ document.getElementById('tFlight').addEventListener('click', () => {
 });
 document.getElementById('tProject').addEventListener('click', () => {
   setAreaProjection(!areaProjection);
+});
+document.getElementById('tVolumes3d')?.addEventListener('click', () => {
+  setVolumes3d(!volumes3dEnabled);
+});
+document.getElementById('tBlackZone')?.addEventListener('click', () => {
+  setBlackZone(!blackZoneEnabled);
 });
 document.getElementById('renderScale').addEventListener('input', (event) => {
   renderScale = Number(event.target.value) / 100;
@@ -9493,7 +10613,10 @@ function loadBallistics() {
     .then((doc) => {
       ballisticsData = doc;
       ballisticWeapons = doc.weapons || [];
-      return fetch('./data/fixed_weapons/index.json').then((r) => r.json()).then((all) => all[MAP] || []).catch(() => []);
+      const fwName = IS_CONQUEST ? `${MAP}_conquest` : MAP;
+      return fetch(`./data/fixed_weapons/${fwName}.json`)
+        .then((r) => (r.ok ? r.json() : fetch(`./data/fixed_weapons/${MAP}.json`).then((r2) => (r2.ok ? r2.json() : []))))
+        .catch(() => []);
     })
     .then((fw) => {
       sceneFixedWeapons = fw;
@@ -9592,6 +10715,18 @@ function computeOriginAt(weapon, pos) {
   return o;
 }
 
+/* 巡飞弹燃料航程：100 能量池 / 对应能耗 × 速度（2026-11-12 源码确认） */
+function droneFuelRanges(weapon) {
+  const cruiseRate = weapon.energyCostPerSec || 8.33;
+  const boostRate = weapon.secondaryEnergyCostPerSec || 16.6;
+  const total = Number.isFinite(weapon.maxEnergy) ? weapon.maxEnergy : cruiseRate * 12;
+  return {
+    total,
+    noBoost: total / cruiseRate * (weapon.cruiseSpeed || 33),
+    fullBoost: total / boostRate * (weapon.secondaryMaxSpeed || 66),
+  };
+}
+
 function renderWeaponInfo(weapon, containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
@@ -9601,9 +10736,12 @@ function renderWeaponInfo(weapon, containerId) {
     lines.push(`\u521d\u901f ${weapon.initSpeed} m/s \u00b7 \u5236\u5bfc\u5de1\u822a ${weapon.cruiseSpeed || 33} m/s`);
     lines.push(`\u52a0\u901f\u5de1\u822a ${weapon.secondaryAcceleration} m/s\u00b2 \u2192 \u6781\u901f ${weapon.secondaryMaxSpeed} m/s`);
     lines.push(`\u80fd\u8017 \u666e\u901f ${weapon.energyCostPerSec}/s \u00b7 \u52a0\u901f ${weapon.secondaryEnergyCostPerSec}/s`);
-    lines.push(`\u6700\u5927\u5c04\u7a0b ${weapon.maxDistance} m \u00b7 \u96f6\u91cd\u529b\u8ddd\u79bb ${weapon.zeroGravityDistance} m \u00b7 \u751f\u547d\u503c ${weapon.health}`);
-    lines.push(`\u8f68\u8ff9 \u8d77\u98de\u2192\u5de1\u822a\u2192\u4fef\u51b2\uff08\u6253\u51fb\u5730\u9762\uff09`);
-    lines.push(`\u603b\u71c3\u6599\u6c60 ${(weapon.energyCostPerSec * 12).toFixed(0)} \u00b7 \u666e\u901f\u7ea612s \u00b7 \u5168\u7a0b\u52a0\u901f\u7ea66s`);
+    const ranges = droneFuelRanges(weapon);
+    lines.push(`\u5b9e\u9645\u6700\u5927\u8ddd\u79bb \u4e0d\u52a0\u901f ${ranges.noBoost.toFixed(0)} m \u00b7 \u5168\u7a0b\u52a0\u901f ${ranges.fullBoost.toFixed(0)} m`);
+    lines.push(`\u96f6\u91cd\u529b\u8ddd\u79bb ${weapon.zeroGravityDistance} m \u00b7 \u751f\u547d\u503c ${weapon.health}`);
+    lines.push(`\u8f68\u8ff9 \u8d77\u98de\u2192\u5de1\u822a\u2192\u4fef\u51b2`);
+    const totalEnergy = ranges.total;
+    lines.push(`\u603b\u71c3\u6599\u6c60 ${totalEnergy.toFixed(0)} \u00b7 \u666e\u901f ${(totalEnergy / weapon.energyCostPerSec).toFixed(1)}s \u00b7 \u52a0\u901f ${(totalEnergy / weapon.secondaryEnergyCostPerSec).toFixed(1)}s`);
   } else {
     lines.push(`\u521d\u901f ${weapon.initSpeed} m/s \u00b7 \u91cd\u529b ${weapon.gravity} m/s\u00b2`);
     if (weapon.airDrag) lines.push(`\u7a7a\u6c14\u963b\u529b ${weapon.airDrag}/s`);
@@ -9619,7 +10757,11 @@ function renderWeaponInfo(weapon, containerId) {
   el.textContent = `${weapon.name}\n${lines.join('\n')}`;
 }
 
-function simulateBallistic(weapon, origin, yawDeg, pitchDeg) {
+function simulateBallistic(weapon, origin, yawDeg, pitchDeg, options = {}) {
+  // options.checkBuildings=false：求解采样阶段跳过建筑射线；collectPoints=false：不建轨迹点数组
+  const checkBuildings = options.checkBuildings !== false;
+  const collectPoints = options.collectPoints !== false;
+  const dt = options.dt || 0.03;
   const v0 = weapon.kind === 'throwable' ? weapon.vHigh : weapon.initSpeed;
   const g = weapon.gravity || 0;
   const drag = weapon.airDrag || 0;
@@ -9632,38 +10774,42 @@ function simulateBallistic(weapon, origin, yawDeg, pitchDeg) {
     Math.sin(pitch),
     Math.cos(pitch) * Math.cos(yaw),
   );
-  const vel = dir.clone().multiplyScalar(v0);
+  const vel = dir.multiplyScalar(v0);
   const pos = origin.clone();
-  const points = [pos.clone()];
+  const points = collectPoints ? [pos.clone()] : null;
+  const prev = new THREE.Vector3();
   let traveled = 0;
   let time = 0;
   let maxHeight = pos.y;
-  const dt = 0.03;
   for (let i = 0; i < 20000; i++) {
-    const prev = pos.clone();
+    prev.copy(pos);
     pos.addScaledVector(vel, dt);
-    const hit = findBuildingHit(prev, pos);
-    if (hit) {
-      traveled += hit.distanceTo(prev);
-      time += hit.distanceTo(prev) / Math.max(1e-6, vel.length());
-      points.push(hit);
-      return { points, impact: hit, traveled, time, maxHeight, ground: false, building: true };
+    if (checkBuildings) {
+      const hit = findBuildingHit(prev, pos);
+      if (hit) {
+        const seg = hit.distanceTo(prev);
+        traveled += seg;
+        time += seg / Math.max(1e-6, vel.length());
+        if (collectPoints) points.push(hit);
+        return { points: points || [], impact: hit, traveled, time, maxHeight, ground: false, building: true };
+      }
     }
-    traveled += vel.length() * dt;
+    const speed = vel.length();
+    traveled += speed * dt;
     time += dt;
     if (pos.y > maxHeight) maxHeight = pos.y;
     if (traveled > zeroG) vel.y -= g * dt;
     if (drag > 0) vel.multiplyScalar(1 / (1 + drag * dt));
-    points.push(pos.clone());
+    if (collectPoints) points.push(pos.clone());
     const groundY = terrainData ? heightAt(pos.x, pos.z) : 0;
     if (pos.y <= groundY) {
-      return { points, impact: pos.clone(), traveled, time, maxHeight, ground: true };
+      return { points: points || [], impact: pos.clone(), traveled, time, maxHeight, ground: true };
     }
     if (traveled > maxDist) {
-      return { points, impact: null, traveled, time, maxHeight, ground: false };
+      return { points: points || [], impact: null, traveled, time, maxHeight, ground: false };
     }
   }
-  return { points, impact: null, traveled, time, maxHeight, ground: false };
+  return { points: points || [], impact: null, traveled, time, maxHeight, ground: false };
 }
 
 /* 打击可行性容差按武器真实伤害半径来（ballistics.json）：
@@ -9680,7 +10826,8 @@ function ballisticTolerances(weapon) {
   return { radius: hit, fullRadius: hit, blast: false };
 }
 
-/* 打击可行性：在仰角范围内采样，找落点 3D 距离最贴近目标的仰角/水平角；再对最优仰角做局部细化。 */
+/* 打击可行性：先用无建筑射线的快速弹道采样 120 个仰角并局部细化，最后只对最优仰角附近
+   少量候选跑完整弹道（含建筑射线）复核。避免每个采样点都做几千次网格射线。 */
 function solveToTarget(weapon, origin, target, lo, hi) {
   const tol = ballisticTolerances(weapon);
   const dx = target.x - origin.x;
@@ -9688,37 +10835,50 @@ function solveToTarget(weapon, origin, target, lo, hi) {
   const yaw = Math.atan2(dx, dz) * 180 / Math.PI;
   const steps = 120;
   const stepPitch = (hi - lo) / steps;
+  const fastOpts = { checkBuildings: false, collectPoints: false };
   let best = null;
   const consider = (pitch) => {
     const clamped = Math.min(hi, Math.max(lo, pitch));
-    const r = simulateBallistic(weapon, origin, yaw, clamped);
+    const r = simulateBallistic(weapon, origin, yaw, clamped, fastOpts);
     if (!r.impact) return;
-    // 3D 距离：水平 + 高度都算，避免“水平接近、但垂直差很多/被反斜面挡住”被当成命中
     const mx = r.impact.x - target.x;
     const my = r.impact.y - target.y;
     const mz = r.impact.z - target.z;
     const miss = Math.sqrt(mx * mx + my * my + mz * mz);
-    if (!best || miss < best.miss) {
-      best = { pitch: clamped, yaw, result: r, miss, dy: Math.abs(my), blocked: false };
-    }
+    if (!best || miss < best.miss) best = { pitch: clamped, yaw, miss, dy: Math.abs(my) };
   };
   for (let i = 0; i <= steps; i++) consider(lo + stepPitch * i);
-  if (best) {
-    // 粗采样后在最优点附近细化，消除 120 段采样本身造成的几米～几十米假偏差
-    let center = best.pitch;
-    let span = stepPitch;
-    for (let round = 0; round < 2; round++) {
-      const before = best.miss;
-      for (let i = -10; i <= 10; i++) consider(center + span * i / 10);
-      center = best.pitch;
-      span /= 10;
-      if (best.miss >= before) break;
-    }
-    best.blocked = best.miss > tol.radius;
-    best.tolerance = tol;
+  if (!best) return null;
+  let center = best.pitch;
+  let span = stepPitch;
+  for (let round = 0; round < 2; round++) {
+    const before = best.miss;
+    for (let i = -10; i <= 10; i++) consider(center + span * i / 10);
+    center = best.pitch;
+    span /= 10;
+    if (best.miss >= before) break;
   }
-  return best;
+  const evaluateFull = (pitch) => {
+    const clamped = Math.min(hi, Math.max(lo, pitch));
+    const r = simulateBallistic(weapon, origin, yaw, clamped, { dt: 0.03 });
+    if (!r.impact) return null;
+    const mx = r.impact.x - target.x;
+    const my = r.impact.y - target.y;
+    const mz = r.impact.z - target.z;
+    return { pitch: clamped, yaw, result: r, miss: Math.sqrt(mx * mx + my * my + mz * mz), dy: Math.abs(my), blocked: false };
+  };
+  let full = null;
+  for (const off of [0, 0.3, -0.3, 0.8, -0.8]) {
+    const cand = evaluateFull(best.pitch + off);
+    if (cand && (!full || cand.miss < full.miss)) full = cand;
+    if (off === 0 && full && full.miss <= tol.radius) break;
+  }
+  if (!full) return null;
+  full.blocked = full.miss > tol.radius;
+  full.tolerance = tol;
+  return full;
 }
+
 
 /* 巡飞弹路径：斜向起飞/俯冲，避免垂直 90° 锐角，再由 CatmullRom 平滑 */
 function buildDronePath(origin, waypoints, target, cruiseY) {
@@ -9779,7 +10939,8 @@ function simulateDroneToTarget(weapon, origin, waypoints, target, cruiseAlt, boo
   const boostSpeed = weapon.secondaryMaxSpeed || 66;
   const cruiseEnergyRate = weapon.energyCostPerSec || 8.33;
   const boostEnergyRate = weapon.secondaryEnergyCostPerSec || 16.6;
-  const totalEnergy = cruiseEnergyRate * 12;   // 普速约 12s → 总燃料池
+  // 燃料池 = MaxEnergy（源码确认 100.0）；旧数据没有该字段时退回 8.33×12≈99.96
+  const totalEnergy = droneFuelRanges(weapon).total;
   const r = Math.min(1, Math.max(0, boostRatio));
   const boostMaxDist = totalEnergy * r / boostEnergyRate * boostSpeed;
   const cruiseMaxDist = totalEnergy * (1 - r) / cruiseEnergyRate * cruiseSpeed;
@@ -9830,6 +10991,45 @@ const BAL_MARK_COLORS = {
   drone: { origin: 0xba68c8, target: 0xff5252, waypoint: 0x90caf9 },
 };
 
+/* 弹道项目折叠：面板只显示当前项目；点位名称取当前选择的武器名（去括号型号） */
+const BAL_PROJECT_LABELS = { fixed: '场景固定武器', build: '建造固定武器', vehicle: '载具武器', drone: '巡飞弹' };
+
+function balPointName(group) {
+  if (group === 'drone') return '巡飞弹';
+  const fallback = { scene: '\u573a\u666f\u56fa\u5b9a\u6b66\u5668', build: '\u5efa\u9020\u56fa\u5b9a\u6b66\u5668', vehicle: '\u8f7d\u5177\u6b66\u5668' }[group] || '';
+  const selectId = { scene: 'scnWeapon', build: 'bldWeapon', vehicle: 'vehWeapon' }[group];
+  const select = selectId ? document.getElementById(selectId) : null;
+  let name = fallback;
+  if (select) {
+    let weapon = null;
+    if (group === 'scene' && select.value.startsWith('fw:')) {
+      const fw = sceneFixedWeapons[Number(select.value.slice(3))];
+      weapon = fw ? ballisticWeapons.find((w) => w.id === fw.weaponId) : null;
+    } else {
+      weapon = ballisticWeapons.find((w) => w.id === select.value);
+    }
+    if (weapon) name = weapon.name;
+  }
+  return name.replace(/\s*\uff08[^\uff09]*\uff09/g, '').trim();
+}
+
+function applyBalProject(name) {
+  if (!BAL_PROJECT_LABELS[name]) name = 'fixed';
+  const select = document.getElementById('balProject');
+  if (select) select.value = name;
+  for (const pane of document.querySelectorAll('#paneBallistics [data-bal-project]')) {
+    pane.hidden = pane.dataset.balProject !== name;
+  }
+  saveStored('df_tactical_bal_project', name);
+}
+
+document.getElementById('balProject').addEventListener('change', (e) => {
+  applyBalProject(e.target.value);
+  // 切换项目时取消正在进行的“设点”，避免在隐藏项目里误加点位
+  if (balMarkMode) toggleMarkMode(balMarkMode);
+});
+try { applyBalProject(loadStored('df_tactical_bal_project', 'fixed')); } catch (error) { applyBalProject('fixed'); }
+
 function drawBallisticMarkers() {
   clearBallistic(ballisticMarkerGroup);
   const mk = (pos, color, radius = 3.5) => {
@@ -9864,14 +11064,14 @@ function rebuildBalLabels() {
     document.getElementById('labels').appendChild(div);
     balOriginLabels.push({ div, pos: pos.clone(), text });
   };
-  add(bal.scene.target, '场景目标', '#ff5252');
-  add(bal.build.origin, '建造发射点', '#ffb74d');
-  add(bal.build.target, '建造目标', '#e57373');
-  add(bal.vehicle.origin, '载具发射点', '#4dd0e1');
-  add(bal.vehicle.target, '载具目标', '#81c784');
-  add(bal.drone.origin, '巡飞弹发射点', '#ba68c8');
-  bal.drone.waypoints.forEach((p, i) => add(p, `途径点 ${i + 1}`, '#90caf9'));
-  add(bal.drone.target, '巡飞弹目标', '#ff5252');
+  add(bal.scene.target, `目标点 · ${balPointName('scene')}`, '#ff5252');
+  add(bal.build.origin, `发射点 · ${balPointName('build')}`, '#ffb74d');
+  add(bal.build.target, `目标点 · ${balPointName('build')}`, '#e57373');
+  add(bal.vehicle.origin, `发射点 · ${balPointName('vehicle')}`, '#4dd0e1');
+  add(bal.vehicle.target, `目标点 · ${balPointName('vehicle')}`, '#81c784');
+  add(bal.drone.origin, `发射点 · ${balPointName('drone')}`, '#ba68c8');
+  bal.drone.waypoints.forEach((p, i) => add(p, `途径点 · ${balPointName('drone')} ${i + 1}`, '#90caf9'));
+  add(bal.drone.target, `目标点 · ${balPointName('drone')}`, '#ff5252');
 }
 
 function renderBalInfo(id, group) {
@@ -9879,9 +11079,10 @@ function renderBalInfo(id, group) {
   if (!el) return;
   const st = bal[group];
   const lines = [];
-  if (st.origin) lines.push(`发射点 (${st.origin.x.toFixed(1)}, ${st.origin.y.toFixed(1)}, ${st.origin.z.toFixed(1)})`);
-  if (st.target) lines.push(`目标点 (${st.target.x.toFixed(1)}, ${st.target.y.toFixed(1)}, ${st.target.z.toFixed(1)})`);
-  if (st.waypoints && st.waypoints.length) lines.push(`途径点 ${st.waypoints.length} 个`);
+  const pointName = balPointName(group);
+  if (st.origin) lines.push(`发射点 · ${pointName}  (${st.origin.x.toFixed(1)}, ${st.origin.y.toFixed(1)}, ${st.origin.z.toFixed(1)})`);
+  if (st.target) lines.push(`目标点 · ${pointName}  (${st.target.x.toFixed(1)}, ${st.target.y.toFixed(1)}, ${st.target.z.toFixed(1)})`);
+  if (st.waypoints && st.waypoints.length) lines.push(`途径点 · ${pointName} ${st.waypoints.length} 个`);
   el.textContent = lines.length
     ? lines.join('\n')
     : (group === 'scene' ? '未设目标点。设目标点后可解算打击可行性。' : '未设发射点 / 目标点。');
@@ -10569,6 +11770,278 @@ try {
   restoreRailScroll();
 } catch (error) { /* 忽略 */ }
 
+
+/* ===== 场景切面 UI =====
+   竖向高度条：拖动手柄或直接输入高度，条以上全部隐藏；关闭时恢复完整场景。 */
+const cutToggle = document.getElementById('cutToggle');
+const cutPanel = document.getElementById('cutPanel');
+const cutTrack = document.getElementById('cutTrack');
+const cutFill = document.getElementById('cutFill');
+const cutHandle = document.getElementById('cutHandle');
+const cutTicks = document.getElementById('cutTicks');
+const cutValueInput = document.getElementById('cutValue');
+
+function cutFormatHeight(value) {
+  return (Math.abs(value) < 0.05 ? 0 : value).toFixed(1);
+}
+
+/* 高度范围 = 地形高程 ∪ 当前可见建筑包围盒（含摩天楼，免得高度条够不到楼顶）。 */
+function cutSceneRange() {
+  let lo = Infinity, hi = -Infinity;
+  const t = terrainData;
+  if (t && t.heights) {
+    for (let i = 0; i < t.nx; i++) {
+      const column = t.heights[i];
+      if (!column) continue;
+      for (let j = 0; j < t.ny; j++) {
+        const v = column[j];
+        if (v < lo) lo = v;
+        if (v > hi) hi = v;
+      }
+    }
+  }
+  try {
+    for (const group of scenePickTargets({ includeTerrain: false })) {
+      if (!group || !group.visible) continue;
+      const box = new THREE.Box3().setFromObject(group);
+      if (box.isEmpty()) continue;
+      lo = Math.min(lo, box.min.y);
+      hi = Math.max(hi, box.max.y);
+    }
+  } catch (error) { /* 忽略：退回地形范围 */ }
+  if (!Number.isFinite(lo) || !Number.isFinite(hi)) { lo = -40; hi = 160; }
+  lo = Math.floor((lo - 8) / 5) * 5;
+  hi = Math.ceil((hi + 8) / 5) * 5;
+  if (hi - lo < 80) {
+    const mid = (lo + hi) / 2;
+    lo = Math.floor((mid - 40) / 5) * 5;
+    hi = lo + 80;
+  }
+  return { min: Math.max(-1200, lo), max: Math.min(1500, hi) };
+}
+
+/* 对数坐标：以「目标点中位高度」为基准 D，D 附近 ±CUT_LOG_BAND 米近似线性，
+   越远越压缩；D 两侧各按自己的 log 量程占位（不强行让 D 停在中点）。线性模式仍等距。 */
+const CUT_LOG_BAND = 12;
+
+function cutDatumHeight(range) {
+  const values = [];
+  for (const area of (areasData || [])) {
+    if (!area || area.kind !== 'objective' || !area.points) continue;
+    for (const point of area.points) {
+      if (point && Number.isFinite(point[1])) values.push(point[1]);
+    }
+  }
+  if (!values.length && objectiveCentre && Number.isFinite(objectiveCentre.y)) values.push(objectiveCentre.y);
+  if (!values.length) return (range.min + range.max) / 2;
+  values.sort((a, b) => a - b);
+  const median = values[Math.floor(values.length / 2)];
+  return Math.max(range.min + 1, Math.min(range.max - 1, median));
+}
+
+function cutNorm(height) {
+  const span = Math.max(1e-6, cutState.max - cutState.min);
+  if (!cutState.log) return Math.max(0, Math.min(1, (height - cutState.min) / span));
+  const up = Math.max(1e-6, cutState.max - cutState.datum);
+  const down = Math.max(1e-6, cutState.datum - cutState.min);
+  const wu = Math.log10(1 + up / CUT_LOG_BAND);
+  const wd = Math.log10(1 + down / CUT_LOG_BAND);
+  const f = Math.log10(1 + Math.abs(height - cutState.datum) / CUT_LOG_BAND);
+  return Math.max(0, Math.min(1, (height >= cutState.datum ? wd + f : wd - f) / (wu + wd)));
+}
+
+function cutHeightAt(norm) {
+  const t = Math.max(0, Math.min(1, norm));
+  if (!cutState.log) return cutState.min + t * (cutState.max - cutState.min);
+  const up = Math.max(1e-6, cutState.max - cutState.datum);
+  const down = Math.max(1e-6, cutState.datum - cutState.min);
+  const wu = Math.log10(1 + up / CUT_LOG_BAND);
+  const wd = Math.log10(1 + down / CUT_LOG_BAND);
+  const p = t * (wu + wd);
+  return p >= wd
+    ? cutState.datum + CUT_LOG_BAND * (Math.pow(10, p - wd) - 1)
+    : cutState.datum - CUT_LOG_BAND * (Math.pow(10, wd - p) - 1);
+}
+
+function cutTickStep(span) {
+  if (span <= 40) return 1;
+  if (span <= 80) return 2;
+  if (span <= 160) return 5;
+  if (span <= 600) return 10;
+  if (span <= 1000) return 25;
+  return 50;
+}
+
+function cutRenderTicks() {
+  cutTicks.textContent = '';
+  const span = Math.max(1e-6, cutState.max - cutState.min);
+  const step = cutTickStep(span);
+  const pxHeight = cutTicks.clientHeight || 214;
+  const minGap = Math.max(16, pxHeight / 16);
+  const picked = [];
+  const push = (value) => {
+    const t = cutNorm(value);
+    if (t <= 0.015 || t >= 0.985) return;
+    if (picked.some((item) => Math.abs(item.t - t) * pxHeight < minGap)) return;
+    picked.push({ value, t });
+  };
+  if (cutState.log) push(cutState.datum);
+  if (cutState.min < 0 && cutState.max > 0) push(0);
+  const first = Math.ceil(cutState.min / step) * step;
+  for (let value = first; value <= cutState.max + 1e-6; value += step) push(value);
+  picked.sort((a, b) => a.value - b.value);
+  for (const item of picked) {
+    const isDatum = cutState.log && Math.abs(item.value - cutState.datum) < 1e-6;
+    const tick = document.createElement('div');
+    tick.className = 'cutTick' + (Math.abs(item.value) < 1e-6 ? ' zero' : '') + (isDatum ? ' datum' : '');
+    tick.style.top = ((1 - item.t) * 100).toFixed(3) + '%';
+    if (isDatum) tick.title = '对数坐标基准：目标点中位高度';
+    const label = document.createElement('b');
+    label.textContent = Number.isInteger(item.value) ? String(item.value) : item.value.toFixed(1);
+    tick.appendChild(label);
+    cutTicks.appendChild(tick);
+  }
+}
+
+function cutRender() {
+  const pct = Math.max(0, Math.min(100, cutNorm(cutState.height) * 100));
+  cutFill.style.height = pct.toFixed(2) + '%';
+  cutHandle.style.bottom = pct.toFixed(2) + '%';
+  if (document.activeElement !== cutValueInput) cutValueInput.value = cutFormatHeight(cutState.height);
+  cutTrack.setAttribute('aria-valuemin', String(cutState.min));
+  cutTrack.setAttribute('aria-valuemax', String(cutState.max));
+  cutTrack.setAttribute('aria-valuenow', cutState.height.toFixed(1));
+  cutTrack.setAttribute('aria-valuetext', cutState.height.toFixed(1) + ' 米');
+}
+
+function cutApplyHeight(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) { cutRender(); return; }
+  cutState.height = Math.max(cutState.min, Math.min(cutState.max, numeric));
+  if (cutState.on) cutPlane.constant = cutState.height;
+  cutRender();
+}
+
+function cutOpen() {
+  cutPanel.hidden = false;
+  cutToggle.hidden = true;
+  if (!cutState.on) {
+    const range = cutSceneRange();
+    cutState.min = range.min;
+    cutState.max = range.max;
+    cutValueInput.min = String(range.min);
+    cutValueInput.max = String(range.max);
+    cutState.datum = cutDatumHeight(range);
+    cutSyncDatumNote();
+    // 首次从最高处开始（画面不变，往下拖才开始切）；关掉再打开时沿用上次高度。
+    const preferred = Number.isFinite(cutState.saved) ? cutState.saved : range.max;
+    cutState.height = Math.max(range.min, Math.min(range.max, preferred));
+    cutState.on = true;
+    cutPlane.constant = cutState.height;
+    cutRenderTicks();
+  }
+  cutRender();
+  updateLabels();
+}
+
+function cutClose() {
+  cutState.on = false;
+  cutState.saved = cutState.height;
+  cutPlane.constant = CUT_OFF_HEIGHT;
+  cutPanel.hidden = true;
+  cutToggle.hidden = false;
+  updateLabels();
+}
+
+function cutScaleLabel() {
+  const button = document.getElementById('cutScaleMode');
+  if (!button) return;
+  button.textContent = cutState.log ? '对数' : '线性';
+  button.classList.toggle('linear', !cutState.log);
+  button.title = cutState.log
+    ? '当前：对数坐标（基准 = 目标点中位高度，附近 12 m 近似线性）· 点击切换线性'
+    : '当前：线性坐标 · 点击切换对数';
+}
+
+function cutSyncDatumNote() {
+  const note = document.getElementById('cutDatumNote');
+  if (!note) return;
+  note.hidden = !cutState.log;
+  if (cutState.log) note.textContent = `对数基准 ${cutFormatHeight(cutState.datum)} m`;
+}
+
+function cutSetScale(log) {
+  cutState.log = !!log;
+  cutScaleLabel();
+  cutSyncDatumNote();
+  saveStored('df_tactical_cut_log', cutState.log ? '1' : '0');
+  cutRenderTicks();
+  cutRender();
+}
+
+function cutHeightFromEvent(event) {
+  const rect = cutTrack.getBoundingClientRect();
+  const ratio = 1 - Math.max(0, Math.min(1, (event.clientY - rect.top) / Math.max(1, rect.height)));
+  return cutHeightAt(ratio);
+}
+
+let cutDragging = false;
+cutTrack.addEventListener('pointerdown', (event) => {
+  if (!cutState.on) return;
+  event.preventDefault();
+  cutDragging = true;
+  try { cutTrack.setPointerCapture(event.pointerId); } catch (error) { /* 忽略 */ }
+  cutApplyHeight(cutHeightFromEvent(event));
+});
+cutTrack.addEventListener('pointermove', (event) => {
+  if (!cutDragging || !cutState.on) return;
+  cutApplyHeight(cutHeightFromEvent(event));
+});
+const endCutDrag = (event) => {
+  if (!cutDragging) return;
+  cutDragging = false;
+  try { cutTrack.releasePointerCapture(event.pointerId); } catch (error) { /* 忽略 */ }
+};
+cutTrack.addEventListener('pointerup', endCutDrag);
+cutTrack.addEventListener('pointercancel', endCutDrag);
+cutTrack.addEventListener('keydown', (event) => {
+  if (!cutState.on) return;
+  const page = (cutState.max - cutState.min) / 10;
+  let next = null;
+  if (event.key === 'ArrowUp' || event.key === 'ArrowRight') next = cutState.height + 1;
+  else if (event.key === 'ArrowDown' || event.key === 'ArrowLeft') next = cutState.height - 1;
+  else if (event.key === 'PageUp') next = cutState.height + page;
+  else if (event.key === 'PageDown') next = cutState.height - page;
+  else if (event.key === 'Home') next = cutState.max;
+  else if (event.key === 'End') next = cutState.min;
+  if (next === null) return;
+  event.preventDefault();
+  cutApplyHeight(next);
+});
+cutValueInput.addEventListener('change', () => cutApplyHeight(cutValueInput.value));
+cutValueInput.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter') return;
+  event.preventDefault();
+  cutApplyHeight(cutValueInput.value);
+  cutValueInput.blur();
+});
+cutToggle.addEventListener('click', cutOpen);
+document.getElementById('cutClose').addEventListener('click', cutClose);
+document.getElementById('cutScaleMode').addEventListener('click', () => cutSetScale(!cutState.log));
+try { cutState.log = loadStored('df_tactical_cut_log', '1') !== '0'; } catch (error) { /* 忽略 */ }
+cutScaleLabel();
+/* 调试/自动化接口（和 window.__bigEvent 同类） */
+window.__sceneCut = {
+  open: cutOpen,
+  close: cutClose,
+  setHeight: cutApplyHeight,
+  setScale: cutSetScale,
+  state: () => ({
+    on: cutState.on, height: cutState.height, min: cutState.min, max: cutState.max,
+    constant: cutPlane.constant, planes: renderer.clippingPlanes.length,
+    log: cutState.log, datum: cutState.datum,
+  }),
+};
 
 /* 测试探针：仅当 URL 带 ?probe=1 时暴露，供无头浏览器核验标点落点；
  * 正常打开页面不会创建这个对象。 */
