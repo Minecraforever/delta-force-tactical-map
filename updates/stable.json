@@ -2,12 +2,40 @@
   "schema": 1,
   "editions": {
     "full": {
-      "latest": "2026.11.05.1",
-      "patches": []
+      "latest": "2026.11.12.1",
+      "patches": [
+        {
+          "from": "2026.11.05.1",
+          "to": "2026.11.12.1",
+          "assets": [
+            {
+              "name": "df-full-2026.11.12.1-part01.zip",
+              "url": "https://raw.githubusercontent.com/Minecraforever/delta-force-tactical-map/main/updates/assets/df-full-2026.11.12.1-part01.zip",
+              "size": 1187894,
+              "sha256": "13785ee934614f1a081b8d2fb9f289bdb46e90360f14451becfc22d3567f73c5"
+            }
+          ],
+          "delete": []
+        }
+      ]
     },
     "szu": {
-      "latest": "2026.11.05.1",
-      "patches": []
+      "latest": "2026.11.12.1",
+      "patches": [
+        {
+          "from": "2026.11.05.1",
+          "to": "2026.11.12.1",
+          "assets": [
+            {
+              "name": "df-szu-2026.11.12.1-part01.zip",
+              "url": "https://raw.githubusercontent.com/Minecraforever/delta-force-tactical-map/main/updates/assets/df-szu-2026.11.12.1-part01.zip",
+              "size": 1166186,
+              "sha256": "0ab36b2888e45d22877343b97c32e6c6cf9d891476e33fb9cd908c1d4903d162"
+            }
+          ],
+          "delete": []
+        }
+      ]
     }
   }
 }

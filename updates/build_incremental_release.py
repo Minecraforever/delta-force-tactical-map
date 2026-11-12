@@ -13,7 +13,7 @@ import json
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent if (HERE.parent / "发布版_2026-11-05_自动更新").is_dir() else HERE.parent.parent
-PREVIOUS = ROOT / "构建_2026-11-12/发布版_2026-11-12"
+PREVIOUS = ROOT / "发布版_2026-11-12"
 CURRENT = ROOT / "发布版_下一版"  # 改成已验收的新发布目录
 FROM_VERSION = "2026.11.12.1"
 TO_VERSION = "2026.11.13.1"  # 改成新版本
