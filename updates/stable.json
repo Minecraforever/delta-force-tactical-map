@@ -2,7 +2,7 @@
   "schema": 1,
   "editions": {
     "full": {
-      "latest": "2026.11.12.1",
+      "latest": "2026.11.15.1",
       "patches": [
         {
           "from": "2026.11.05.1",
@@ -16,11 +16,24 @@
             }
           ],
           "delete": []
+        },
+        {
+          "from": "2026.11.12.1",
+          "to": "2026.11.15.1",
+          "assets": [
+            {
+              "name": "df-full-2026.11.15.1-part01.zip",
+              "url": "https://raw.githubusercontent.com/Minecraforever/delta-force-tactical-map/main/updates/assets/df-full-2026.11.15.1-part01.zip",
+              "size": 591435,
+              "sha256": "67f745abeebfab5ca5dddba5f42b65d1b04efdece753616df37963a95f296fbe"
+            }
+          ],
+          "delete": []
         }
       ]
     },
     "szu": {
-      "latest": "2026.11.12.1",
+      "latest": "2026.11.15.1",
       "patches": [
         {
           "from": "2026.11.05.1",
@@ -31,6 +44,19 @@
               "url": "https://raw.githubusercontent.com/Minecraforever/delta-force-tactical-map/main/updates/assets/df-szu-2026.11.12.1-part01.zip",
               "size": 1166186,
               "sha256": "0ab36b2888e45d22877343b97c32e6c6cf9d891476e33fb9cd908c1d4903d162"
+            }
+          ],
+          "delete": []
+        },
+        {
+          "from": "2026.11.12.1",
+          "to": "2026.11.15.1",
+          "assets": [
+            {
+              "name": "df-szu-2026.11.15.1-part01.zip",
+              "url": "https://raw.githubusercontent.com/Minecraforever/delta-force-tactical-map/main/updates/assets/df-szu-2026.11.15.1-part01.zip",
+              "size": 570040,
+              "sha256": "26519e91269115e579c02212a4ebff37efc5001a43f2483a1866798e1c83b146"
             }
           ],
           "delete": []
