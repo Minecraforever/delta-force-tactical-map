@@ -234,21 +234,17 @@
   #hud { position: absolute; left: 12px; bottom: 12px; font-size: 12px; color: #8b9bb3;
     background: rgba(11,14,19,.75); padding: 6px 10px; border-radius: 4px; line-height: 1.7;
     font-family: Consolas, monospace; }
-  /* 实验性三维体积图层：默认关闭，独立图例；不改原地图默认外观 */
-  #vol3dLegend { position: absolute; left: 12px; bottom: 54px; z-index: 80;
-    max-width: 300px; padding: 7px 9px 8px; border-radius: 6px;
-    background: rgba(8,12,18,.88); border: 1px solid #31506e;
-    color: #cfe6ff; font-size: 11px; line-height: 1.55; pointer-events: none; }
-  #vol3dLegend[hidden] { display: none !important; }
-  #vol3dLegend .v3title { color: #fff; font-weight: 700; font-size: 11.5px; margin-bottom: 3px; }
-  #vol3dLegend .v3title span { color: #8fb4d8; font-weight: 400; }
-  #vol3dLegend .v3row { white-space: nowrap; }
-  #vol3dLegend .v3sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px;
-    margin-right: 5px; vertical-align: -1px; }
-  #vol3dLegend .v3note { color: #ffcf5a; margin-top: 3px; white-space: normal; }
-  body.mode-conquest #vol3dStatus { display: none !important; }
   #loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     font-size: 14px; color: #9ad7ff; background: rgba(11,14,19,.88); }
+  #mapEmptyState { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 10px; text-align: center; padding: 24px;
+    background: radial-gradient(circle at 50% 40%, rgba(25,48,74,.55), rgba(7,12,18,.9)); z-index: 6; }
+  #mapEmptyState[hidden] { display: none; }
+  #mapEmptyState .emptyTitle { font-size: 24px; font-weight: 700; color: #dcecff; letter-spacing: 1px; }
+  #mapEmptyState .emptyText { max-width: 520px; font-size: 13px; line-height: 1.8; color: #93a9c0; }
+  #mapEmptyState button { padding: 7px 16px; border-radius: 8px; border: 1px solid #2f6fa8;
+    background: #123a5a; color: #e6f2ff; cursor: pointer; font-size: 13px; }
+  #mapEmptyState button:hover { background: #174a74; }
   #labels { position: absolute; inset: 0; pointer-events: none; }
   .plabel { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; pointer-events: none;
     font-size: 11px; padding: 1px 5px; border-radius: 3px; background: rgba(8,11,16,.72);
@@ -432,10 +428,18 @@
   .capRow.selected td { background: #1b3a5c; color: #5fd0ff; }
   #stageFloat { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 85;
     display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 5px 8px;
-    max-width: min(72vw, 980px); background: rgba(10,16,26,.92); border: 1px solid var(--line);
+    max-width: min(72vw, 720px); background: rgba(10,16,26,.92); border: 1px solid var(--line);
     border-radius: 10px; backdrop-filter: blur(8px); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
   #stageFloat .stageRow { display: flex; align-items: center; gap: 6px; }
-  #stageFloat #stageButtons, #stageFloat #stageButtonsUnreleased { display: flex; flex-wrap: wrap; gap: 4px; }
+  #stageFloat > .stageRow { display: flex; flex-direction: row; align-items: flex-start; gap: 8px; }
+  #stageFloat > .stageRow > #stageCollapse { flex: 0 0 auto; }
+  #stageFloat > .stageRow > #stageButtons { flex: 1 1 auto; min-width: 0; }
+  #stageFloat #stageButtons { display: flex; flex-direction: column; align-items: stretch; gap: 5px; }
+  #stageFloat #stageButtonsUnreleased { display: flex; flex-wrap: wrap; gap: 4px; }
+  #stageFloat #stageButtonsUnreleased:empty { display: none; }
+  #stageFloat #stageButtons .stageRow { display: flex; flex-direction: column; align-items: stretch; gap: 3px; width: 100%; }
+  #stageFloat #stageButtons .stageRowBtns { display: flex; flex-wrap: wrap; gap: 4px; }
+  #stageFloat #stageButtons .stageRowLabel { color: #8ea0b8; font-size: 11px; line-height: 1.2; }
   #stageFloat #stageButtons button, #stageFloat #stageButtonsUnreleased button { padding: 3px 9px; font-size: 12px; border-radius: 6px;
     border: 1px solid var(--line); background: #141f2f; color: #cfe0f5; }
   #stageFloat #stageButtons button.on, #stageFloat #stageButtonsUnreleased button.on { background: #1f5f9e; border-color: #2f7fd1; color: #fff; }
@@ -584,7 +588,6 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
     <button id="tProject" title="把区域边界投射到地形；默认关闭，保留源数据 Z">边界投射</button>
     <button id="tVolumes3d" title="显示据点真高边界与 DetectHeight 高度带；默认关闭">据点体积</button>
   </div>
-  <div class="note commander-only" id="vol3dStatus">默认关闭。开启后显示据点真高边界与高度带；不改原地图。</div>
   <table id="stageList" class="commander-only"></table>
   <div class="note commander-only" id="phaseNotes" hidden></div>
   <div class="note commander-only" id="flightInfo">当前地图未检测到飞行载具区。</div>
@@ -791,7 +794,6 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
     <h2>大事件</h2>
     <div class="beHead">
       <button id="tBigEventVolume" title="在 3D、小地图与全屏地图上显示/隐藏大事件判定区">显示判定区</button>
-      <span id="beMechanicTag" class="beMechanicTag" hidden>提示 · 机制</span>
     </div>
     <div id="beMissilePanel">
     <table class="beTable" id="beTable"></table>
@@ -813,23 +815,22 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
       <button id="beReset">重置</button>
     </div>
     <div class="beLog" id="beLog"></div>
+    <div class="beSectionTitle" id="beMissileBroadcastTitle" hidden>游戏内播报</div>
+    <div class="beMechQuotes" id="beMissileGameBroadcasts" hidden></div>
     </div>
     <div id="beMechanics" hidden>
       <div class="beMechanicHead">
-        <span id="beMechanicKind" class="beMechanicTag">气象事件</span>
         <span id="beMechanicName" class="beMechanicName"></span>
-        <span id="beMechanicSub" class="beMechanicSub"></span>
       </div>
       <div class="note" id="beMechanicSummary"></div>
-      <div class="beSectionTitle">机制参数</div>
-      <table class="beTable beFacts" id="beMechanicFacts"></table>
-      <div class="beSectionTitle">阶段与影响</div>
-      <div class="bePhaseList" id="beMechanicPhases"></div>
-      <div class="beSectionTitle">要点提示</div>
-      <div class="note beTips" id="beMechanicTips"></div>
+      <div class="beSectionTitle">触发方案</div>
+      <table class="beTable beFacts" id="beMechanicBranches"></table>
+      <div class="beSectionTitle" id="beMechanicStagesTitle" hidden>阶段走向</div>
+      <table class="beTable beFacts" id="beMechanicStages" hidden></table>
+      <div class="beSectionTitle">基本参数</div>
+      <table class="beTable beFacts" id="beMechanicParams"></table>
       <div class="beSectionTitle">游戏内播报</div>
       <div class="beMechQuotes" id="beMechanicBroadcasts"></div>
-      <div class="note beSource" id="beMechanicNotes"></div>
     </div>
     </div>
   </section>
@@ -994,14 +995,6 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
   </div>
   <div id="labels"></div>
   <div id="hud">左键旋转 · Shift+左键平移 · 滚轮缩放</div>
-  <div id="vol3dLegend" hidden>
-    <div class="v3title">据点体积 <span id="vol3dLegendCount"></span></div>
-    <div class="v3row"><i class="v3sw" style="background:#ff2bd6"></i>据点边界（真高）</div>
-    <div class="v3row"><i class="v3sw" style="background:#ff2bd6;opacity:.6"></i>据点高度带（DetectHeight）</div>
-    <div class="v3row"><i class="v3sw" style="background:#ffffff;border:1px solid #6f8299"></i>每个点上定点</div>
-    <div class="v3row"><i class="v3sw" style="background:#ff2bd6;border:1px solid #6f8299"></i>每个点下定点</div>
-    <div class="v3note" id="vol3dLegendNote"></div>
-  </div>
   <div id="debugPick" hidden></div>
   <div id="minimap" hidden title="点击打开全屏战术地图">
     <div class="cap" id="minimapCap">战术地图 · M键 / 点击预览</div>
@@ -1035,6 +1028,11 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
       <div class="cutNote">条以上隐藏 · 往下拖</div>
       <div class="cutDatumNote" id="cutDatumNote" hidden title="对数坐标的基准：当前目标点中位高度"></div>
     </div>
+  </div>
+  <div id="mapEmptyState" hidden>
+    <div class="emptyTitle">未选择地图</div>
+    <div class="emptyText">从右侧「地图」下拉选择一张地图；未选择时不会加载地图资源。</div>
+    <button id="emptyOpenRail" type="button">打开地图选项</button>
   </div>
   <div id="loading">正在加载地图…</div>
 </div>
@@ -1160,6 +1158,7 @@ NVIDIA 控制面板 → 管理 3D 设置 → 程序设置 中也可为浏览器�
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { buildDeployment } from './deploy_system.js';
 import { createFieldSupport } from './field_support.js';
 
@@ -1180,10 +1179,22 @@ let modeStateToken = 0;
 let baseMinimapCfg = null;
 let baseMinimapRange = 150;
 let tdmReturnView = null;
-const mapCodes = ["Iceland", "Cracked", "Gibraltar", "Shafted", "Crest", "Retrowar", "Derail", "NavalBattle", "Fault", "Mogadishu", "Skyline"];
-const requestedMap = PAGE_PARAMS.get('map') || 'Skyline';
-const MAP = mapCodes.find(code => code.toLowerCase() === requestedMap.toLowerCase()) || 'Skyline';
-let MAP_ROOT = './map/' + MAP + '/';
+const mapCodes = ["Iceland", "Cracked", "Gibraltar", "Shafted", "Crest", "Retrowar", "Derail", "NavalBattle", "Mogadishu", "Skyline"];
+const requestedMapRaw = PAGE_PARAMS.get('map');
+const requestedMap = requestedMapRaw && requestedMapRaw.toLowerCase() !== 'none' ? requestedMapRaw : '';
+const MAP = requestedMap
+  ? (mapCodes.find(code => code.toLowerCase() === requestedMap.toLowerCase()) || '')
+  : '';
+let MAP_ROOT = MAP ? './map/' + MAP + '/' : '';
+const MAP_ASSET_VERSION = '20261115_9';
+function versionedMapUrl(url) {
+  if (!url) return url;
+  return url + (url.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(MAP_ASSET_VERSION);
+}
+
+let highFilterConfig = null;
+let highFilterBounds = null;
+let lowFilterBounds = null;
 
 async function mapFileExists(url) {
   try {
@@ -1278,7 +1289,8 @@ const mapSelect = document.getElementById('mapSelect');
 mapSelect.addEventListener('change', () => {
   const code = mapSelect.value;
   const url = new URL(location.href);
-  url.searchParams.set('map', code);
+  if (code) url.searchParams.set('map', code);
+  else url.searchParams.delete('map');
   if (APP_MODE !== 'commander') url.searchParams.set('mode', APP_MODE);
   else url.searchParams.delete('mode');
   // 整页切换前把左侧当前页签/滚动和右侧栏滚动落盘，重载后各自恢复。
@@ -1328,14 +1340,21 @@ function modeLabelFor(modeId, fallback = '') {
 }
 /* 该模式在当前地图是否有数据；没有就置灰并在点击时说明原因。 */
 function modeAvailableForMap(modeId) {
+  if (!MAP) return false;
   const maps = modeCatalogEntry(modeId)?.maps;
   if (!Array.isArray(maps) || !maps.length) return true;
   return maps.some((code) => String(code).toLowerCase() === MAP.toLowerCase());
 }
 let modeNoticeTimer = 0;
 function syncModeAvailability() {
-  const mapName = mapManifest?.mapName || MAP;
+  const mapName = mapManifest?.mapName || MAP || '未选择地图';
   for (const button of document.querySelectorAll('#modeSwitch button')) {
+    if (!MAP) {
+      button.classList.add('unavailable');
+      button.setAttribute('aria-disabled', 'true');
+      button.title = '请先选择地图';
+      continue;
+    }
     const modeId = button.dataset.mode;
     const available = modeAvailableForMap(modeId);
     button.classList.toggle('unavailable', !available);
@@ -1356,7 +1375,7 @@ function hideModeNotice() {
 function showModeNotice(modeId) {
   const el = document.getElementById('modeNotice');
   const label = modeLabelFor(modeId, '该模式');
-  const mapName = mapManifest?.mapName || MAP;
+  const mapName = mapManifest?.mapName || MAP || '未选择地图';
   if (el) {
     el.textContent = `当前地图「${mapName}」没有${label}数据；请先在地图下拉中切换到支持${label}的地图，再选择该模式。`;
     el.hidden = false;
@@ -1375,8 +1394,9 @@ function refreshMapSelect() {
   const mode = currentModeEntry();
   const allowed = new Set((mode?.maps || []).map((code) => String(code).toLowerCase()));
   const maps = mapIndexCache.filter((item) => allowed.has(String(item.code).toLowerCase()));
-  const current = maps.find((item) => String(item.code).toLowerCase() === MAP.toLowerCase());
-  mapSelect.innerHTML = maps.map((item) =>
+  const current = MAP ? maps.find((item) => String(item.code).toLowerCase() === MAP.toLowerCase()) : null;
+  const placeholder = `<option value="" ${current ? '' : 'selected'}>未选择</option>`;
+  mapSelect.innerHTML = placeholder + maps.map((item) =>
     `<option value="${item.code}" ${current?.code === item.code ? 'selected' : ''}>` +
     `${item.name}${mapModeSuffix(item.code)}${item.ready ? '' : '（未就绪）'}</option>`).join('');
 }
@@ -1388,7 +1408,7 @@ function applyModeCopy() {
   for (const button of document.querySelectorAll('#modeSwitch button')) {
     button.classList.toggle('on', button.dataset.mode === APP_MODE);
   }
-  const mapName = mapManifest?.mapName || MAP;
+  const mapName = mapManifest?.mapName || MAP || '未选择地图';
   const modeTitle = modeDisplayName();
   document.title = `三角洲行动 · ${modeTitle} · ${mapName}`;
   document.querySelector('#panel h1').textContent =
@@ -1683,8 +1703,8 @@ Promise.all([
     || (catalog.modes || [])[0];
   const allowed = new Set((mode?.maps || []).map((code) => String(code).toLowerCase()));
   const maps = index.filter((item) => allowed.has(String(item.code).toLowerCase()));
-  const current = maps.find((item) => String(item.code).toLowerCase() === MAP.toLowerCase());
-  if (!current && maps.length) {
+  const current = MAP ? maps.find((item) => String(item.code).toLowerCase() === MAP.toLowerCase()) : null;
+  if (MAP && !current && maps.length) {
     const url = new URL(location.href);
     url.searchParams.set('map', maps[0].code);
     location.replace(url.toString());
@@ -2069,7 +2089,7 @@ function sampleGrid(t, x, y) {
 async function loadGroundTextures(groundUris) {
   const loader = new THREE.TextureLoader();
   const hdParam = earlyParams.get('hd');
-  const useHd = hdParam === '1' || (hdParam !== '0' && gpuTier === 'discrete');
+  const useHd = false; // 在线版统一读取标准地表贴图
   const pick = async (i) => {
     if (!groundUris[i]) return null;
     let tex;
@@ -2494,12 +2514,13 @@ async function loadFlightData() {
  * ------------------------------------------------------------------ */
 /* MFPK 单文件数据包（可选快速通道）：整档几何 + 其引用的底色贴图打成一个
  * 二进制文件，浏览器每档只发 1 次请求，减少数百/上千次 HTTP 往返。 */
-const SPLIT_MFPK = {"map/Crest/Crest_low.mfpk":{"parts":["Crest_low.mfpk.part01","Crest_low.mfpk.part02","Crest_low.mfpk.part03","Crest_low.mfpk.part04"],"size":14875440},"map/Retrowar/Retrowar_low.mfpk":{"parts":["Retrowar_low.mfpk.part01","Retrowar_low.mfpk.part02"],"size":66310276},"map/Mogadishu/Mogadishu_low.mfpk":{"parts":["Mogadishu_low.mfpk.part01","Mogadishu_low.mfpk.part02","Mogadishu_low.mfpk.part03"],"size":100469668},"map/Skyline/Skyline_low.mfpk":{"parts":["Skyline_low.mfpk.part01","Skyline_low.mfpk.part02","Skyline_low.mfpk.part03","Skyline_low.mfpk.part04","Skyline_low.mfpk.part05","Skyline_low.mfpk.part06","Skyline_low.mfpk.part07","Skyline_low.mfpk.part08","Skyline_low.mfpk.part09","Skyline_low.mfpk.part10","Skyline_low.mfpk.part11","Skyline_low.mfpk.part12","Skyline_low.mfpk.part13"],"size":53915284},"map/Skyline/Skyline_lowextra.mfpk":{"parts":["Skyline_lowextra.mfpk.part01","Skyline_lowextra.mfpk.part02","Skyline_lowextra.mfpk.part03","Skyline_lowextra.mfpk.part04","Skyline_lowextra.mfpk.part05","Skyline_lowextra.mfpk.part06","Skyline_lowextra.mfpk.part07","Skyline_lowextra.mfpk.part08","Skyline_lowextra.mfpk.part09","Skyline_lowextra.mfpk.part10","Skyline_lowextra.mfpk.part11","Skyline_lowextra.mfpk.part12"],"size":46245164}};
+const SPLIT_MFPK = {"map/Crest/Crest_low.mfpk":{"parts":["Crest_low.mfpk.part01","Crest_low.mfpk.part02","Crest_low.mfpk.part03"],"size":11508392},"map/Retrowar/Retrowar_low.mfpk":{"parts":["Retrowar_low.mfpk.part01","Retrowar_low.mfpk.part02"],"size":65557912},"map/Mogadishu/Mogadishu_low.mfpk":{"parts":["Mogadishu_low.mfpk.part01","Mogadishu_low.mfpk.part02"],"size":73851680},"map/Skyline/Skyline_low.mfpk":{"parts":["Skyline_low.mfpk.part01","Skyline_low.mfpk.part02","Skyline_low.mfpk.part03","Skyline_low.mfpk.part04","Skyline_low.mfpk.part05","Skyline_low.mfpk.part06","Skyline_low.mfpk.part07","Skyline_low.mfpk.part08","Skyline_low.mfpk.part09","Skyline_low.mfpk.part10","Skyline_low.mfpk.part11","Skyline_low.mfpk.part12"],"size":46242136},"map/Skyline/Skyline_lowextra.mfpk":{"parts":["Skyline_lowextra.mfpk.part01","Skyline_lowextra.mfpk.part02","Skyline_lowextra.mfpk.part03","Skyline_lowextra.mfpk.part04","Skyline_lowextra.mfpk.part05","Skyline_lowextra.mfpk.part06","Skyline_lowextra.mfpk.part07","Skyline_lowextra.mfpk.part08"],"size":33503060}};
 async function fetchMfpkBytes(url) {
-  if (url.endsWith('/' + MAP + '_high.mfpk') && onlineHighFiles.has(MAP)) {
+  const packagePath = url.split('?')[0];
+  if (packagePath.endsWith('/' + MAP + '_high.mfpk') && onlineHighFiles.has(MAP)) {
     return onlineHighFiles.get(MAP).arrayBuffer();
   }
-  const key = url.replace(/^\.\//, '');
+  const key = packagePath.replace(/^\.\//, '');
   const split = SPLIT_MFPK[key];
   if (!split) {
     const response = await fetch(url);
@@ -2546,6 +2567,7 @@ onlineHighInput.addEventListener('change', async () => {
 });
 
 async function parseMfpk(url) {
+  url = versionedMapUrl(url);
   let buf = await fetchMfpkBytes(url);
   if (new TextDecoder().decode(new Uint8Array(buf, 0, 4)) !== 'MFPK') throw new Error('bad mfpk magic');
   const view = new DataView(buf);
@@ -2602,6 +2624,10 @@ function instanceTransformKey(inst) {
 }
 
 function instanceFromGltf(group, entry, insts, name, meshIndex, gltf, overlapRule = null) {
+  // 只在明确配置的三张图启用高精度外围过滤；配置缺失/其他地图不启用，避免误删 C1/C2 等外围高精度。
+  let filteredInsts = insts;
+  if (name === 'high' && highFilterBounds) filteredInsts = insts.filter(insideHighFilter);
+  if (!filteredInsts.length) return;
   // These two glass overlays are coplanar with textured building windows;
   // their missing baked window inputs caused visible depth fighting.
   if (MAP === 'Skyline' && name === 'high'
@@ -2622,7 +2648,7 @@ function instanceFromGltf(group, entry, insts, name, meshIndex, gltf, overlapRul
         material.map.colorSpace = THREE.SRGBColorSpace;
       }
     }
-    let batches = [{ geometry: node.geometry, indices: insts.map((_, i) => i), trimmed: false }];
+    let batches = [{ geometry: node.geometry, indices: filteredInsts.map((_, i) => i), trimmed: false }];
     const mask = overlapRule?.materials?.[material?.name];
     if (mask && material?.userData?.dfMaterialStatus === 'missing_baked_input') {
       const original = node.geometry.index;
@@ -2638,7 +2664,7 @@ function instanceFromGltf(group, entry, insts, name, meshIndex, gltf, overlapRul
         trimmedGeometry.setIndex(kept);
         trimmedGeometry.clearGroups();
         const matched = [], unmatched = [];
-        insts.forEach((inst, i) => {
+        filteredInsts.forEach((inst, i) => {
           (overlapRule.baseTransforms.has(instanceTransformKey(inst)) ? matched : unmatched).push(i);
         });
         batches = [];
@@ -2656,7 +2682,7 @@ function instanceFromGltf(group, entry, insts, name, meshIndex, gltf, overlapRul
       const p = new THREE.Vector3(), q = new THREE.Quaternion(), s = new THREE.Vector3();
       const colour = new THREE.Color();
       batch.indices.forEach((originalIndex, k) => {
-        const inst = insts[originalIndex];
+        const inst = filteredInsts[originalIndex];
         p.set(inst[1], inst[2], inst[3]);
         q.set(inst[4], inst[5], inst[6], inst[7]);
         s.set(inst[8], inst[9], inst[10]);
@@ -2694,7 +2720,8 @@ function applyMeshHides() {
 async function loadTilesFromMfpk(manifest) {
   const pkg = await getMfpk('low');
   if (!pkg) throw new Error('缺少低精度 MFPK 数据包：' + MAP + '_low.mfpk');
-  const queue = [...manifest.tiles];
+  const queue = (manifest.tiles || []).filter(lowTileKept);
+  window.__lowFilterStats = { map: MAP, total: (manifest.tiles || []).length, kept: queue.length, bounds: lowFilterBounds };
   const workers = Array.from({ length: 6 }, async () => {
     while (queue.length) {
       const tile = queue.shift();
@@ -2859,7 +2886,7 @@ function tierCandidates(name) {
 }
 
 async function loadTier(name) {
-  if (!lodDoc) lodDoc = await (await fetch(MAP_ROOT + 'lod.json')).json();
+  if (!lodDoc) lodDoc = await (await fetch(versionedMapUrl(MAP_ROOT + 'lod.json'))).json();
   if (tierGroups[name]) {
     tierGroups[name].visible = tierState[name];
     return;
@@ -2919,9 +2946,11 @@ async function loadTier(name) {
           } else {
             try {
               const gltf = await pkg.loader.parseAsync(pkg.slice(pkgEntry), '');
+              const usedInsts = name === 'high' && highFilterBounds
+                ? insts.filter(insideHighFilter).length : insts.length;
               instanceFromGltf(group, entry, insts, name, meshIndex, gltf, glassOverlapRules.get(entry.name));
-              loadedCount += insts.length;
-              instTris += (entry.tris || 0) * insts.length;
+              loadedCount += usedInsts;
+              instTris += (entry.tris || 0) * usedInsts;
             } catch (error) { failed++; console.warn('网格解析失败', entry.name, error); }
           }
           done++;
@@ -2952,6 +2981,9 @@ async function loadTier(name) {
 
 /* 大事件 overlay：每个事件独立加载/隐藏（覆盖在基础地图之上） */
 const eventGroups = {};
+// 事件层里的巨环特效（SM_EFX_Ring_Colosseum_01/02）实例被放大到 50 倍，
+// 在大事件阶段看起来像悬空的大号薄片；它们只是特效，不参与场景展示，直接跳过。
+const EVENT_HIDDEN_MESHES = new Set(['SM_EFX_Ring_Colosseum_01', 'SM_EFX_Ring_Colosseum_02']);
 
 async function loadEventOverlay(eventCode) {
   if (!eventCode || eventGroups[eventCode]) return;
@@ -2979,6 +3011,7 @@ async function loadEventOverlay(eventCode) {
     while (jobs.length) {
       const meshIndex = jobs.shift();
       const entry = spec.meshes[meshIndex];
+      if (EVENT_HIDDEN_MESHES.has(entry.name)) continue;
       const insts = byMesh.get(meshIndex);
       const pkgEntry = pkg.entries.get(entry.file);
       if (!pkgEntry) continue;
@@ -3290,6 +3323,7 @@ let areaProjection = false;
 let volumes3dEnabled = false;
 let volumes3dData = null;
 let volumes3dMap = null;
+let volumes3dMode = null;
 let volumes3dGroup = null;
 let vol3dParamApplied = false;
 let blackZoneEnabled = false;
@@ -3598,47 +3632,30 @@ function bigEventEscapeHtml(value) {
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 }
 
-/* 渲染「大事件 · 机制提示」：参数表 / 阶段 / 要点 / 游戏内播报 / 来源 */
+/* 渲染「大事件 · 机制提示」：摘要 / 触发方案 / 基本参数 / 游戏内播报 */
 function renderBigEventMechanics(entry) {
-  const quake = entry.kind === 'earthquake';
-  const kindEl = document.getElementById('beMechanicKind');
-  if (kindEl) {
-    kindEl.textContent = entry.category || (quake ? '地震事件' : '气象事件');
-    kindEl.classList.toggle('earthquake', quake);
-  }
   const nameEl = document.getElementById('beMechanicName');
   if (nameEl) nameEl.textContent = entry.name || entry.mapName || '';
-  const subEl = document.getElementById('beMechanicSub');
-  if (subEl) subEl.textContent = '提示性质 · 不做数值模拟';
   const summaryEl = document.getElementById('beMechanicSummary');
   if (summaryEl) summaryEl.textContent = entry.summary || '';
-  const facts = document.getElementById('beMechanicFacts');
-  if (facts) {
-    const rows = Array.isArray(entry.facts) ? entry.facts : [];
-    facts.innerHTML = rows.map((row) => {
+
+  const fillRows = (id, rows) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const list = Array.isArray(rows) ? rows : [];
+    el.innerHTML = list.map((row) => {
       const [key, value] = Array.isArray(row) ? row : [row?.key, row?.value];
       return `<tr><td>${bigEventEscapeHtml(key)}</td><td>${bigEventEscapeHtml(value)}</td></tr>`;
     }).join('');
-    facts.hidden = !rows.length;
-  }
-  const phases = document.getElementById('beMechanicPhases');
-  if (phases) {
-    const rows = Array.isArray(entry.phases) ? entry.phases : [];
-    phases.innerHTML = rows.map((row) => {
-      const [name, timing, detail] = Array.isArray(row) ? row : [row?.name, row?.timing, row?.detail];
-      return `<div class="bePhase"><div class="bePhaseHead">` +
-        `<span class="bePhaseName">${bigEventEscapeHtml(name)}</span>` +
-        `<span class="bePhaseTime">${bigEventEscapeHtml(timing)}</span></div>` +
-        `<div class="bePhaseDetail">${bigEventEscapeHtml(detail)}</div></div>`;
-    }).join('');
-    phases.hidden = !rows.length;
-  }
-  const tips = document.getElementById('beMechanicTips');
-  if (tips) {
-    const rows = Array.isArray(entry.tips) ? entry.tips : [];
-    tips.textContent = rows.map((tip) => '· ' + tip).join('\n');
-    tips.hidden = !rows.length;
-  }
+    el.hidden = !list.length;
+  };
+  fillRows('beMechanicBranches', entry.branches);
+  const stagesTitle = document.getElementById('beMechanicStagesTitle');
+  const stageRows = Array.isArray(entry.stages) ? entry.stages : [];
+  fillRows('beMechanicStages', stageRows);
+  if (stagesTitle) stagesTitle.hidden = !stageRows.length;
+  fillRows('beMechanicParams', entry.params);
+
   const broadcasts = document.getElementById('beMechanicBroadcasts');
   if (broadcasts) {
     const rows = Array.isArray(entry.broadcasts) ? entry.broadcasts : [];
@@ -3649,15 +3666,21 @@ function renderBigEventMechanics(entry) {
     }).join('');
     broadcasts.hidden = !rows.length;
   }
-  const notes = document.getElementById('beMechanicNotes');
-  if (notes) {
-    const parts = [];
-    if (entry.note) parts.push(entry.note);
-    const sources = Array.isArray(entry.sources) ? entry.sources : [];
-    if (sources.length) parts.push('来源：\n' + sources.map((src) => '· ' + src).join('\n'));
-    notes.textContent = parts.join('\n\n');
-    notes.hidden = !parts.length;
+}
+
+function renderMissileGameBroadcasts(entry) {
+  const title = document.getElementById('beMissileBroadcastTitle');
+  const el = document.getElementById('beMissileGameBroadcasts');
+  const rows = Array.isArray(entry?.gameBroadcasts) ? entry.gameBroadcasts : [];
+  if (el) {
+    el.innerHTML = rows.map((row) => {
+      const [when, what] = Array.isArray(row) ? row : [row?.when, row?.what];
+      return `<div class="beQuote"><span class="when">${bigEventEscapeHtml(when)}</span>` +
+        `<span class="what">${bigEventEscapeHtml(what)}</span></div>`;
+    }).join('');
+    el.hidden = !rows.length;
   }
+  if (title) title.hidden = !rows.length;
 }
 
 function updateBigEventPanel() {
@@ -3672,19 +3695,18 @@ function updateBigEventPanel() {
   if (mechPanel) mechPanel.hidden = !mechanic;
   const volumeBtn = document.getElementById('tBigEventVolume');
   if (volumeBtn) volumeBtn.hidden = !view;
-  const mechTag = document.getElementById('beMechanicTag');
-  if (mechTag) mechTag.hidden = !mechanic;
   if (!view && !mechanic) return;
   if (mechanic) {
+    renderMissileGameBroadcasts(null);
     renderBigEventMechanics(mechanic);
     return;
   }
   const { entry, mode } = view;
+  renderMissileGameBroadcasts(entry);
   if (view.scripted) {
     if (missilePanel) missilePanel.hidden = true;
     const mech = currentBigEventMechanic();
     if (mechPanel) mechPanel.hidden = !mech;
-    if (mechTag) mechTag.hidden = !mech;
     if (volumeBtn) volumeBtn.hidden = false;
     if (mech) renderBigEventMechanics(mech);
     return;
@@ -3751,7 +3773,6 @@ function updateBigEventPanel() {
     const viewMech = currentBigEventMechanic();
     if (viewMech) {
       if (mechPanel) mechPanel.hidden = false;
-      if (mechTag) mechTag.hidden = false;
       renderBigEventMechanics(viewMech);
     }
   }
@@ -3963,6 +3984,11 @@ function areaVisible(item) {
   if (IS_CONQUEST) return true;   // 占领没有阶段：旗点/区域/基地全部可见
   if (activePhase) {
     if (item.kind === 'objective') return activePhase._src.has(item.srcLabel);
+    if (Array.isArray(activePhase.areaLabels) && activePhase.areaLabels.length) {
+      const label = String(item.label || item.name
+        || item.node?.userData?.area?.label || item.node?.userData?.area?.name || '');
+      return activePhase.areaLabels.includes(label);
+    }
     return item.stage === activePhase.stage;
   }
   if (item.eventOnly && String(stageFilter) !== String(item.stage)) return false;
@@ -4118,14 +4144,14 @@ function buildAreas(areas) {
   for (const area of areas) {
     const node = makeAreaMesh(area);
     group.add(node);
-    areaNodes.push({ node, kind: area.kind, stage: area.stage, subkind: area.subkind, srcLabel: area.srcLabel, eventOnly: area.eventOnly });
+    areaNodes.push({ node, kind: area.kind, stage: area.stage, subkind: area.subkind, srcLabel: area.srcLabel, eventOnly: area.eventOnly, label: area.label, name: area.name });
     if (area.kind !== 'objective') continue;
     const div = document.createElement('div');
     div.className = 'plabel';
     div.textContent = areaLabelText(area);
     div.style.color = '#' + ((area.subkind === 'hidden' || area.hidden) ? 0xf1c40f : areaColour(area)).toString(16).padStart(6, '0');
     document.getElementById('labels').appendChild(div);
-    labelNodes.push({ div, node, stage: area.stage, kind: area.kind, subkind: area.subkind, srcLabel: area.srcLabel, eventOnly: area.eventOnly });
+    labelNodes.push({ div, node, stage: area.stage, kind: area.kind, subkind: area.subkind, srcLabel: area.srcLabel, eventOnly: area.eventOnly, label: area.label, name: area.name });
   }
   const objs = areas.filter((a) => a.kind === 'objective');
   if (objs.length) {
@@ -4385,59 +4411,56 @@ function addVol3dRingRibbon(group, ring, y, color, width) {
   group.add(mesh);
 }
 
-function addVol3dPrism(points, bottomY, topY, color) {
+function addVol3dPrism(points, bottomY, topY, color, options = {}) {
   if (!points || points.length < 3 || !(topY > bottomY)) return null;
   const ring = simplifyRing2D(points, 0.05);
   if (ring.length < 3) return null;
+  const radius = Number.isFinite(options.thickness) ? options.thickness : 0.12;
+  const pointColor = options.pointColor != null ? options.pointColor : 0xffffff;
   const group = new THREE.Group();
 
-  // 只画线框（环 + 竖边 + 点），不画半透明面，避免缩小时摩尔纹和透明面重叠。
-
-
-  // 每个原始点都画上/下端点和竖边；只用线段，避免圆柱面在缩小时产生摩尔纹。
-  const topPts = ring.map((p) => new THREE.Vector3(p[0], topY, p[1]));
-  const bottomPts = ring.map((p) => new THREE.Vector3(p[0], bottomY, p[1]));
-  const vtx = [];
-  for (let i = 0; i < ring.length; i++) {
-    vtx.push(new THREE.Vector3(ring[i][0], bottomY, ring[i][1]));
-    vtx.push(new THREE.Vector3(ring[i][0], topY, ring[i][1]));
+  // 用细圆柱代替 LineBasicMaterial：WebGL 的 linewidth 在多数浏览器被忽略。
+  // 所有线（上下环 + 竖边）统一一个颜色并合并成一个 mesh；所有顶点统一一个颜色。
+  const tube = (a, b) => {
+    const dir = new THREE.Vector3().subVectors(b, a);
+    const len = dir.length();
+    if (len < 1e-6) return null;
+    const geo = new THREE.CylinderGeometry(radius, radius, len, 6, 1, true);
+    geo.translate(0, len / 2, 0);
+    geo.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize()));
+    geo.translate(a.x, a.y, a.z);
+    return geo;
+  };
+  const bottomRing = ring.map((p) => new THREE.Vector3(p[0], bottomY, p[1]));
+  const topRing = ring.map((p) => new THREE.Vector3(p[0], topY, p[1]));
+  const n = ring.length;
+  const tubes = [];
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    tubes.push(tube(bottomRing[i], bottomRing[j]));
+    tubes.push(tube(topRing[i], topRing[j]));
+    tubes.push(tube(bottomRing[i], topRing[i]));
   }
-  const vlines = new THREE.LineSegments(
-    new THREE.BufferGeometry().setFromPoints(vtx),
-    new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.95, depthTest: false, depthWrite: false }),
-  );
-  vlines.renderOrder = 31;
-  vlines.frustumCulled = false;
-  group.add(vlines);
-  const ringLine = (y, colour) => {
-    const pts = ring.map((p) => new THREE.Vector3(p[0], y, p[1]));
-    const line = new THREE.LineLoop(
-      new THREE.BufferGeometry().setFromPoints(pts),
-      new THREE.LineBasicMaterial({ color: colour, transparent: true, opacity: 1, depthTest: false, depthWrite: false }),
-    );
-    line.renderOrder = 32;
-    line.frustumCulled = false;
-    group.add(line);
-  };
-  ringLine(bottomY, 0xff2bd6);
-  ringLine(topY, 0xffb3f0);
-
-  // 每个原始点都画上/下定点；点按世界尺度缩放，缩小地图时不会变成密集像素点。
-  const marker = (arr, colour, size, order) => {
-    if (!arr.length) return;
-    const geo = new THREE.BufferGeometry().setFromPoints(arr);
-    const pts = new THREE.Points(geo, new THREE.PointsMaterial({
-      color: colour, size, sizeAttenuation: false, transparent: true, opacity: 1,
-      depthTest: false, depthWrite: false,
+  const merged = mergeGeometries(tubes.filter(Boolean), false);
+  for (const g of tubes) if (g) g.dispose();
+  if (merged) {
+    const mesh = new THREE.Mesh(merged, new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity: 0.95, depthTest: false, depthWrite: false,
     }));
-    pts.renderOrder = order;
-    pts.frustumCulled = false;
-    group.add(pts);
-  };
-  marker(topPts, 0xffffff, 2.8, 33);
-  marker(topPts, color, 1.6, 34);
-  marker(bottomPts, color, 2.4, 33);
-  marker(bottomPts, 0xffffff, 1.5, 34);
+    mesh.renderOrder = 31;
+    mesh.frustumCulled = false;
+    group.add(mesh);
+  }
+
+  // 顶点统一一个颜色和大小。
+  const ptsGeo = new THREE.BufferGeometry().setFromPoints(topRing.concat(bottomRing));
+  const pts = new THREE.Points(ptsGeo, new THREE.PointsMaterial({
+    color: pointColor, size: 2.4, sizeAttenuation: false, transparent: true, opacity: 1,
+    depthTest: false, depthWrite: false,
+  }));
+  pts.renderOrder = 33;
+  pts.frustumCulled = false;
+  group.add(pts);
   return group;
 }
 
@@ -4589,8 +4612,6 @@ function buildBlackZone(data) {
     status.textContent = `黑区：${cells} 个格（当前阶段 ${stageNum == null ? '全部' : stageNum} 交战区/基地包络之外）；${safeAreas.length} 个区域，包络 ${hull.length} 点；` +
       '这是包络近似，不是已证实的“玩家可存在区域”；进入黑区后倒计时，未回交战区会被击杀。';
   }
-  const legend = document.getElementById('vol3dLegend');
-  if (legend) legend.hidden = false;
 }
 
 async function setBlackZone(enabled) {
@@ -4636,8 +4657,6 @@ function clearVolumes3d() {
     volumes3dGroup = null;
   }
   clearBlackZone();
-  const legend = document.getElementById('vol3dLegend');
-  if (legend) legend.hidden = true;
   if (window.__mapReady) {
     Object.assign(window.__mapReady, { volumes3d: false, volumes3dLoaded: false, volumes3dCounts: null });
   }
@@ -4645,37 +4664,55 @@ function clearVolumes3d() {
 }
 
 async function loadVolumes3d() {
-  if (volumes3dData && volumes3dMap === MAP) return volumes3dData;
+  if (volumes3dData && volumes3dMap === MAP && volumes3dMode === APP_MODE) return volumes3dData;
+  if (IS_CONQUEST) {
+    if (!captureData?.objectives?.length) await loadCaptureData();
+    if (!captureData?.objectives?.length) throw new Error('占领据点数据未加载');
+    const features = [];
+    for (const o of captureData.objectives) {
+      const pts = (o.points || []).filter((p) => Array.isArray(p) && p.length >= 3);
+      if (pts.length < 3) continue;
+      const ys = pts.map((p) => Number(p[1])).filter(Number.isFinite);
+      if (!ys.length) continue;
+      const bottom = Math.min(...ys);
+      const heightM = Math.max(0.25, (Number(o.detectHeight) || 0) / 100);
+      features.push({
+        type: 'area',
+        subtype: 'objective',
+        label: o.label || o.demarcation || o.name,
+        stage: null,
+        status: 'static_verified',
+        source: { level: 'capture_conquest', actor: o.name, component: null },
+        raw: { worldSplinePoint: pts, detectHeight: o.detectHeight },
+        web: {
+          points: pts,
+          zRange: [bottom, bottom + heightM],
+          heightM,
+        },
+      });
+    }
+    const data = {
+      schemaVersion: 1,
+      map: MAP,
+      mapName: captureData.mapName || MAP,
+      sourceLevel: 'capture_conquest.json',
+      features,
+      gaps: [],
+      counts: { areas: features.length, areasVerified: features.length, gaps: 0 },
+      conquest: true,
+    };
+    volumes3dData = data;
+    volumes3dMap = MAP;
+    volumes3dMode = APP_MODE;
+    return data;
+  }
   const resp = await fetch(`./data/volumes3d/${encodeURIComponent(MAP)}.json`, { cache: 'no-store' });
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
   const data = await resp.json();
   volumes3dData = data;
   volumes3dMap = MAP;
+  volumes3dMode = APP_MODE;
   return data;
-}
-
-function vol3dCountsText(data, shownAreas, shownHeights, skipped) {
-  const c = data?.counts || {};
-  return `${MAP} · ${shownAreas} 据点` +
-    (shownHeights ? ` · ${shownHeights} 高度带` : '') +
-    (skipped ? ` · 跳过 ${skipped} 个警告` : '') +
-    (c.gaps ? ` · 缺口 ${c.gaps}` : '');
-}
-
-function updateVol3dLegend(data, shownAreas, shownHeights, skipped) {
-  const legend = document.getElementById('vol3dLegend');
-  const count = document.getElementById('vol3dLegendCount');
-  const note = document.getElementById('vol3dLegendNote');
-  if (!legend) return;
-  if (!data) { legend.hidden = true; return; }
-  if (count) count.textContent = vol3dCountsText(data, shownAreas, shownHeights, skipped);
-  if (note) {
-    const c = data.counts || {};
-    note.textContent = '只显示据点边界、据点高度带和每个点的上/下定点；线框模式，不做半透明面。' +
-      ' 交战区/基地/静态体积不在此层。黑区层已下掉。' +
-      (c.gaps ? ` ${c.gaps} 个源数据缺口，未用猜测几何补齐。` : '');
-  }
-  legend.hidden = false;
 }
 
 function buildVolumes3d(data) {
@@ -4692,7 +4729,12 @@ function buildVolumes3d(data) {
       if (f.status !== 'static_verified') { skipped++; continue; }
       // 三维实验层只保留据点：交战区/基地边界在原地图已有，静态体积意义不大。
       if (f.subtype !== 'objective') continue;
-      if (stageNum != null && Number(f.stage) !== stageNum) continue;
+      if (!IS_CONQUEST && stageNum != null && Number(f.stage) !== stageNum) continue;
+      if (activePhase && !activePhase._src.has(String(f.label))) continue;
+      if (!activePhase && stageFilter === 'all') {
+        const regular = regularPhaseSources();
+        if (regular && !regular.has(String(f.label))) continue;
+      }
       const color = VOL3D_COLORS[f.subtype] || 0xcccccc;
       if (f.web?.zRange) {
         const bottomY = f.web.zRange[0];
@@ -4718,24 +4760,16 @@ function buildVolumes3d(data) {
       volumes3dCounts: group.userData.counts,
     });
   }
-  updateVol3dLegend(data, shownAreas, shownHeights, skipped);
   applyAreaVisibility();
   if (blackZoneEnabled) buildBlackZone(data);
-  const status = document.getElementById('vol3dStatus');
-  if (status) {
-    status.textContent = `已开启：${shownAreas} 据点` +
-      (shownHeights ? ` / ${shownHeights} 个高度带` : '') +
-      (skipped ? `；跳过 ${skipped} 个警告（Skyline 点位不一致）` : '') +
-      (data.counts?.gaps ? `；${data.counts.gaps} 个缺口见 README` : '');
-  }
 }
 
 async function setVolumes3d(enabled) {
   const next = !!enabled;
   const btn = document.getElementById('tVolumes3d');
-  const status = document.getElementById('vol3dStatus');
-  if (next && (IS_TDM || IS_CONQUEST)) {
-    if (status) status.textContent = '据点体积仅用于胜者为王/攻防。';
+  if (next && IS_TDM) {
+    const status = document.getElementById('vol3dStatus');
+    if (status) status.textContent = '据点体积不支持团队死斗。';
     return false;
   }
   volumes3dEnabled = next;
@@ -4745,10 +4779,8 @@ async function setVolumes3d(enabled) {
     const blackBtn = document.getElementById('tBlackZone');
     if (blackBtn) blackBtn.classList.remove('on');
     clearVolumes3d();
-    if (status) status.textContent = '默认关闭。开启后显示据点真高边界与高度带；不改原地图。';
     return false;
   }
-  if (status) status.textContent = '加载据点体积…';
   try {
     const data = await loadVolumes3d();
     if (!volumes3dEnabled) return false;
@@ -4758,7 +4790,6 @@ async function setVolumes3d(enabled) {
     volumes3dEnabled = false;
     if (btn) btn.classList.remove('on');
     clearVolumes3d();
-    if (status) status.textContent = `据点体积加载失败：${error.message}`;
     console.warn('[volumes3d]', error);
     return false;
   }
@@ -5339,7 +5370,7 @@ function drawFullDeploymentPoints(ctx, toX, toY, u) {
     for (const [key, color, inner, camp] of groups) {
       if (!campVisible(camp)) continue;
       for (const p of ob.spawns?.[key] || []) {
-        link(ob.pos, p, color);
+        link(flagPointOf(ob), p, color);
         dot(p, color, (inner ? 2.6 : 1.8) * u);
       }
     }
@@ -5967,8 +5998,10 @@ function setMinimapFullZoom(value) {
 const labelProjection = new THREE.Vector3();
 function updateLabels() {
   const w = canvas.clientWidth, h = canvas.clientHeight;
-  for (const { div, node } of labelNodes) {
-    if (div.dataset.hidden || !node.visible) { div.style.display = 'none'; continue; }
+  for (const { div, node, kind } of labelNodes) {
+    // 据点体积开启时 objective 的 area mesh 会被隐藏以避免重叠，但字母标要保留。
+    const hiddenByNode = !node.visible && !(volumes3dEnabled && kind === 'objective');
+    if (div.dataset.hidden || hiddenByNode) { div.style.display = 'none'; continue; }
     const p = labelProjection.copy(node.userData.centre);
     const ground = heightAt(p.x, p.z);
     const elevated = p.y - ground > 5;
@@ -6608,13 +6641,88 @@ async function loadVehicleSystem() {
   }
 }
 
+async function loadHighFilterConfig() {
+  if (highFilterConfig) return highFilterConfig;
+  try {
+    highFilterConfig = await (await fetch('./data/high_filter.json', { cache: 'no-store' })).json();
+  } catch (error) {
+    highFilterConfig = { default: { enabled: false }, maps: {} };
+  }
+  return highFilterConfig;
+}
+
+function computeHighFilterBounds() {
+  if (!['Collapse', 'Mogadishu', 'Colosseum'].includes(MAP)) return null;
+  const config = highFilterConfig?.maps?.[MAP] || highFilterConfig?.default || { enabled: false };
+  if (config.enabled === false) return null;
+  const points = [];
+  for (const area of (mapManifest?.breakthrough || [])) {
+    for (const p of (area.points || [])) {
+      if (Array.isArray(p) && p.length >= 3) points.push(p);
+    }
+  }
+  if (!points.length) return null;
+  const pad = Number(config.padding) || 0;
+  let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+  for (const p of points) {
+    if (p[0] < minX) minX = p[0];
+    if (p[0] > maxX) maxX = p[0];
+    if (p[2] < minZ) minZ = p[2];
+    if (p[2] > maxZ) maxZ = p[2];
+  }
+  return [minX - pad, maxX + pad, minZ - pad, maxZ + pad];
+}
+
+function computeLowFilterBounds() {
+  if (!['Collapse', 'Mogadishu', 'Colosseum'].includes(MAP)) return null;
+  const config = highFilterConfig?.maps?.[MAP]?.low
+    || highFilterConfig?.default?.low || { enabled: false };
+  if (config.enabled !== true) return null;
+  const points = [];
+  for (const area of (mapManifest?.breakthrough || [])) {
+    for (const p of (area.points || [])) {
+      if (Array.isArray(p) && p.length >= 3) points.push(p);
+    }
+  }
+  if (!points.length) return null;
+  const pad = Number(config.padding) || 0;
+  let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+  for (const p of points) {
+    if (p[0] < minX) minX = p[0];
+    if (p[0] > maxX) maxX = p[0];
+    if (p[2] < minZ) minZ = p[2];
+    if (p[2] > maxZ) maxZ = p[2];
+  }
+  return [minX - pad, maxX + pad, minZ - pad, maxZ + pad];
+}
+
+function lowTileKept(tile) {
+  if (!lowFilterBounds) return true;
+  const mn = tile?.min, mx = tile?.max;
+  if (!Array.isArray(mn) || !Array.isArray(mx)) return true;
+  const [x0, x1, z0, z1] = lowFilterBounds;
+  // 与构建期一致：整块都在边界外才丢弃；跨边界瓦片保留，避免在场地边缘挖洞。
+  return !(mx[0] < x0 || mn[0] > x1 || mx[2] < z0 || mn[2] > z1);
+}
+
+function insideHighFilter(pos) {
+  if (!highFilterBounds) return true;
+  const [x0, x1, z0, z1] = highFilterBounds;
+  return pos[1] >= x0 && pos[1] <= x1 && pos[3] >= z0 && pos[3] <= z1;
+}
+
 async function run() {
-  if (MAP === 'Derail' && !(await mapFileExists(MAP_ROOT + 'manifest.json'))
+  if (MAP === 'Derail' && !(await mapFileExists(versionedMapUrl(MAP_ROOT + 'manifest.json')))
       && await mapFileExists('./map/derail/manifest.json')) MAP_ROOT = './map/derail/';
   if (!(await ensureMapPackage())) throw new Error('缺少地图包：' + MAP);
-  const manifest = await (await fetch(MAP_ROOT + 'manifest.json')).json();
+  const manifest = await (await fetch(versionedMapUrl(MAP_ROOT + 'manifest.json'))).json();
   mapManifest = manifest;
   mapMeta = manifest;
+  // 外围过滤已烘焙进地图包；运行时不计算、不再二次过滤。
+  highFilterBounds = null;
+  lowFilterBounds = null;
+  window.__highFilterInfo = { map: MAP, bounds: null, baked: true };
+  window.__lowFilterInfo = { map: MAP, bounds: null, baked: true };
   applyModeCopy();
     const minimapImg = document.getElementById('minimapImg');
     minimapImg.onerror = () => { document.getElementById('minimap').hidden = true; };
@@ -6873,7 +6981,7 @@ async function applyModeState({ initial = false, previousMode = null } = {}) {
   }
 
   clearAreas();
-  const vol3dWasEnabled = volumes3dEnabled && !IS_TDM && !IS_CONQUEST;
+  const vol3dWasEnabled = volumes3dEnabled && !IS_TDM;
   volumes3dEnabled = vol3dWasEnabled;
   const black3dWasEnabled = blackZoneEnabled && !IS_TDM && !IS_CONQUEST;
   blackZoneEnabled = black3dWasEnabled;
@@ -7035,26 +7143,79 @@ function buildStageList(areas) {
   allButton.dataset.stage = 'all';
   allButton.textContent = '全部阶段';
   allButton.classList.add('on');
-  stageButtons.appendChild(allButton);
+  const unreleasedBox = document.getElementById('stageButtonsUnreleased');
+  if (unreleasedBox) unreleasedBox.innerHTML = '';
+  // 阶段按「标签一行 + 按钮自动换行」排列：标签不再占用横向一列，按钮在整行宽度内自动折行。
+  const makeRow = (labelText) => {
+    const row = document.createElement('div');
+    row.className = 'stageRow';
+    if (labelText) {
+      const label = document.createElement('span');
+      label.className = 'stageRowLabel';
+      label.textContent = labelText;
+      row.appendChild(label);
+    }
+    const box = document.createElement('div');
+    box.className = 'stageRowBtns';
+    row.appendChild(box);
+    stageButtons.appendChild(row);
+    return box;
+  };
+  const unreleased = [];
+  const addUnreleasedRow = () => {
+    if (!unreleased.length) return;
+    const box = makeRow('未发布');
+    for (const button of unreleased) box.appendChild(button);
+  };
   if (phasePlan) {
-    const unreleasedBox = document.getElementById('stageButtonsUnreleased');
-    for (const phase of phasePlan.phases) {
+    const makePhaseButton = (phase) => {
       const text = phaseButtonText(phase);
       const button = document.createElement('button');
       button.dataset.phase = phase.id;
       button.textContent = text;
       if (phase.kind === 'event') button.classList.add('event');
+      return { button, text };
+    };
+    const addPhaseButton = (phase, parent) => {
+      const { button, text } = makePhaseButton(phase);
       if (text.includes('未发布')) {
         button.classList.add('unreleased');
-        unreleasedBox.appendChild(button);
+        unreleased.push(button);
       } else {
-        stageButtons.appendChild(button);
+        parent.appendChild(button);
       }
+    };
+    const rows = new Map();
+    const order = [];
+    for (const phase of phasePlan.phases) {
+      const key = phase.branch || '';
+      if (!rows.has(key)) {
+        rows.set(key, []);
+        order.push(key);
+      }
+      rows.get(key).push(phase);
+    }
+    if (order.some((key) => key)) {
+      let firstRow = true;
+      for (const key of order) {
+        const box = makeRow((phasePlan.branchLabels && phasePlan.branchLabels[key]) || key || '其它');
+        if (firstRow) {
+          box.appendChild(allButton);
+          firstRow = false;
+        }
+        for (const phase of rows.get(key)) addPhaseButton(phase, box);
+      }
+      addUnreleasedRow();
+    } else {
+      const box = makeRow(null);
+      box.appendChild(allButton);
+      for (const phase of phasePlan.phases) addPhaseButton(phase, box);
+      addUnreleasedRow();
     }
   } else {
     const stages = [...new Set(areas.map((a) => a.stage).filter((s) => s >= 1))].sort((a, b) => a - b);
     const stageLabels = mapMeta?.stageLabels || {};
-    const unreleasedBox = document.getElementById('stageButtonsUnreleased');
+    const released = [];
     for (const stage of stages) {
       const text = stageLabels[String(stage)] || `阶段 ${stageLetter(stage)}`;
       const button = document.createElement('button');
@@ -7062,11 +7223,15 @@ function buildStageList(areas) {
       button.textContent = text;
       if (text.includes('未发布')) {
         button.classList.add('unreleased');
-        unreleasedBox.appendChild(button);
+        unreleased.push(button);
       } else {
-        stageButtons.appendChild(button);
+        released.push(button);
       }
     }
+    const box = makeRow(null);
+    box.appendChild(allButton);
+    for (const button of released) box.appendChild(button);
+    addUnreleasedRow();
   }
   // 占领值是阶段（扇区）属性，按扇区列出，而非逐个据点重复
   let rows = '';
@@ -7373,6 +7538,11 @@ function objectiveDisplayName(ob) {
   return String(ob?.icon || '').trim();
 }
 
+function flagPointOf(ob) {
+  // flagPos 来自关卡里 BP_SectorAnchorFlag 的根组件（旗杆），缺省回退锚点根组件
+  return (ob && ob.flagPos) || (ob && ob.pos);
+}
+
 function predCandidates(ob) {
   if (IS_TDM) {
     const camp = document.getElementById('predCamp').value === 'defend' ? 'defend' : 'attack';
@@ -7472,6 +7642,7 @@ function scoreSpawn(pos, ob) {
     nearest = Math.min(nearest, d);
     if (d < 110) nearby.push({ e, d });
   }
+  const flag = flagPointOf(ob);
   const squads = predSquads();
   let nearestSquad = Infinity;
   let laneGap = Infinity;
@@ -7481,7 +7652,7 @@ function scoreSpawn(pos, ob) {
     if (d < 18) score -= 70;
     else if (d < 48) score -= 48 * (1 - d / 48);
     else if (d < 90) score -= 18 * (1 - d / 90);
-    laneGap = Math.min(laneGap, pointSegmentDistance(squad.x, squad.z, pos[0], pos[2], ob.pos[0], ob.pos[2]));
+    laneGap = Math.min(laneGap, pointSegmentDistance(squad.x, squad.z, pos[0], pos[2], flag[0], flag[2]));
   }
   if (laneGap < 16) score -= 42;
   else if (laneGap < 34) score -= 25 * (1 - (laneGap - 16) / 18);
@@ -7497,7 +7668,7 @@ function scoreSpawn(pos, ob) {
       else if (d < 105) score -= 11 * (1 - d / 105);
     }
   }
-  const flagD = Math.hypot(pos[0] - ob.pos[0], pos[2] - ob.pos[2]);
+  const flagD = Math.hypot(pos[0] - flag[0], pos[2] - flag[2]);
   score -= Math.min(18, flagD * 0.16);
   return {
     score: Math.max(0, Math.min(100, score)),
@@ -8003,6 +8174,67 @@ function buildTdmSpawnOverlay(linkGroup, mk) {
 
 }
 
+function volumeRangeFor(target) {
+  // 与「据点体积」同一份数据：area/objective 的 zRange[0] 为底，heightM 为高度。
+  // target 可以是 label 字符串，也可以是 spawn objective（附属据点的 label 是显示名，需用 icon/name 兜底）。
+  const keys = (target && typeof target === 'object'
+    ? [target.label, target.icon, target.name, target.displayLabel]
+    : [target]).filter(Boolean).map(String);
+  const feats = (volumes3dData && volumes3dData.features) || [];
+  const norm = (s) => String(s || '').replace(/[^0-9A-Za-z]/g, '').toUpperCase();
+  const isObj = (x) => x && x.type === 'area' && x.subtype === 'objective';
+  const f = feats.find((x) => isObj(x) && keys.includes(String(x.label)))
+    || feats.find((x) => isObj(x) && keys.some((k) => norm(k) === norm(x.label)));
+  if (!f || !f.web || !Array.isArray(f.web.zRange)) return null;
+  const bottomY = Number(f.web.zRange[0]);
+  const h = Number(f.web.heightM) || 0;
+  if (!Number.isFinite(bottomY)) return null;
+  return { bottomY, topY: bottomY + Math.max(h, 0.25) };
+}
+
+function objectivePhaseKeys(ob) {
+  // 阶段计划的 src 是 A1/B1/D1 这类标号。spawns 的 label/icon 会被阶段计划/显示名改写
+  // （Colosseum D2 的 label 变成 D1），不能无条件取 label：
+  //   - icon 带数字（D1/B1/A0）时直接当身份，避免 label 撞车；
+  //   - icon 只有字母（A/B）时再依次试 label、actor 名。
+  const icon = String(ob?.icon || '').trim();
+  if (/\d/.test(icon)) return [icon];
+  const out = [];
+  const label = String(ob?.label || '').trim();
+  if (label) out.push(label);
+  if (icon) out.push(icon);
+  const nm = String(ob?.name || '');
+  const m = nm.match(/Objective_(?:Appendix_Point|Point)?(.+)$/i);
+  if (m && m[1]) out.push(m[1].replace(/_\d+$/, ''));
+  return [...new Set(out)];
+}
+
+function regularPhaseSources() {
+  // 「全部阶段」只展示常规阶段（regular branch / normal kind）的据点，
+  // 避免常规 D 与事件 D2、余震 B1/B2 分支等互斥阶段体积叠在一起。
+  if (!phasePlan) return null;
+  const out = new Set();
+  for (const phase of phasePlan.phases || []) {
+    if (phase.kind !== 'normal') continue;
+    if (phase.branch && phase.branch !== 'regular') continue;
+    for (const o of phaseObjectives(phase)) {
+      if (o && o.src) out.add(String(o.src));
+    }
+  }
+  return out.size ? out : null;
+}
+
+function captureAnchorLabel(actorName) {
+  // capture.json 的 anchor label 是关卡原始标号（A1/D1/D2…），
+  // spawns 的 label/icon 会被阶段计划改写（Colosseum D2 的 label=D2、icon=D1 都可能撞车）。
+  for (const sector of captureData?.sectors || []) {
+    for (const anchor of sector.anchors || []) {
+      if (anchor.name === actorName && anchor.label) return String(anchor.label);
+    }
+  }
+  return null;
+}
+
 function deploymentContext() {
   return {
     THREE, scene, labelsEl: document.getElementById('labels'), heightAt, areasData,
@@ -8011,6 +8243,8 @@ function deploymentContext() {
     vehicleSerialOf, vehicleSerialFromName, vehicleSelectedSector,
     vehicleSpawnVisible, vehicleIconVisible, vehicleHighlightId,
     vehicleSpawnerVisible, vehicleSpriteCache, deployLinksVisible, mapCode: MAP,
+    addVol3dPrism, volumeRangeFor, activePhaseSrc: activePhase?._src || null,
+    regularPhaseSrc: regularPhaseSources(), regularOnly: !activePhase && stageFilter === 'all', objectivePhaseKeys, captureAnchorLabel,
   };
 }
 
@@ -8027,6 +8261,12 @@ function buildSpawnOverlay() {
   deployLabelNodes = result.labels;
   scene.add(spawnGroup);
   scene.add(vehicleOverlayGroup);
+  // 旗杆区域的棱柱高度要用 volumes3d（据点体积）的数据；没加载时先拉一次再重画。
+  if (!volumes3dData || volumes3dMap !== MAP) {
+    loadVolumes3d()
+      .then(() => { if (spawnData) buildSpawnOverlay(); })
+      .catch(() => {});
+  }
   spawnGroup.visible = spawnVisible;
   vehicleOverlayGroup.visible = spawnVisible;
   initPredictionPanel();
@@ -8085,7 +8325,7 @@ function buildSpawnOverlayLegacy() {
   for (const ob of spawnData.objectives || []) {
     const stage = objectiveStage(ob.label);
     if (!spawnStageVisible(ob.label, stage)) continue;
-    const flagV = new THREE.Vector3(ob.pos[0], ob.pos[1], ob.pos[2]);
+    const flagV = new THREE.Vector3(...flagPointOf(ob));
     // 据点旁复活点：攻方(Camp0)=绿、守方(Camp1)=红，都连向旗杆；
     // 攻方绿点为前压复活点（夺旗后可用），守方红点为初始据点部署。
     const groups = [
@@ -8098,21 +8338,22 @@ function buildSpawnOverlayLegacy() {
       if (!campVisible(camp)) continue;
       for (const p of ob.spawns?.[key] || []) putMarker(p, col, size, lift, flagV, col);
     }
-    // 最大占点倍率区：据点边界按旗杆中心缩放 10%，保留采样点的真实高度。
+    // 最大占点倍率区：据点边界按旗杆中心（flagPos）缩放 10%，保留采样点的真实高度。
     const area = areaOf(ob.label);
     if (area && (area.points || []).length >= 3) {
       const RATIO = 0.1;
       const source = area.points;
+      const center = flagPointOf(ob);
       const step = Math.max(1, Math.ceil(source.length / 48));
       const sampled = [];
       for (let i = 0; i < source.length; i += step) sampled.push(source[i]);
       if (sampled[sampled.length - 1] !== source[source.length - 1]) sampled.push(source[source.length - 1]);
       const ringPts = sampled.map((p) => {
-        const py = Number.isFinite(Number(p[1])) ? Number(p[1]) : ob.pos[1];
+        const py = Number.isFinite(Number(p[1])) ? Number(p[1]) : center[1];
         return new THREE.Vector3(
-          ob.pos[0] + (p[0] - ob.pos[0]) * RATIO,
-          ob.pos[1] + (py - ob.pos[1]) * RATIO + 1.2,
-          ob.pos[2] + (p[2] - ob.pos[2]) * RATIO,
+          center[0] + (p[0] - center[0]) * RATIO,
+          center[1] + (py - center[1]) * RATIO + 1.2,
+          center[2] + (p[2] - center[2]) * RATIO,
         );
       });
       const shape = new THREE.Shape();
@@ -8124,7 +8365,7 @@ function buildSpawnOverlayLegacy() {
       const fillPos = fillGeo.attributes.position;
       for (let k = 0; k < fillPos.count; k++) {
         const y = yByKey.get(`${Math.round(fillPos.getX(k) * 100)},${Math.round(fillPos.getZ(k) * 100)}`);
-        fillPos.setY(k, (y ?? ob.pos[1] + 1.2) + 0.15);
+        fillPos.setY(k, (y ?? center[1] + 1.2) + 0.15);
       }
       fillPos.needsUpdate = true;
       const fill = new THREE.Mesh(fillGeo, new THREE.MeshBasicMaterial({
@@ -8593,7 +8834,7 @@ function refreshSystemInfo() {
     if (el) el.textContent = value;
   };
   setText('si-mode', `${modeDisplayName()} · ${modeMapCount()} 图`);
-  setText('si-map', `${mapManifest?.mapName || MAP}（${MAP}）`);
+  setText('si-map', MAP ? `${mapManifest?.mapName || MAP}（${MAP}）` : '未选择');
   setText('si-tier', tierState.high ? '高精度' : '低精度');
   setText('si-stage', activePhase
     ? phaseButtonText(activePhase)
@@ -8660,8 +8901,10 @@ function runDebugPick(event) {
   const targets = scenePickTargets({ includeTerrain: false });
   const hits = visibleHits(raycaster.intersectObjects(targets, true));
   const el = document.getElementById('debugPick');
-  if (!hits.length) { el.hidden = true; return; }
-  const hit = hits[0];
+  // 大事件 overlay（event 资产）没有基础地图的 mesh spec，调试信息只会显示「资产: ?」，
+  // 这里直接跳过，继续看它后面的建筑/地形命中。
+  const hit = hits.find((h) => !(h.object?.isInstancedMesh && h.object.userData?.tier === 'event'));
+  if (!hit) { el.hidden = true; return; }
   const obj = hit.object;
   let text = '';
   if (obj.isInstancedMesh && obj.userData?.tier) {
@@ -12154,11 +12397,30 @@ if (earlyParams.get('probe') === '1') {
   };
 }
 
-run().catch((error) => {
-  const el = document.getElementById('loading');
-  if (el) el.textContent = '加载失败：' + error.message;
-  console.error(error);
-});
+function showMapEmptyState() {
+  const loading = document.getElementById('loading');
+  if (loading) loading.style.display = 'none';
+  const empty = document.getElementById('mapEmptyState');
+  if (empty) empty.hidden = false;
+  const hud = document.getElementById('hud');
+  if (hud) hud.textContent = '尚未选择地图：请在右侧「地图」下拉中选择。';
+  const minimap = document.getElementById('minimap');
+  if (minimap) minimap.hidden = true;
+  document.title = '三角洲行动 · 未选择地图';
+  const openRail = document.getElementById('emptyOpenRail');
+  if (openRail) openRail.addEventListener('click', () => setRailOpen(true));
+  setRailOpen(true, false);
+}
+
+if (MAP) {
+  run().catch((error) => {
+    const el = document.getElementById('loading');
+    if (el) el.textContent = '加载失败：' + error.message;
+    console.error(error);
+  });
+} else {
+  showMapEmptyState();
+}
 requestAnimationFrame(tick);
 </script>
 </body>

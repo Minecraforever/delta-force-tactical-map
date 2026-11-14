@@ -13,10 +13,10 @@ import json
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent if (HERE.parent / "发布版_2026-11-05_自动更新").is_dir() else HERE.parent.parent
-PREVIOUS = ROOT / "发布版_2026-11-12"
+PREVIOUS = ROOT / "发布版_2026-11-15"
 CURRENT = ROOT / "发布版_下一版"  # 改成已验收的新发布目录
-FROM_VERSION = "2026.11.12.1"
-TO_VERSION = "2026.11.13.1"  # 改成新版本
+FROM_VERSION = "2026.11.15.1"
+TO_VERSION = "2026.11.16.1"  # 改成新版本
 OUTPUT = ROOT / "更新附件_下一版"
 INDEX = ROOT / ".cloud_repo/updates/stable.json"
 MAX_RAW_PER_ASSET = 40 << 20

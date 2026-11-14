@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "generated": "2026-11-14",
+  "source": "每张地图的攻防 breakthrough 多边形包围盒 + 地图级 high/low padding；Skyline 暂不启用",
+  "default": {
+    "enabled": true,
+    "padding": 120,
+    "low": {
+      "enabled": false,
+      "padding": 0
+    }
+  },
+  "maps": {
+    "Collapse": {
+      "enabled": true,
+      "padding": 20,
+      "low": {
+        "enabled": true,
+        "padding": 0
+      }
+    },
+    "Colosseum": {
+      "enabled": true,
+      "padding": 0,
+      "low": {
+        "enabled": true,
+        "padding": 0
+      }
+    },
+    "Cracked": {
+      "enabled": true,
+      "padding": 80
+    },
+    "Crest": {
+      "enabled": true,
+      "padding": 90
+    },
+    "Derail": {
+      "enabled": true,
+      "padding": 140
+    },
+    "Fault": {
+      "enabled": true,
+      "padding": 140
+    },
+    "Gibraltar": {
+      "enabled": true,
+      "padding": 100
+    },
+    "Iceland": {
+      "enabled": true,
+      "padding": 200
+    },
+    "Mogadishu": {
+      "enabled": true,
+      "padding": 20,
+      "low": {
+        "enabled": true,
+        "padding": 0
+      }
+    },
+    "Monument": {
+      "enabled": true,
+      "padding": 190
+    },
+    "NavalBattle": {
+      "enabled": true,
+      "padding": 170
+    },
+    "Retrowar": {
+      "enabled": true,
+      "padding": 90
+    },
+    "Shafted": {
+      "enabled": true,
+      "padding": 100
+    },
+    "Skyline": {
+      "enabled": false,
+      "padding": 0,
+      "low": {
+        "enabled": false,
+        "padding": 0
+      }
+    }
+  }
+}

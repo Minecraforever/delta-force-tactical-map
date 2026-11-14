@@ -1,424 +1,474 @@
 {
- "schema": 1,
- "generated": "2026-11-01",
- "gameBuild": "正式服 1.101.37117.36",
- "coordNote": "center=米，web [x,y,z]=[UE X, UE Z, UE Y]/100；half=判定区半尺寸(m)，轴序同 web；yawDeg=UE Yaw，three.js 用 rotation.y=-yaw。",
- "maps": {
-  "Iceland": {
-   "name": "攀升",
-   "target": "D 区尖塔（F 点）",
-   "targetShort": "尖塔",
-   "anchor": "Objective_PointF_0",
-   "volume": {
-    "center": [
-     2337.67,
-     137.52,
-     -2416.22
-    ],
-    "half": [
-     30.0,
-     90.0,
-     40.0
-    ],
-    "yawDeg": -29.9377
-   },
-   "modes": {
-    "commander": {
-     "mapId": 601,
-     "tableRow": "Iceland_BigEvent_commander",
-     "hp": 1200,
-     "missileWeight": 300,
-     "artilleryWeight": 4,
-     "missileShots": 4,
-     "artilleryRounds": 12,
-     "missiles": [
-      300,
-      1200
-     ],
-     "source": "DamageEventTable:Iceland_BigEvent_commander",
-     "broadcasts": [
-      {
-       "atPct": 50,
-       "text": "尖塔地基受损",
-       "detail": "尖塔血量低于百分之50"
+  "schema": 1,
+  "generated": "2026-11-01",
+  "gameBuild": "正式服 1.101.37117.36",
+  "coordNote": "center=米，web [x,y,z]=[UE X, UE Z, UE Y]/100；half=判定区半尺寸(m)，轴序同 web；yawDeg=UE Yaw，three.js 用 rotation.y=-yaw。",
+  "maps": {
+    "Iceland": {
+      "name": "攀升",
+      "target": "D 区尖塔（F 点）",
+      "targetShort": "尖塔",
+      "anchor": "Objective_PointF_0",
+      "volume": {
+        "center": [
+          2337.67,
+          137.52,
+          -2416.22
+        ],
+        "half": [
+          30.0,
+          90.0,
+          40.0
+        ],
+        "yawDeg": -29.9377
       },
-      {
-       "atPct": 30,
-       "text": "尖塔结构严重受损",
-       "detail": "尖塔血量低于百分之30"
+      "modes": {
+        "commander": {
+          "mapId": 601,
+          "tableRow": "Iceland_BigEvent_commander",
+          "hp": 1200,
+          "missileWeight": 300,
+          "artilleryWeight": 4,
+          "missileShots": 4,
+          "artilleryRounds": 12,
+          "missiles": [
+            300,
+            1200
+          ],
+          "source": "DamageEventTable:Iceland_BigEvent_commander",
+          "broadcasts": [
+            {
+              "atPct": 50,
+              "text": "尖塔地基受损",
+              "detail": "尖塔血量低于百分之50"
+            },
+            {
+              "atPct": 30,
+              "text": "尖塔结构严重受损",
+              "detail": "尖塔血量低于百分之30"
+            },
+            {
+              "atPct": 0,
+              "text": "尖塔受到致命打击"
+            }
+          ]
+        },
+        "assault": {
+          "mapId": 54,
+          "tableRow": "Iceland_BigEvent",
+          "hp": 1500,
+          "missileWeight": 300,
+          "artilleryWeight": 4,
+          "missileShots": 5,
+          "artilleryRounds": 15,
+          "missiles": [
+            300,
+            1500
+          ],
+          "source": "DamageEventTable:Iceland_BigEvent",
+          "broadcasts": [
+            {
+              "atPct": 50,
+              "text": "尖塔地基受损",
+              "detail": "尖塔血量低于百分之50"
+            },
+            {
+              "atPct": 30,
+              "text": "尖塔结构严重受损",
+              "detail": "尖塔血量低于百分之30"
+            },
+            {
+              "atPct": 0,
+              "text": "尖塔受到致命打击"
+            }
+          ]
+        }
       },
-      {
-       "atPct": 0,
-       "text": "尖塔受到致命打击"
-      }
-     ]
+      "artilleryAllowed": true,
+      "artilleryShellsPerRound": 25,
+      "broadcasts": [
+        {
+          "atPct": 50,
+          "text": "尖塔地基受损",
+          "detail": "尖塔血量低于百分之50"
+        },
+        {
+          "atPct": 30,
+          "text": "尖塔结构严重受损",
+          "detail": "尖塔血量低于百分之30"
+        },
+        {
+          "atPct": 0,
+          "text": "尖塔受到致命打击"
+        }
+      ],
+      "notes": [
+        "只有进攻方能呼叫阵地支援（守方不消耗分数）。",
+        "前 2 个据点阶段不开放制导导弹。",
+        "炮兵齐射每发炮弹计 4 点，一轮 25 发≈100 点；其余三图炮兵齐射不计入大事件。",
+        "触发后：尖塔倒塌、D2 开启、背水一战，F 点移除。"
+      ],
+      "gameBroadcasts": [
+        [
+          "卫星残骸预警",
+          "全体注意：哈夫克的天网卫星正在坠毁，卫星残骸可能会掉落在攀升的各个区域，行动时务必小心！"
+        ],
+        [
+          "卫星命中尖塔（攻方）",
+          "情报显示，卫星残骸砸中了尖塔，并严重破坏了尖塔四周的设施。今天务必抓住机会，彻底摧毁尖塔！"
+        ],
+        [
+          "卫星命中尖塔（守方）",
+          "情况危急！卫星残骸砸中了尖塔，并对尖塔四周的设施造成了严重的破坏！尖塔是攀升的一切，是哈夫克重要的战略设施，不能再让敌人更进一步了！"
+        ],
+        [
+          "尖塔血量 50%",
+          "尖塔地基受损"
+        ],
+        [
+          "尖塔血量 30%",
+          "尖塔结构严重受损"
+        ],
+        [
+          "尖塔被摧毁",
+          "尖塔受到致命打击（D2 开启、背水一战）"
+        ]
+      ]
     },
-    "assault": {
-     "mapId": 54,
-     "tableRow": "Iceland_BigEvent",
-     "hp": 1500,
-     "missileWeight": 300,
-     "artilleryWeight": 4,
-     "missileShots": 5,
-     "artilleryRounds": 15,
-     "missiles": [
-      300,
-      1500
-     ],
-     "source": "DamageEventTable:Iceland_BigEvent",
-     "broadcasts": [
-      {
-       "atPct": 50,
-       "text": "尖塔地基受损",
-       "detail": "尖塔血量低于百分之50"
+    "Cracked": {
+      "name": "烬区",
+      "target": "C1 军需仓库",
+      "targetShort": "C1 仓库",
+      "anchor": "Objective_PointC1",
+      "volume": {
+        "center": [
+          1054.12,
+          -4.9,
+          -1027.06
+        ],
+        "half": [
+          11.34,
+          7.4062,
+          20.5938
+        ],
+        "yawDeg": 0.0
       },
-      {
-       "atPct": 30,
-       "text": "尖塔结构严重受损",
-       "detail": "尖塔血量低于百分之30"
+      "modes": {
+        "commander": {
+          "mapId": 602,
+          "tableRow": "Cracked_BigEvent_Commander",
+          "hp": 1200,
+          "missileWeight": 600,
+          "artilleryWeight": 0,
+          "missileShots": 2,
+          "artilleryRounds": null,
+          "missiles": [
+            600,
+            1200
+          ],
+          "source": "DamageEventTable:Cracked_BigEvent_Commander",
+          "broadcasts": [
+            {
+              "atPct": 0,
+              "text": "C1受到致命打击"
+            }
+          ]
+        },
+        "assault": {
+          "mapId": 33,
+          "tableRow": null,
+          "hp": 2,
+          "missileWeight": 1,
+          "artilleryWeight": 0,
+          "missileShots": 2,
+          "artilleryRounds": null,
+          "missiles": [
+            1,
+            2
+          ],
+          "source": "关卡实例（DamageEventTable 无 MapID 33 行）",
+          "broadcasts": [
+            {
+              "atPct": 0,
+              "text": "C1受到致命打击"
+            }
+          ]
+        }
       },
-      {
-       "atPct": 0,
-       "text": "尖塔受到致命打击"
-      }
-     ]
-    }
-   },
-   "artilleryAllowed": true,
-   "artilleryShellsPerRound": 25,
-   "broadcasts": [
-    {
-     "atPct": 50,
-     "text": "尖塔地基受损",
-     "detail": "尖塔血量低于百分之50"
+      "artilleryAllowed": false,
+      "artilleryShellsPerRound": 25,
+      "broadcasts": [
+        {
+          "atPct": 0,
+          "text": "C1受到致命打击"
+        }
+      ],
+      "notes": [
+        "只有进攻方能呼叫制导导弹（守方不消耗分数）。",
+        "判定区仅 23×41×15 m，基本要命中 C1 仓库本体；炮兵齐射不计数。",
+        "攻防模式无表行，按关卡实例 2/1 计（同样是 2 发）。",
+        "触发后：C1 仓库变废墟、C1 据点消失，仅剩 C2。"
+      ],
+      "gameBroadcasts": [
+        [
+          "C1 被摧毁",
+          "C1受到致命打击"
+        ],
+        [
+          "C1 据点状态",
+          "C1据点成为我方前线基地 / C1据点已被彻底摧毁"
+        ]
+      ]
     },
-    {
-     "atPct": 30,
-     "text": "尖塔结构严重受损",
-     "detail": "尖塔血量低于百分之30"
+    "Gibraltar": {
+      "name": "临界点",
+      "target": "C1 监控区（S3A2）",
+      "targetShort": "C1 监控区",
+      "anchor": "Objective_S3A2",
+      "volume": {
+        "center": [
+          2463.89,
+          -68.16,
+          -1750.53
+        ],
+        "half": [
+          22.6245,
+          13.9147,
+          25.7761
+        ],
+        "yawDeg": -19.7232
+      },
+      "modes": {
+        "commander": {
+          "mapId": 603,
+          "tableRow": null,
+          "hp": 1800,
+          "missileWeight": 900,
+          "artilleryWeight": 0,
+          "missileShots": 2,
+          "artilleryRounds": null,
+          "missiles": [
+            900,
+            1800
+          ],
+          "source": "关卡实例（DamageEventTable 无 MapID 603 行）",
+          "broadcasts": [
+            {
+              "atPct": 0,
+              "text": "C1受到致命打击"
+            }
+          ]
+        },
+        "assault": {
+          "mapId": 75,
+          "tableRow": "Gibraltar_BigEvent",
+          "hp": 1800,
+          "missileWeight": 900,
+          "artilleryWeight": 0,
+          "missileShots": 2,
+          "artilleryRounds": null,
+          "missiles": [
+            900,
+            1800
+          ],
+          "source": "DamageEventTable:Gibraltar_BigEvent",
+          "broadcasts": [
+            {
+              "atPct": 0,
+              "text": "C1受到致命打击"
+            }
+          ]
+        }
+      },
+      "artilleryAllowed": false,
+      "artilleryShellsPerRound": 25,
+      "broadcasts": [
+        {
+          "atPct": 0,
+          "text": "C1受到致命打击"
+        }
+      ],
+      "notes": [
+        "只有进攻方能呼叫制导导弹（守方不消耗分数）。",
+        "炮兵齐射不计数；判定区约 45×52×28 m，要落在 S3A2 仓库建筑群。",
+        "胜者为王模式无表行，按关卡实例 1800/900 计（2 发）。",
+        "触发后：C1 变废墟，占领状态重置（仍可争夺）。"
+      ],
+      "gameBroadcasts": [
+        [
+          "C1 被摧毁",
+          "C1受到致命打击"
+        ],
+        [
+          "小事件 · 巡航导弹出仓",
+          "收到，巡航导弹已出仓！预计5s后抵达。"
+        ],
+        [
+          "小事件 · 导弹来袭",
+          "侦测到在途的巡航导弹打击！寻找掩体！"
+        ]
+      ]
     },
-    {
-     "atPct": 0,
-     "text": "尖塔受到致命打击"
+    "Skyline": {
+      "name": "天际港",
+      "target": "C 区 · 巨浪",
+      "targetShort": "巨浪",
+      "anchor": "Objective_PointC3",
+      "eventType": "tsunami",
+      "area": {
+        "name": "Dday_Breakthrough_Sector_S3_Event_Area",
+        "label": "S3",
+        "stage": 4,
+        "points": [
+          [
+            654.0,
+            7.1,
+            -974.9
+          ],
+          [
+            627.5,
+            7.1,
+            -996.7
+          ],
+          [
+            751.7,
+            15.8,
+            -1148.4
+          ],
+          [
+            815.3,
+            16.7,
+            -1093.8
+          ],
+          [
+            832.7,
+            17.0,
+            -1116.1
+          ],
+          [
+            909.4,
+            16.4,
+            -1055.9
+          ],
+          [
+            925.2,
+            16.2,
+            -1043.5
+          ],
+          [
+            959.0,
+            15.9,
+            -1020.7
+          ],
+          [
+            996.1,
+            16.0,
+            -1002.7
+          ],
+          [
+            986.4,
+            15.1,
+            -976.5
+          ],
+          [
+            1013.1,
+            17.1,
+            -964.6
+          ],
+          [
+            1013.2,
+            8.1,
+            -833.1
+          ],
+          [
+            816.9,
+            7.8,
+            -833.3
+          ],
+          [
+            816.7,
+            7.8,
+            -843.9
+          ],
+          [
+            762.5,
+            7.2,
+            -844.0
+          ],
+          [
+            742.4,
+            4.1,
+            -858.7
+          ],
+          [
+            690.1,
+            7.8,
+            -800.5
+          ],
+          [
+            581.9,
+            7.3,
+            -888.8
+          ]
+        ]
+      },
+      "modes": {
+        "commander": {
+          "mapId": 616,
+          "hp": 2,
+          "missileWeight": 1,
+          "artilleryWeight": 0,
+          "missileShots": 2,
+          "artilleryRounds": null,
+          "missiles": [
+            1,
+            2
+          ],
+          "source": "C 区制导导弹成功命中 2 发；温压弹暂不计入，待实机",
+          "broadcasts": [
+            {
+              "atPct": 0,
+              "text": "巨浪大事件触发，海啸淹没城市"
+            }
+          ]
+        },
+        "assault": {
+          "mapId": 165,
+          "hp": 2,
+          "missileWeight": 1,
+          "artilleryWeight": 0,
+          "missileShots": 2,
+          "artilleryRounds": null,
+          "missiles": [
+            1,
+            2
+          ],
+          "source": "C 区制导导弹成功命中 2 发；温压弹暂不计入，待实机",
+          "broadcasts": [
+            {
+              "atPct": 0,
+              "text": "巨浪大事件触发，海啸淹没城市"
+            }
+          ]
+        }
+      },
+      "artilleryAllowed": false,
+      "artilleryShellsPerRound": 25,
+      "broadcasts": [],
+      "notes": [
+        "当前只计入制导导弹：C 区成功命中 2 发触发巨浪。",
+        "温压弹暂不计入：按用户口径，等实机测试确认后再接入。",
+        "没有额外随机：第 1 发成功不触发，第 2 发成功必触发。",
+        "触发后系统播报，海啸淹没城市；C1/C2 消失，C3 天台点出现，攻方获得约 10 分钟。",
+        "2026-11-12 热修：事件持续时间 50→130 秒。"
+      ],
+      "sources": [
+        "Dday_Breakthrough:TsunamiWaveBigEventTrigger",
+        "Dday_Breakthrough:BigEventAnchorChange",
+        "LOC_MAPS_Dday:Dday_BigEventName=巨浪"
+      ],
+      "eventDurationSec": 130,
+      "eventDurationPrevSec": 50
     }
-   ],
-   "notes": [
-    "只有进攻方能呼叫阵地支援（守方 ScoreCost=-1）。",
-    "前 2 个据点阶段不开放制导导弹（UnOpenSectors=[2]）。",
-    "炮兵齐射每发炮弹计 4 点，一轮 25 发≈100 点；其余三图炮兵齐射不计入大事件。",
-    "触发后：尖塔倒塌、D2 开启、背水一战，F 点移除。"
-   ]
-  },
-  "Cracked": {
-   "name": "烬区",
-   "target": "C1 军需仓库",
-   "targetShort": "C1 仓库",
-   "anchor": "Objective_PointC1",
-   "volume": {
-    "center": [
-     1054.12,
-     -4.9,
-     -1027.06
-    ],
-    "half": [
-     11.34,
-     7.4062,
-     20.5938
-    ],
-    "yawDeg": 0.0
-   },
-   "modes": {
-    "commander": {
-     "mapId": 602,
-     "tableRow": "Cracked_BigEvent_Commander",
-     "hp": 1200,
-     "missileWeight": 600,
-     "artilleryWeight": 0,
-     "missileShots": 2,
-     "artilleryRounds": null,
-     "missiles": [
-      600,
-      1200
-     ],
-     "source": "DamageEventTable:Cracked_BigEvent_Commander",
-     "broadcasts": [
-      {
-       "atPct": 0,
-       "text": "C1受到致命打击"
-      }
-     ]
-    },
-    "assault": {
-     "mapId": 33,
-     "tableRow": null,
-     "hp": 2,
-     "missileWeight": 1,
-     "artilleryWeight": 0,
-     "missileShots": 2,
-     "artilleryRounds": null,
-     "missiles": [
-      1,
-      2
-     ],
-     "source": "关卡实例（DamageEventTable 无 MapID 33 行）",
-     "broadcasts": [
-      {
-       "atPct": 0,
-       "text": "C1受到致命打击"
-      }
-     ]
-    }
-   },
-   "artilleryAllowed": false,
-   "artilleryShellsPerRound": 25,
-   "broadcasts": [
-    {
-     "atPct": 0,
-     "text": "C1受到致命打击"
-    }
-   ],
-   "notes": [
-    "只有进攻方能呼叫制导导弹（守方 ScoreCost=-1）。",
-    "判定区仅 23×41×15 m，基本要命中 C1 仓库本体；炮兵齐射不计数。",
-    "攻防模式（MapID 33）无表行，按关卡实例 2/1 计（同样是 2 发）。",
-    "触发后：C1 仓库变废墟、C1 据点消失，仅剩 C2。"
-   ]
-  },
-  "Gibraltar": {
-   "name": "临界点",
-   "target": "C1 监控区（S3A2）",
-   "targetShort": "C1 监控区",
-   "anchor": "Objective_S3A2",
-   "volume": {
-    "center": [
-     2463.89,
-     -68.16,
-     -1750.53
-    ],
-    "half": [
-     22.6245,
-     13.9147,
-     25.7761
-    ],
-    "yawDeg": -19.7232
-   },
-   "modes": {
-    "commander": {
-     "mapId": 603,
-     "tableRow": null,
-     "hp": 1800,
-     "missileWeight": 900,
-     "artilleryWeight": 0,
-     "missileShots": 2,
-     "artilleryRounds": null,
-     "missiles": [
-      900,
-      1800
-     ],
-     "source": "关卡实例（DamageEventTable 无 MapID 603 行）",
-     "broadcasts": [
-      {
-       "atPct": 0,
-       "text": "C1受到致命打击"
-      }
-     ]
-    },
-    "assault": {
-     "mapId": 75,
-     "tableRow": "Gibraltar_BigEvent",
-     "hp": 1800,
-     "missileWeight": 900,
-     "artilleryWeight": 0,
-     "missileShots": 2,
-     "artilleryRounds": null,
-     "missiles": [
-      900,
-      1800
-     ],
-     "source": "DamageEventTable:Gibraltar_BigEvent",
-     "broadcasts": [
-      {
-       "atPct": 0,
-       "text": "C1受到致命打击"
-      }
-     ]
-    }
-   },
-   "artilleryAllowed": false,
-   "artilleryShellsPerRound": 25,
-   "broadcasts": [
-    {
-     "atPct": 0,
-     "text": "C1受到致命打击"
-    }
-   ],
-   "notes": [
-    "只有进攻方能呼叫制导导弹（守方 ScoreCost=-1）。",
-    "炮兵齐射不计数；判定区约 45×52×28 m，要落在 S3A2 仓库建筑群。",
-    "指挥官模式（MapID 603）无表行，按关卡实例 1800/900 计（2 发）。",
-    "触发后：C1 变废墟，占领状态重置（仍可争夺）。"
-   ]
-  },
-  "Skyline": {
-   "name": "天际港",
-   "target": "C 区 · 巨浪",
-   "targetShort": "巨浪",
-   "anchor": "Objective_PointC3",
-   "eventType": "tsunami",
-   "area": {
-    "name": "Dday_Breakthrough_Sector_S3_Event_Area",
-    "label": "S3",
-    "stage": 4,
-    "points": [
-     [
-      654.0,
-      7.1,
-      -974.9
-     ],
-     [
-      627.5,
-      7.1,
-      -996.7
-     ],
-     [
-      751.7,
-      15.8,
-      -1148.4
-     ],
-     [
-      815.3,
-      16.7,
-      -1093.8
-     ],
-     [
-      832.7,
-      17.0,
-      -1116.1
-     ],
-     [
-      909.4,
-      16.4,
-      -1055.9
-     ],
-     [
-      925.2,
-      16.2,
-      -1043.5
-     ],
-     [
-      959.0,
-      15.9,
-      -1020.7
-     ],
-     [
-      996.1,
-      16.0,
-      -1002.7
-     ],
-     [
-      986.4,
-      15.1,
-      -976.5
-     ],
-     [
-      1013.1,
-      17.1,
-      -964.6
-     ],
-     [
-      1013.2,
-      8.1,
-      -833.1
-     ],
-     [
-      816.9,
-      7.8,
-      -833.3
-     ],
-     [
-      816.7,
-      7.8,
-      -843.9
-     ],
-     [
-      762.5,
-      7.2,
-      -844.0
-     ],
-     [
-      742.4,
-      4.1,
-      -858.7
-     ],
-     [
-      690.1,
-      7.8,
-      -800.5
-     ],
-     [
-      581.9,
-      7.3,
-      -888.8
-     ]
-    ]
-   },
-   "modes": {
-    "commander": {
-     "mapId": 616,
-     "hp": 2,
-     "missileWeight": 1,
-     "artilleryWeight": 0,
-     "missileShots": 2,
-     "artilleryRounds": null,
-     "missiles": [
-      1,
-      2
-     ],
-     "source": "C 区制导导弹成功命中 2 发；温压弹暂不计入，待实机",
-     "broadcasts": [
-      {
-       "atPct": 0,
-       "text": "巨浪大事件触发，海啸淹没城市"
-      }
-     ]
-    },
-    "assault": {
-     "mapId": 165,
-     "hp": 2,
-     "missileWeight": 1,
-     "artilleryWeight": 0,
-     "missileShots": 2,
-     "artilleryRounds": null,
-     "missiles": [
-      1,
-      2
-     ],
-     "source": "C 区制导导弹成功命中 2 发；温压弹暂不计入，待实机",
-     "broadcasts": [
-      {
-       "atPct": 0,
-       "text": "巨浪大事件触发，海啸淹没城市"
-      }
-     ]
-    }
-   },
-   "artilleryAllowed": false,
-   "artilleryShellsPerRound": 25,
-   "broadcasts": [],
-   "notes": [
-    "当前只计入制导导弹：C 区成功命中 2 发触发巨浪。",
-    "温压弹暂不计入：代码路径虽同为 ArtilleryShelling，但按用户口径等实机测试确认后再接入。",
-    "DamageEventTable 没有 MapID 165/616 行；BigEventTriggerProbabilitySeq=[0,2,0,0,0]，第 1 发 0 不触发、第 2 发 2.0 必触发。",
-    "触发后系统播报，海啸淹没城市；C1/C2 消失，C3 天台点出现，攻方获得约 10 分钟。",
-    "2026-11-12 热修：BigEventAnchorChange.EventDuration 50→130 秒"
-   ],
-   "sources": [
-    "Dday_Breakthrough:TsunamiWaveBigEventTrigger",
-    "Dday_Breakthrough:BigEventAnchorChange",
-    "LOC_MAPS_Dday:Dday_BigEventName=巨浪"
-   ],
-   "eventDurationSec": 130,
-   "eventDurationPrevSec": 50
   }
- }
 }

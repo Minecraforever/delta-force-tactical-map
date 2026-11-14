@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "coefficient": 1.0,
+  "source": "全部阶段 base 边界最远点 / 全部据点平均中心；radius=特征尺度×coefficient",
+  "maps": {
+    "Collapse": {
+      "center": [
+        1018.571,
+        -1031.429
+      ],
+      "radius": 453.327,
+      "coefficient": 0.8
+    },
+    "Colosseum": {
+      "center": [
+        1036.38,
+        -952.46
+      ],
+      "radius": 651.231,
+      "coefficient": 0.8
+    },
+    "Cracked": {
+      "center": [
+        960.64,
+        -941.6
+      ],
+      "radius": 440.88
+    },
+    "Crest": {
+      "center": [
+        2144.6,
+        -2025.82
+      ],
+      "radius": 494.537
+    },
+    "Derail": {
+      "center": [
+        877.683,
+        -794.25
+      ],
+      "radius": 658.619
+    },
+    "Fault": {
+      "center": [
+        2090.22,
+        -1940.44
+      ],
+      "radius": 852.759
+    },
+    "Gibraltar": {
+      "center": [
+        2506.86,
+        -1548.7
+      ],
+      "radius": 455.543
+    },
+    "Iceland": {
+      "center": [
+        2109.3,
+        -2100.529
+      ],
+      "radius": 1302.747
+    },
+    "Mogadishu": {
+      "center": [
+        992.967,
+        -1129.5
+      ],
+      "radius": 524.535,
+      "coefficient": 0.8
+    },
+    "Monument": {
+      "center": [
+        1073.229,
+        -986.157
+      ],
+      "radius": 866.884
+    },
+    "NavalBattle": {
+      "center": [
+        998.329,
+        -1108.557
+      ],
+      "radius": 935.257
+    },
+    "Retrowar": {
+      "center": [
+        1053.043,
+        -1018.871
+      ],
+      "radius": 534.064
+    },
+    "Shafted": {
+      "center": [
+        450.475,
+        -692.25
+      ],
+      "radius": 448.508
+    },
+    "Skyline": {
+      "center": [
+        943.129,
+        -790.986
+      ],
+      "radius": 1090.802,
+      "coefficient": 0.9
+    }
+  }
+}

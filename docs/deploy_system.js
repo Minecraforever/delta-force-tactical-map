@@ -8,6 +8,7 @@ export function buildDeployment(ctx) {
     vehicleMarkerColor, vehicleSerialOf, vehicleSerialFromName, vehicleSelectedSector,
     vehicleSpawnVisible, vehicleIconVisible, vehicleHighlightId,
     vehicleSpawnerVisible, vehicleSpriteCache, deployLinksVisible, mapCode,
+    addVol3dPrism, volumeRangeFor, activePhaseSrc, regularPhaseSrc, regularOnly, objectivePhaseKeys, captureAnchorLabel,
   } = ctx;
 
   const ATK = 0x2ecc71, DEF = 0xe74c3c, REBORN = 0x8fa3bf, BONUS = 0xf1c40f, VEH_LINK = 0xf0c75e;
@@ -22,8 +23,16 @@ export function buildDeployment(ctx) {
   const mk = (c, opacity = 0.95) => new THREE.MeshBasicMaterial({
     color: c, depthTest: false, transparent: true, opacity,
   });
-  const areaOf = (label) => areasData.find((a) => a.kind === 'objective' &&
-    (a.srcLabel || simpleLabel(a.label)) === label);
+  const areaOf = (target) => {
+    const keys = (target && typeof target === 'object'
+      ? [target.label, target.icon, target.name, target.displayLabel]
+      : [target]).filter(Boolean).map(String);
+    const norm = (s) => String(s || '').replace(/[^0-9A-Za-z]/g, '').toUpperCase();
+    return areasData.find((a) => a.kind === 'objective'
+      && keys.includes(String(a.srcLabel || simpleLabel(a.label)))) ||
+      areasData.find((a) => a.kind === 'objective'
+        && keys.some((k) => norm(k) === norm(a.srcLabel || simpleLabel(a.label))));
+  };
   const putMarker = (p, col, size, lift, option, linkColor) => {
     const gy = p[1];
     const y = gy + lift;
@@ -45,9 +54,18 @@ export function buildDeployment(ctx) {
 
   // ---- 步兵部署：据点内外复活点 ----
   for (const ob of spawnData?.objectives || []) {
+    // 阶段计划激活时只画该阶段的点；「全部阶段」只画常规阶段的点，
+    // 避免常规 D 与事件 D2、余震 B1/B2 分支等互斥阶段的旗杆区叠在一起。
+    // 优先用 capture.json 的 anchor label 作身份；spawns 的 label/icon 会被阶段计划改写（D2→D1），不能直接信。
+    const anchorLabel = captureAnchorLabel ? captureAnchorLabel(ob.name) : null;
+    const phaseKeys = anchorLabel ? [anchorLabel]
+      : (objectivePhaseKeys ? objectivePhaseKeys(ob) : [String(ob.icon || ob.label)]);
+    if (activePhaseSrc && !phaseKeys.some((k) => activePhaseSrc.has(k))) continue;
+    if (!activePhaseSrc && regularOnly && regularPhaseSrc && !phaseKeys.some((k) => regularPhaseSrc.has(k))) continue;
     const stage = objectiveStage(ob.label);
     if (!spawnStageVisible(ob.label, stage)) continue;
-    const flagV = new THREE.Vector3(ob.pos[0], ob.pos[1], ob.pos[2]);
+    const flag = ob.flagPos || ob.pos;
+    const flagV = new THREE.Vector3(flag[0], flag[1], flag[2]);
     const groups = [
       ['Camp0InnerSpawnAreas', ATK, 3.4, 6, 'attack'],
       ['Camp0OuterSpawnAreas', ATK, 2.0, 6, 'attack'],
@@ -58,50 +76,30 @@ export function buildDeployment(ctx) {
       if (!campVisible(camp)) continue;
       for (const p of ob.spawns?.[key] || []) putMarker(p, col, size, lift, flagV, col);
     }
-    const area = areaOf(ob.label);
+    const area = areaOf(ob);
     if (area && (area.points || []).length >= 3) {
-      // 最大占点倍率区：将据点边界按旗杆中心缩放 10%，保留边界采样点的真实高度。
+      // 最大占点倍率区：旗杆中心（flagPos）缩放 10%，用「据点体积」同款棱柱显示；
+      // 高度与该据点体积一致：volumes3d.zRange[0] 为底、heightM 为高（缺数据用 DetectHeight）。
       const RATIO = 0.1;
       const source = area.points;
       const step = Math.max(1, Math.ceil(source.length / 48));
       const sampled = [];
       for (let i = 0; i < source.length; i += step) sampled.push(source[i]);
       if (sampled[sampled.length - 1] !== source[source.length - 1]) sampled.push(source[source.length - 1]);
-      const ringPts = sampled.map((p) => {
-        const py = Number.isFinite(Number(p[1])) ? Number(p[1]) : ob.pos[1];
-        return new THREE.Vector3(
-          ob.pos[0] + (p[0] - ob.pos[0]) * RATIO,
-          ob.pos[1] + (py - ob.pos[1]) * RATIO + 1.2,
-          ob.pos[2] + (p[2] - ob.pos[2]) * RATIO,
+      const ringPts = sampled.map((p) => new THREE.Vector3(
+        flag[0] + (p[0] - flag[0]) * RATIO,
+        0,
+        flag[2] + (p[2] - flag[2]) * RATIO,
+      ));
+      const range = volumeRangeFor ? volumeRangeFor(ob) : null;
+      const bottomY = range ? range.bottomY : flag[1];
+      const topY = range ? range.topY : flag[1] + Math.max((Number(ob.detectHeight) || 0) / 100, 0.25);
+      if (addVol3dPrism && ringPts.length >= 3) {
+        const prism = addVol3dPrism(
+          ringPts.map((p) => [p.x, 0, p.z]), bottomY, topY, BONUS,
         );
-      });
-      // 半透明填充：小区域在远景下也能看见范围
-      const shape = new THREE.Shape();
-      ringPts.forEach((p, i) => (i ? shape.lineTo(p.x, -p.z) : shape.moveTo(p.x, -p.z)));
-      const fillGeo = new THREE.ShapeGeometry(shape);
-      fillGeo.rotateX(-Math.PI / 2);
-      const yByKey = new Map(ringPts.map((p) =>
-        [`${Math.round(p.x * 100)},${Math.round(p.z * 100)}`, p.y]));
-      const fillPos = fillGeo.attributes.position;
-      for (let k = 0; k < fillPos.count; k++) {
-        const y = yByKey.get(`${Math.round(fillPos.getX(k) * 100)},${Math.round(fillPos.getZ(k) * 100)}`);
-        fillPos.setY(k, (y ?? ob.pos[1] + 1.2) + 0.15);
+        if (prism) spawnGroup.add(prism);
       }
-      fillPos.needsUpdate = true;
-      const fill = new THREE.Mesh(fillGeo, new THREE.MeshBasicMaterial({
-        color: BONUS, depthTest: false, transparent: true, opacity: 0.18,
-        side: THREE.DoubleSide, depthWrite: false,
-      }));
-      fill.renderOrder = 21;
-      spawnGroup.add(fill);
-      // 粗边界：LineBasicMaterial 的 linewidth 在多数浏览器无效，用 Tube 代替
-      const curve = new THREE.CatmullRomCurve3(ringPts, true);
-      const tube = new THREE.TubeGeometry(curve, Math.max(32, ringPts.length * 2), 0.75, 6, true);
-      const outline = new THREE.Mesh(tube, new THREE.MeshBasicMaterial({
-        color: BONUS, depthTest: false, transparent: true, opacity: 0.98,
-      }));
-      outline.renderOrder = 23;
-      spawnGroup.add(outline);
     }
     if ((ob.reborn || []).length >= 3) {
       const pts = ob.reborn.concat([ob.reborn[0]])

@@ -151,7 +151,7 @@ export function createFieldSupport(options) {
     return mesh;
   }
 
-  function addSphereSilhouette(radius, color, opacity, visibleAt = 0) {
+  function addSphereSilhouette(radius, color, opacity, visibleAt = 0, yOffset = 0) {
     const size = 256;
     const canvas = document.createElement('canvas');
     canvas.width = size;
@@ -169,41 +169,43 @@ export function createFieldSupport(options) {
     });
     const sprite = new THREE.Sprite(material);
     sprite.scale.set(radius * 2, radius * 2, 1);
+    sprite.position.y = yOffset;
     sprite.renderOrder = 59;
     group.add(sprite);
     objects.rings.push({ mesh: sprite, visibleAt });
   }
 
   /* 半透明球壳 + 屏幕轮廓环：球体有体积感，边界是清楚的一圈，不再是细网。 */
-  function addSphereVolume(radius, color, opacity, silhouetteOpacity, visibleAt = 0) {
+  function addSphereVolume(radius, color, opacity, silhouetteOpacity, visibleAt = 0, yOffset = 0) {
     const shell = new THREE.Mesh(
       new THREE.SphereGeometry(radius, 32, 20),
       new THREE.MeshBasicMaterial({
         color, transparent: true, opacity, depthTest: false, depthWrite: false, side: THREE.FrontSide,
       }),
     );
+    shell.position.y = yOffset;
     shell.renderOrder = 57;
     group.add(shell);
     objects.rings.push({ mesh: shell, visibleAt });
-    addSphereSilhouette(radius, color, silhouetteOpacity, visibleAt);
+    addSphereSilhouette(radius, color, silhouetteOpacity, visibleAt, yOffset);
   }
 
-  function addHeightRuler(radius, color, visibleAt = 0) {
+  function addHeightRuler(radius, color, visibleAt = 0, yOffset = 0) {
     const line = new THREE.Mesh(
       new THREE.CylinderGeometry(0.22, 0.22, radius * 2, 6),
       makeBasicMaterial(color, 0.5),
     );
-    line.position.y = 0;
+    line.position.y = yOffset;
     line.renderOrder = 59;
     group.add(line);
     objects.rings.push({ mesh: line, visibleAt });
-    for (const y of [radius, -radius]) {
+    for (const dy of [radius, -radius]) {
       const ring = new THREE.Mesh(
         new THREE.RingGeometry(1.2, 2.0, 32),
         makeBasicMaterial(color, 0.8),
       );
       ring.rotation.x = -Math.PI / 2;
-      ring.position.y = y;
+      ring.position.y = yOffset + dy;
       ring.renderOrder = 60;
       group.add(ring);
       objects.rings.push({ mesh: ring, visibleAt });
@@ -611,22 +613,22 @@ export function createFieldSupport(options) {
         addHeightRuler(blast.radius, 0xffb347, impactAt);
       } else if (skill.kind === 'thermobaric') {
         const killRadius = radiusForDamage(blast, 100);
-        // 温压弹：制导导弹式 3D 伤害球，但球心在钻地目标（地面/屋顶之下），
-        // 并画出从地表到目标的钻地通道；制导导弹仍以可见表面为球心。
-        const surfaceY = typeof surfaceHeightAt === 'function'
+        // 温压弹打的是用户点选的精确目标点（可在地面、侧面、低处），
+        // 不是地面；若目标点低于其上方最表面，显示从上表面钻到目标点的通道。
+        const topY = typeof surfaceHeightAt === 'function'
           ? surfaceHeightAt(cx, cz) : heightAt(cx, cz);
-        const drillDepth = Number.isFinite(surfaceY) ? Math.max(0, surfaceY - cy) : 0;
-        if (drillDepth > 0.2) {
+        const entryY = Number.isFinite(topY) ? Math.max(0, topY - cy) : 0;
+        if (entryY > 0.2) {
           const shaft = new THREE.Mesh(
-            new THREE.CylinderGeometry(1.15, 0.7, drillDepth, 18, 1, true),
-            makeBasicMaterial(0xff4d2e, 0.52),
+            new THREE.CylinderGeometry(1.15, 0.7, entryY, 18, 1, true),
+            makeBasicMaterial(0xff4d2e, 0.42),
           );
-          shaft.position.y = drillDepth / 2;
+          shaft.position.y = entryY / 2;
           shaft.renderOrder = 54;
           group.add(shaft);
           objects.rings.push({ mesh: shaft, visibleAt: impactAt });
-          addRing(2.6, 0.5, 0xffb347, 0.95, drillDepth, impactAt);
-          addRing(1.25, 0.35, 0xff6b45, 1.0, drillDepth + 0.12, impactAt);
+          addRing(2.6, 0.5, 0xffb347, 0.95, entryY, impactAt);
+          addRing(1.25, 0.35, 0xff6b45, 1.0, entryY + 0.12, impactAt);
         }
         addSphereVolume(blast.radius, 0xff4d2e, 0.10, 0.95, impactAt);
         addRing(blast.radius, 0.8, 0xff5a45, 0.95, 0.32, impactAt);
@@ -638,7 +640,7 @@ export function createFieldSupport(options) {
           addSphereVolume(killRadius, 0xffd166, 0.12, 0.95, impactAt);
           addRing(killRadius, 0.5, 0xffd166, 0.98, 0.38, impactAt);
         }
-        // 钻地目标核心点，保证在全图缩放下也能看见
+        // 精确目标点核心
         const core = new THREE.Mesh(
           new THREE.SphereGeometry(1.15, 16, 12),
           makeBasicMaterial(0xffe08a, 0.95),
@@ -654,7 +656,7 @@ export function createFieldSupport(options) {
       const dot = skill.special?.dotRadius || 0;
       const delay = skill.special?.dotDelay || 0;
       if (dot) {
-        // 持续燃烧区也画成 3D 体积球，而不是平面圆
+        // 持续燃烧区与精确目标同球心
         addSphereVolume(dot, 0xff7a2f, 0.018, 0.32, impactTimes[0] + delay);
         addRing(dot, 0.7, 0xffa040, 0.65, 0.3, impactTimes[0] + delay);
       }
@@ -1294,12 +1296,13 @@ export function createFieldSupport(options) {
   function placeAt(point) {
     if (!point) return false;
     const skill = skills[state.skill];
-    // 制导导弹/空投载具以可见表面为命中面；温压弹钻地，目标取地面高度（可位于屋顶之下）。
-    const drill = skill?.kind === 'thermobaric';
-    const baseY = drill
-      ? heightAt(point.x, point.z)
-      : (Number.isFinite(point.y) ? point.y : heightAt(point.x, point.z));
-    const y = baseY + 0.25;
+    // 温压弹：打“点哪里就是哪里”的精确目标点。
+    // 制导导弹/空投载具：只打该 X/Z 的最上方可见表面，不按点击到的侧面/低处算。
+    const exactTarget = skill?.id === 'thermobaric';
+    const topY = typeof surfaceHeightAt === 'function'
+      ? surfaceHeightAt(point.x, point.z)
+      : heightAt(point.x, point.z);
+    const y = ((exactTarget && Number.isFinite(point.y)) ? point.y : topY) + 0.25;
     state.center = new THREE.Vector3(point.x, y, point.z);
     state.placing = false;
     state.staticView = true;

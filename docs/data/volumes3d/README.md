@@ -2,7 +2,7 @@
 
 > 源版本：**1.101.37119.18**（正式服 2026-11-05 全量包）
 > 生成：`_dev_tools/build_volumes3d.py`（无 argparse，VS Code 直接运行）
-> 生成时间：2026-11-12T00:16:52+08:00
+> 生成时间：2026-11-14T02:36:26+08:00
 > **不改现有 `web/map/<Map>/manifest.json`，不改默认地图外观。**
 > **已归档：Suez（赛季轮换，2026-11-09 移出活跃站点；见 `_backup/suez_archived_20261109/`）。**
 
@@ -101,9 +101,10 @@
 ## 6. 网页实验层
 
 - 入口：`web/map.html` 左侧“攻防阶段”第二行“**据点体积**”（正式功能，与边界投射同组）。
-- **默认关闭**；仅胜者为王/攻防显示；`?vol3d=1` 可用于本地截图/测试。
+- **默认关闭**；胜者为王/攻防/占领显示，TDM 禁用；`?vol3d=1` 可用于本地截图/测试。
 - 2026-11-11 起只绘制**当前阶段据点**的原始轮廓点序（仅去重 <0.35m，洋红 LineLoop 线框）、`DetectHeight` 高度带和每个原始点的上/下定点；交战区/基地/静态体积不再进入此层。
 - 打开后加载 `web/data/volumes3d/<Map>.json`，只绘制 `subtype=objective` 且属于当前 `stageFilter` 的据点。
+- 占领模式不读该文件，改从 `web/map/<Map>/capture_conquest.json` 的 `objectives` 读取 6 个旗点，`detectHeight` 作为高度带；攻防/胜者为王仍读 `volumes3d/<Map>.json`。
 - 底部 spline 中间点不画；开启体积时隐藏原地图据点虚线边界，避免叠线。
 - 交战区/基地/`valid_area`/`forbidden_area`/`redeploy_forbidden` 不再进入此层。
 - `static_verified_manifest_mismatch` 不画，只在图例/状态里提示。
